@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import {
   Box,
   Button,
+  IconButton,
   Checkbox,
   FormControl,
   FormLabel,
@@ -11,8 +12,10 @@ import {
   Stack,
   Link,
   Flex,
+  InputGroup,
+  InputRightElement,
 } from "@chakra-ui/react";
-import { ArrowForwardIcon } from "@chakra-ui/icons";
+import { ArrowForwardIcon, ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 
 const VARIANT_COLOR = "teal";
 
@@ -44,7 +47,6 @@ LoginArea.propTypes = {
   onLogin: PropTypes.func.isRequired,
 };
 
-
 const LoginHeader = () => {
   return (
     <Box textAlign="center">
@@ -53,10 +55,12 @@ const LoginHeader = () => {
   );
 };
 
-const LoginForm = ({ onLogin}) => {
+const LoginForm = ({ onLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [passwordShow, setPasswordShow] = useState(false);
+  const handlePasswordShow = () => setPasswordShow(!passwordShow);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -81,13 +85,25 @@ const LoginForm = ({ onLogin}) => {
         </FormControl>
         <FormControl mt={4}>
           <FormLabel>Password:</FormLabel>
-          <Input
-            type="password"
-            placeholder="Enter your Password"
-            name="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-          />
+          <InputGroup>
+            <Input
+              type={passwordShow ? "text" : "password"}
+              placeholder="Enter your Password"
+              name="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+            />
+            <InputRightElement width="4.5rem">
+              <IconButton
+                variant="unstyled"
+                colorScheme="teal"
+                size="md"
+                aria-label={passwordShow ? "Hide Password" : "Show Password"}
+                onClick={handlePasswordShow}
+                icon={passwordShow ? <ViewOffIcon /> : <ViewIcon />}
+              />
+            </InputRightElement>
+          </InputGroup>
         </FormControl>
         <Stack isInline justifyContent="space-between" mt={4}>
           <Box>

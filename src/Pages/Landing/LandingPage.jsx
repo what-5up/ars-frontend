@@ -10,7 +10,7 @@ import Footer from "../../Components/Footer/Footer";
 import LandingHeader from "../../Containers/Landing/LandingHeader";
 import LandingHomeContent from "../../Containers/Landing/LandingHomeContent";
 import LandingRegisterContent from "../../Containers/Landing/LandingRegisterContent";
-import Emplooyees from "../../Containers/Employees/Employees";
+import FlightCard from "../../Components/Cards/FlightCard";
 
 export default function LandingPage() {
   return (
@@ -36,7 +36,7 @@ const Content = () => {
     <animated.div key={key} style={props}>
       <Switch location={item}>
         <Route path={`/discover`}>
-          <Emplooyees/>
+          <FlightCard/>
         </Route>
         <Route path={`/contact-us`}>
           <LandingHomeContent />

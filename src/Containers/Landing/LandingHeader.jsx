@@ -42,7 +42,10 @@ const LandingHeader = () => {
       // position="fixed"
       // top="0"
       mb={4}
-      bg={colorMode === "light" ? "white" : "rgba(0, 0, 40)"}
+      borderBottomRadius="2rem"
+      bgGradient={
+        colorMode === "light" ? "linear(to-r, #7928CA, #9883a8)"  : "linear(to-l, #382859, #3d4e69)"
+      }
     >
       <Box width="full" boxShadow="lg" borderBottomRadius="2rem">
         <Stack isInline justifyContent="space-between" px={8}>
@@ -130,7 +133,10 @@ const MenuItems = (props) => {
 };
 const Menu = ({ direction }) => {
   return (
-    <Stack direction={direction} divider={<StackDivider borderColor="gray.200" />}>
+    <Stack
+      direction={direction}
+      divider={<StackDivider borderColor="gray.200" />}
+    >
       <MenuItems to="/">Home</MenuItems>
       <MenuItems to="/discover">Discover </MenuItems>
       <MenuItems to="/contact-us">Contact Us </MenuItems>
@@ -194,7 +200,7 @@ const SignInArea = ({ withAvatar }) => {
   );
 };
 
-const MenuDrawer=()=> {
+const MenuDrawer = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef();
 
@@ -234,6 +240,6 @@ const MenuDrawer=()=> {
       </Drawer>
     </>
   );
-}
+};
 
 export default LandingHeader;
