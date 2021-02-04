@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import { React, useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import {
   Box,
@@ -16,6 +16,9 @@ import {
   InputRightElement,
 } from "@chakra-ui/react";
 import { ArrowForwardIcon, ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import { connect, useSelector, useDispatch } from 'react-redux';
+import { Redirect } from 'react-router-dom';
+import * as actions from '../../store/actions/index';
 
 const VARIANT_COLOR = "teal";
 
@@ -61,17 +64,24 @@ const LoginForm = ({ onLogin }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [passwordShow, setPasswordShow] = useState(false);
   const handlePasswordShow = () => setPasswordShow(!passwordShow);
+  const isAuthenticated = useSelector(state => state.auth.token !== null);
+  const authRedirectPath = useSelector(state => state.auth.authRedirectPath);
+  const isLoading = useSelector(state => state.auth.loading);
+  const dispatch = useDispatch()
+  const onAuth = useCallback(
+    (email, password, onLogin) => dispatch( actions.auth( email, password, onLogin )),
+    [dispatch]
+  )
+
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      onLogin();
-    }, 3000);
+    setIsSubmitting(isLoading);
+    onAuth( email, password, onLogin );
   };
   return (
     <Box my={8} textAlign="center">
+      {isAuthenticated} ? <Redirect to={authRedirectPath}/>
       <form onSubmit={handleSubmit}>
         <FormControl>
           <FormLabel>Email Address:</FormLabel>
@@ -135,4 +145,4 @@ LoginForm.propTypes = {
   onLogin: PropTypes.func.isRequired,
 };
 
-export default LoginArea;
+export default connect(null, null)( LoginArea );

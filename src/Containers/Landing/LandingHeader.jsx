@@ -31,11 +31,13 @@ import {
 } from "@chakra-ui/react";
 import { HamburgerIcon } from "@chakra-ui/icons";
 import Media from "react-media";
+import { connect, useSelector } from 'react-redux';
 import ThemeSelector from "../../Components/ThemeSelector/ThemeSelector";
 import LoginArea from "../../Components/Forms/LoginArea";
 
 const LandingHeader = () => {
   const { colorMode, _ } = useColorMode();
+  const isAuthenticated = useSelector(state => state.auth.token !== null);
   return (
     <Flex
       width="full"
@@ -70,7 +72,7 @@ const LandingHeader = () => {
                     align="center"
                   >
                     <Menu direction={"row"} />
-                    <SignInArea withAvatar={true} />
+                    <SignInArea withAvatar={true} isAuthenticated = {isAuthenticated} />
                     <ThemeSelector />
                   </Stack>
                 )}
@@ -164,7 +166,7 @@ const SigninButton = ({ onOpen }) => {
   );
 };
 
-const SignInArea = ({ withAvatar }) => {
+const SignInArea = ({ withAvatar, isAuthenticated }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
@@ -172,13 +174,13 @@ const SignInArea = ({ withAvatar }) => {
         <WrapItem>
           <Avatar
             size="sm"
-            onClick={onOpen}
+            onClick={() => console.log(!isAuthenticated ? onOpen : null)}
             cursor="pointer"
             display={withAvatar ? "block" : "none"}
           />
         </WrapItem>
       </Wrap>
-      <SigninButton onOpen={onOpen} />
+      <SigninButton onOpen={!isAuthenticated ? onOpen : null} />
       <Modal
         closeOnOverlayClick={false}
         isOpen={isOpen}
@@ -192,7 +194,7 @@ const SignInArea = ({ withAvatar }) => {
         <ModalContent>
           <ModalCloseButton />
           <ModalBody>
-            <LoginArea onLogin={() => console.log("Logged in")} />
+            <LoginArea onLogin={onClose} />
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -242,4 +244,4 @@ const MenuDrawer = () => {
   );
 };
 
-export default LandingHeader;
+export default connect(null, null)( LandingHeader );
