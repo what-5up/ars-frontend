@@ -10,6 +10,7 @@ import {
   Heading,
   Input,
   Stack,
+  Text,
   Link,
   Flex,
   InputGroup,
@@ -64,25 +65,25 @@ const LoginForm = ({ onLogin }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [passwordShow, setPasswordShow] = useState(false);
   const handlePasswordShow = () => setPasswordShow(!passwordShow);
-  const isAuthenticated = useSelector(state => state.auth.token !== null);
-  const authRedirectPath = useSelector(state => state.auth.authRedirectPath);
+  const error = useSelector(state => state.auth.error)
   const isLoading = useSelector(state => state.auth.loading);
   const dispatch = useDispatch()
   const onAuth = useCallback(
-    (email, password, onLogin) => dispatch( actions.auth( email, password, onLogin )),
+    (email, password, onLogin) => dispatch(actions.auth(email, password, onLogin)),
     [dispatch]
   )
 
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setIsSubmitting(isLoading);
-    onAuth( email, password, onLogin );
+    onAuth(email, password, onLogin);
   };
   return (
     <Box my={8} textAlign="center">
-      {isAuthenticated} ? <Redirect to={authRedirectPath}/>
       <form onSubmit={handleSubmit}>
+        <Text fontSize="16px" color="tomato">
+          {error}
+        </Text>
         <FormControl>
           <FormLabel>Email Address:</FormLabel>
           <Input
@@ -131,7 +132,7 @@ const LoginForm = ({ onLogin }) => {
           rightIcon={<ArrowForwardIcon />}
           width="full"
           mt={4}
-          isLoading={isSubmitting}
+          isLoading={isLoading}
           loadingText="Signinig in"
         >
           Sign In
@@ -145,4 +146,4 @@ LoginForm.propTypes = {
   onLogin: PropTypes.func.isRequired,
 };
 
-export default connect(null, null)( LoginArea );
+export default connect(null, null)(LoginArea);

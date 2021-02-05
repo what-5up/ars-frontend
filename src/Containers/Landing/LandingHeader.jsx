@@ -62,8 +62,8 @@ const LandingHeader = () => {
           >
             {(matches) => (
               <>
-                {matches.small && <MenuDrawer />}
-                {matches.medium && <MenuDrawer />}
+                {matches.small && <MenuDrawer isAuthenticated = {isAuthenticated} />}
+                {matches.medium && <MenuDrawer isAuthenticated = {isAuthenticated} />}
                 {matches.large && (
                   <Stack
                     isInline
@@ -71,8 +71,8 @@ const LandingHeader = () => {
                     mt={4}
                     align="center"
                   >
-                    <Menu direction={"row"} />
-                    <SignInArea withAvatar={true} isAuthenticated = {isAuthenticated} />
+                    <Menu direction={"row"} isAuthenticated = {isAuthenticated}/>
+                    {!isAuthenticated ? <SignInArea withAvatar={true} isAuthenticated = {isAuthenticated} /> : null}
                     <ThemeSelector />
                   </Stack>
                 )}
@@ -133,7 +133,7 @@ const MenuItems = (props) => {
     </Text>
   );
 };
-const Menu = ({ direction }) => {
+const Menu = ({ direction, isAuthenticated }) => {
   return (
     <Stack
       direction={direction}
@@ -142,9 +142,14 @@ const Menu = ({ direction }) => {
       <MenuItems to="/">Home</MenuItems>
       <MenuItems to="/discover">Discover </MenuItems>
       <MenuItems to="/contact-us">Contact Us </MenuItems>
+      {!isAuthenticated ? 
       <MenuItems to="/register" isLast>
         Register
+      </MenuItems> : 
+      <MenuItems to="/signout" isLast>
+        Sign Out
       </MenuItems>
+      }
     </Stack>
   );
 };
@@ -202,7 +207,7 @@ const SignInArea = ({ withAvatar, isAuthenticated }) => {
   );
 };
 
-const MenuDrawer = () => {
+const MenuDrawer = ( {isAuthenticated} ) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef();
 
@@ -232,8 +237,8 @@ const MenuDrawer = () => {
             </DrawerHeader>
 
             <DrawerBody>
-              <Menu direction={"column"} />
-              <SignInArea withAvatar={false} />
+               <Menu direction={"column"} isAuthenticated = {isAuthenticated}/>
+              {!isAuthenticated ? <SignInArea withAvatar={false} /> : null}
             </DrawerBody>
 
             <DrawerFooter></DrawerFooter>
