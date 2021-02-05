@@ -179,7 +179,7 @@ const SignInArea = ({ withAvatar, isAuthenticated }) => {
         <WrapItem>
           <Avatar
             size="sm"
-            onClick={() => console.log(!isAuthenticated ? onOpen : null)}
+            onClick={!isAuthenticated ? onOpen : null}
             cursor="pointer"
             display={withAvatar ? "block" : "none"}
           />
