@@ -11,7 +11,7 @@ import LandingHeader from "../../Containers/Landing/LandingHeader";
 import LandingHomeContent from "../../Containers/Landing/LandingHomeContent";
 import LandingRegisterContent from "../../Containers/Landing/LandingRegisterContent";
 import FlightCard from "../../Components/Cards/FlightCard";
-import Logout from '../../Containers/Routes/Logout';
+import Signout from '../../Containers/Routes/Signout';
 
 export default function LandingPage() {
   return (
@@ -45,10 +45,10 @@ const Content = () => {
         <Route path={`/register`}>
           <LandingRegisterContent />
         </Route>
+        <Route path="/signout" component={Signout} />
         <Route path="/">
           <LandingHomeContent />
         </Route>
-        <Route path="/logout" component={Logout} />
       </Switch>
     </animated.div>
   ));
