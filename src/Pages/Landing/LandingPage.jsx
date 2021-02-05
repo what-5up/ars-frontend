@@ -1,12 +1,17 @@
-import React from 'react';
-import { BrowserRouter as Router, Switch, Route, useLocation } from 'react-router-dom';
-import { useTransition, animated } from 'react-spring';
-import Footer from '../../Components/Footer/Footer';
-import LandingHeader from '../../Containers/Landing/LandingHeader';
-import LandingHomeContent from '../../Containers/Landing/LandingHomeContent';
-import LandingRegisterContent from '../../Containers/Landing/LandingRegisterContent';
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  useLocation,
+} from "react-router-dom";
+import { useTransition,animated } from "react-spring";
+import Footer from "../../Components/Footer/Footer";
+import LandingHeader from "../../Containers/Landing/LandingHeader";
+import LandingHomeContent from "../../Containers/Landing/LandingHomeContent";
+import LandingRegisterContent from "../../Containers/Landing/LandingRegisterContent";
+import Signout from '../../Containers/Routes/Signout';
 import DiscoverFlights from '../../Containers/DiscoverFlights/DiscoverFlights';
-import { Box, Flex, Input, Center, Button, Text, FormLabel, UnorderedList, ListItem } from '@chakra-ui/react';
 
 export default function LandingPage() {
 	return (
@@ -40,6 +45,7 @@ const Content = () => {
 				<Route path={`/register`}>
 					<LandingRegisterContent />
 				</Route>
+				<Route path="/signout" component={Signout} />
 				<Route path="/">
 					<LandingHomeContent />
 				</Route>

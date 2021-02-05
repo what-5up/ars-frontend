@@ -31,11 +31,13 @@ import {
 } from "@chakra-ui/react";
 import { HamburgerIcon } from "@chakra-ui/icons";
 import Media from "react-media";
+import { connect, useSelector } from 'react-redux';
 import ThemeSelector from "../../Components/ThemeSelector/ThemeSelector";
 import LoginArea from "../../Components/Forms/LoginArea";
 
 const LandingHeader = () => {
   const { colorMode, _ } = useColorMode();
+  const isAuthenticated = useSelector(state => state.auth.token !== null);
   return (
     <Flex
       width="full"
@@ -60,8 +62,8 @@ const LandingHeader = () => {
           >
             {(matches) => (
               <>
-                {matches.small && <MenuDrawer />}
-                {matches.medium && <MenuDrawer />}
+                {matches.small && <MenuDrawer isAuthenticated = {isAuthenticated} />}
+                {matches.medium && <MenuDrawer isAuthenticated = {isAuthenticated} />}
                 {matches.large && (
                   <Stack
                     isInline
@@ -69,8 +71,8 @@ const LandingHeader = () => {
                     mt={4}
                     align="center"
                   >
-                    <Menu direction={"row"} />
-                    <SignInArea withAvatar={true} />
+                    <Menu direction={"row"} isAuthenticated = {isAuthenticated}/>
+                    {!isAuthenticated ? <SignInArea withAvatar={true} isAuthenticated = {isAuthenticated} /> : null}
                     <ThemeSelector />
                   </Stack>
                 )}
@@ -131,7 +133,7 @@ const MenuItems = (props) => {
     </Text>
   );
 };
-const Menu = ({ direction }) => {
+const Menu = ({ direction, isAuthenticated }) => {
   return (
     <Stack
       direction={direction}
@@ -140,9 +142,14 @@ const Menu = ({ direction }) => {
       <MenuItems to="/">Home</MenuItems>
       <MenuItems to="/discover">Discover </MenuItems>
       <MenuItems to="/contact-us">Contact Us </MenuItems>
+      {!isAuthenticated ? 
       <MenuItems to="/register" isLast>
         Register
+      </MenuItems> : 
+      <MenuItems to="/signout" isLast>
+        Sign Out
       </MenuItems>
+      }
     </Stack>
   );
 };
@@ -164,7 +171,7 @@ const SigninButton = ({ onOpen }) => {
   );
 };
 
-const SignInArea = ({ withAvatar }) => {
+const SignInArea = ({ withAvatar, isAuthenticated }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
@@ -172,13 +179,13 @@ const SignInArea = ({ withAvatar }) => {
         <WrapItem>
           <Avatar
             size="sm"
-            onClick={onOpen}
+            onClick={!isAuthenticated ? onOpen : null}
             cursor="pointer"
             display={withAvatar ? "block" : "none"}
           />
         </WrapItem>
       </Wrap>
-      <SigninButton onOpen={onOpen} />
+      <SigninButton onOpen={!isAuthenticated ? onOpen : null} />
       <Modal
         closeOnOverlayClick={false}
         isOpen={isOpen}
@@ -192,7 +199,7 @@ const SignInArea = ({ withAvatar }) => {
         <ModalContent>
           <ModalCloseButton />
           <ModalBody>
-            <LoginArea onLogin={() => console.log("Logged in")} />
+            <LoginArea onLogin={onClose} />
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -200,7 +207,7 @@ const SignInArea = ({ withAvatar }) => {
   );
 };
 
-const MenuDrawer = () => {
+const MenuDrawer = ( {isAuthenticated} ) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef();
 
@@ -230,8 +237,8 @@ const MenuDrawer = () => {
             </DrawerHeader>
 
             <DrawerBody>
-              <Menu direction={"column"} />
-              <SignInArea withAvatar={false} />
+               <Menu direction={"column"} isAuthenticated = {isAuthenticated}/>
+              {!isAuthenticated ? <SignInArea withAvatar={false} /> : null}
             </DrawerBody>
 
             <DrawerFooter></DrawerFooter>
@@ -242,4 +249,4 @@ const MenuDrawer = () => {
   );
 };
 
-export default LandingHeader;
+export default connect(null, null)( LandingHeader );

@@ -1,16 +1,23 @@
-import React from "react";
-import { BrowserRouter, Switch, Route } from "react-router-dom";
+import React, { useEffect, useCallback } from "react";
+import { Switch, Route } from "react-router-dom";
 import LandingPage from "./Landing/LandingPage";
+import { connect, useDispatch } from 'react-redux';
+import * as actions from '../store/actions/index';
 
 const Main = () => {
+  const dispatch = useDispatch()
+  const autoSignup = useCallback(
+    () => dispatch( actions.authCheckState() ),
+    [dispatch]
+  )
+  useEffect(() => autoSignup());
+
   return (
-    <BrowserRouter>
       <Switch>
         <Route path="/">
           <LandingPage />
         </Route>
       </Switch>
-    </BrowserRouter>
   );
 };
-export default Main;
+export default connect(null, null) (Main);
