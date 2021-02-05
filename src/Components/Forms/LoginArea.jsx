@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import { React, useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import {
   Box,
@@ -10,12 +10,16 @@ import {
   Heading,
   Input,
   Stack,
+  Text,
   Link,
   Flex,
   InputGroup,
   InputRightElement,
 } from "@chakra-ui/react";
 import { ArrowForwardIcon, ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import { connect, useSelector, useDispatch } from 'react-redux';
+import { Redirect } from 'react-router-dom';
+import * as actions from '../../store/actions/index';
 
 const VARIANT_COLOR = "teal";
 
@@ -61,18 +65,25 @@ const LoginForm = ({ onLogin }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [passwordShow, setPasswordShow] = useState(false);
   const handlePasswordShow = () => setPasswordShow(!passwordShow);
+  const error = useSelector(state => state.auth.error)
+  const isLoading = useSelector(state => state.auth.loading);
+  const dispatch = useDispatch()
+  const onAuth = useCallback(
+    (email, password, onLogin) => dispatch(actions.auth(email, password, onLogin)),
+    [dispatch]
+  )
+
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      onLogin();
-    }, 3000);
+    onAuth(email, password, onLogin);
   };
   return (
     <Box my={8} textAlign="center">
       <form onSubmit={handleSubmit}>
+        <Text fontSize="16px" color="tomato">
+          {error}
+        </Text>
         <FormControl>
           <FormLabel>Email Address:</FormLabel>
           <Input
@@ -121,7 +132,7 @@ const LoginForm = ({ onLogin }) => {
           rightIcon={<ArrowForwardIcon />}
           width="full"
           mt={4}
-          isLoading={isSubmitting}
+          isLoading={isLoading}
           loadingText="Signinig in"
         >
           Sign In
@@ -135,4 +146,4 @@ LoginForm.propTypes = {
   onLogin: PropTypes.func.isRequired,
 };
 
-export default LoginArea;
+export default connect(null, null)(LoginArea);
