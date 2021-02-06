@@ -7,15 +7,64 @@ export default class SeatMap extends Component {
         passengers: [],
         passengerPointer: null,
         unassigned: [],
+        maxRows: null,
+        maxColumns: null,
+        map: null
     }
 
     constructor(props) {
         super(props)
+
+        //TODO: Get the seatmap using props.flightID and axios
+        const input = {
+            maxRows: 3,
+            maxColumns: 4,
+            map: [
+                { id: 1, number: "1B", class: "Platinum", price: 520000, reserved: true }, { id: 2, number: "1C", class: "Platinum", price: 520000, reserved: false },
+                { id: 3, number: "2B", class: "Business", price: 340000, reserved: false }, { id: 4, number: "2C", class: "Business", price: 340000, reserved: true },
+                { id: 5, number: "3A", class: "Economy", price: 180000, reserved: true }, { id: 6, number: "3B", class: "Economy", price: 180000, reserved: false },
+                { id: 7, number: "3C", class: "Economy", price: 180000, reserved: false }, { id: 8, number: "3D", class: "Economy", price: 180000, reserved: false },
+            ],
+        };
+
         this.state = {
             passengers: props.passengers,
             passengerPointer: props.passengers[0].id,
-            unassigned: props.passengers.map(p => { return p.id })
+            unassigned: props.passengers.map(p => { return p.id }),
+            maxRows: input.maxRows,
+            maxColumns: input.maxColumns,
+            map: input.map
         }
+    }
+
+    nextChar = (c) => {
+        return String.fromCharCode(c.charCodeAt(0) + 1);
+    }
+
+    generateMap = () => {
+        var seatMap = [...this.state.map];
+
+        var map = [];
+        for (var i = 0; i < this.state.maxRows; i++) {
+            map[i] = [];
+            var column = 'A';
+            for (var j = 0; j < this.state.maxColumns; j++) {
+                var pointer = (i + 1) + column;
+                if (seatMap[0].number === pointer) {
+                    var seat = seatMap.shift();
+                    map[i][j] = {
+                        id: seat.id,
+                        number: seat.number,
+                        isReserved: seat.reserved,
+                        tooltip: seat.reserved ? "Reserved" : `${seat.class} Rs.${seat.price}`
+                    }
+                } else {
+                    map[i][j] = null;
+                }
+                column = this.nextChar(column);
+            }
+        }
+        return map;
     }
 
     assignSeatToPassenger = (passengerID, seatID, seatNumber) => {
@@ -27,8 +76,14 @@ export default class SeatMap extends Component {
             ...this.state.passengers[passengerIndex]
         };
 
+        const seatIndex = this.state.map.findIndex(seat => {
+            return seat.id === seatID;
+        })
+
         passenger.seatID = seatID;
         passenger.seatNumber = seatNumber;
+        passenger.class = this.state.map[seatIndex].class;
+        passenger.price = this.state.map[seatIndex].price;
 
         const passengers = [...this.state.passengers];
         passengers[passengerIndex] = passenger;
@@ -44,7 +99,7 @@ export default class SeatMap extends Component {
         }
         this.setState(
             {
-                unassigned : unassigned,
+                unassigned: unassigned,
                 passengerPointer: unassigned[0]
             }
         );
@@ -61,6 +116,8 @@ export default class SeatMap extends Component {
 
         passenger.seatID = null;
         passenger.seatNumber = null;
+        passenger.class = null;
+        passenger.price = null;
 
         const passengers = [...this.state.passengers];
         passengers[passengerIndex] = passenger;
@@ -71,11 +128,11 @@ export default class SeatMap extends Component {
 
         const unassigned = [...this.state.unassigned];
         unassigned.push(passenger.id);
-        unassigned.sort((a,b)=>{return a-b});
+        unassigned.sort((a, b) => { return a - b });
 
         this.setState({
             unassigned: unassigned,
-            passengerPointer: unassigned[0] 
+            passengerPointer: unassigned[0]
         });
     }
 
@@ -89,31 +146,39 @@ export default class SeatMap extends Component {
     removeSeatCallback = ({ row, number, id }, removeCb) => {
         this.setState(async () => {
             this.removeSeatFromPassenger(id);
-            removeCb(row, number, id);
+            removeCb(row, number);
         })
     }
 
     render() {
-        const rows = [
-            [null, { id: 1, number: "1B", isReserved: false, tooltip: "Platinum Rs.52000" }, { id: 2, number: "1C", isReserved: false, tooltip: "Platinum Rs.52000" }, null, { id: 3, number: "1E", isReserved: false, tooltip: "Platinum Rs.52000" }, { id: 4, number: "1F", isReserved: false, tooltip: "Platinum Rs.52000" }],
-            [null, { id: 5, number: "2B", isReserved: true, tooltip: "Platinum Rs.52000" }, { id: 6, number: "2C", isReserved: false, tooltip: "Platinum Rs.52000" }, null, { id: 7, number: "2E", isReserved: false, tooltip: "Platinum Rs.52000" }, { id: 8, number: "2F", isReserved: false, tooltip: "Platinum Rs.52000" }],
-            [{ id: 8, number: "3A", isReserved: true, tooltip: "Platinum Rs.52000" }, { id: 9, number: "3B", isReserved: false, tooltip: "Platinum Rs.52000" }, { id: 10, number: "3C", isReserved: true, tooltip: "Platinum Rs.52000" }, null, { id: 7, number: "3E", isReserved: true, tooltip: "Platinum Rs.52000" }, { id: 8, number: "3F", isReserved: false, tooltip: "Platinum Rs.52000" }, { id: 8, number: "3G", isReserved: false, tooltip: "Platinum Rs.52000" }],
-            [{ id: 19, number: "4A", isReserved: false, tooltip: "Platinum Rs.52000" }, { id: 5, number: "4B", isReserved: false, tooltip: "Platinum Rs.52000" }, { id: 6, number: "4C", isReserved: false, tooltip: "Platinum Rs.52000" }, null, { id: 7, number: "4E", isReserved: false, tooltip: "Platinum Rs.52000" }, { id: 8, number: "4F", isReserved: false, tooltip: "Platinum Rs.52000" }, { id: 8, number: "4G", isReserved: false, tooltip: "Platinum Rs.52000" }],
-            [{ id: 20, number: "5A", isReserved: false, tooltip: "Platinum Rs.52000" }, { id: 5, number: "5B", isReserved: false, tooltip: "Platinum Rs.52000" }, { id: 6, number: "5C", isReserved: false, tooltip: "Platinum Rs.52000" }, null, { id: 7, number: "5E", isReserved: true, tooltip: "Platinum Rs.52000" }, { id: 8, number: "5F", isReserved: true, tooltip: "Platinum Rs.52000" }, { id: 8, number: "5G", isReserved: false, tooltip: "Platinum Rs.52000" }]
-        ]
-        
         return (
             <div>
                 <h1>Passengers</h1>
-                {this.state.passengers.map(p => {
-                    return <p>{p.first_name} {p.last_name} ==== Seat Number: {p.seatNumber}</p>
-                })}
+                <table width="75%" align>
+                    <tr align="left">
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Seat Number</th>
+                        <th>Class</th>
+                        <th>Price (Rs.)</th>
+                    </tr>
+                    {this.state.passengers.map(p => {
+                        return <tr key={p.id}>
+                            <td>{p.first_name} {this.state.passengerPointer === p.id ? "***" : null}</td>
+                            <td>{p.last_name}</td>
+                            <td>{p.seatNumber}</td>
+                            <td>{p.class}</td>
+                            <td>{p.price}</td>
+                        </tr>
+                    })}
+                </table>
+                <h2>Total Price = {this.state.unassigned.length === 0 ? "Rs. " + this.state.passengers.reduce(((total, p) => total + p.price), 0) : null}</h2>
                 <h1>Seat Picker</h1>
-                <div style={{ marginTop: '100px' }}>
+                <div style={{ marginTop: '30px' }}>
                     <SeatPicker
                         addSeatCallback={this.addSeatCallback}
                         removeSeatCallback={this.removeSeatCallback}
-                        rows={rows}
+                        rows={this.generateMap()}
                         visible
                         maxReservableSeats={this.state.passengers.length}
                         selectedByDefault
