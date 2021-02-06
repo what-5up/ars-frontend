@@ -1,45 +1,128 @@
 import { React, useState } from "react";
 import PropTypes from "prop-types";
-import {
-  Box,
-  Button,
-  Checkbox,
-  FormControl,
-  FormLabel,
-  Heading,
-  Input,
-  Stack,
-  Link,
-  Flex,
-  Accordion,
-  AccordionItem,
-  AccordionButton,
-  AccordionPanel,
-  AccordionIcon,
-} from "@chakra-ui/react";
+import { Box, Button, Heading } from "@chakra-ui/react";
 import { ArrowForwardIcon } from "@chakra-ui/icons";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import TextField from "@material-ui/core/TextField";
+import Grid from "@material-ui/core/Grid";
+import { makeStyles } from "@material-ui/core/styles";
+import Container from "@material-ui/core/Container";
 
-const VARIANT_COLOR = "teal";
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    margin: theme.spacing(8),
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  form: {
+    width: "100%",
+    marginTop: theme.spacing(3),
+  },
+}));
 
-const RegistrationArea = ({ onRegistration }) => {
+const RegistrationArea = () => {
+  const classes = useStyles();
+  const [data, setData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const handleChange = (event) => {
+    var value = event.target.value;
+
+    setData({ ...data, [event.target.name]: value });
+  };
+
   return (
-    <Flex
-      mt="10px"
-    >
-      <Box
-        px={8}
-        py={4}
-        borderRadius={10}
-      >
-        <RegistrationHeader />
-        <RegistrationForm onRegistration={onRegistration} />
-      </Box>
-    </Flex>
+    <Box boxShadow="xl" borderRadius="10px" border="1px" borderColor="gray.200">
+      <Container component="main" maxWidth="md">
+        <CssBaseline />
+        <div className={classes.paper}>
+          <RegistrationHeader />
+          <form className={classes.form} noValidate>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  autoComplete="fname"
+                  name="firstName"
+                  variant="outlined"
+                  required
+                  fullWidth
+                  id="firstName"
+                  label="First Name"
+                  autoFocus
+                  autoComplete="off"
+                  onChange={(event) => handleChange(event)}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  variant="outlined"
+                  required
+                  fullWidth
+                  id="lastName"
+                  label="Last Name"
+                  name="lastName"
+                  autoComplete="off"
+                  onChange={(event) => handleChange(event)}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  variant="outlined"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="off"
+                  onChange={(event) => handleChange(event)}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  variant="outlined"
+                  required
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  onChange={(event) => handleChange(event)}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  variant="outlined"
+                  required
+                  fullWidth
+                  name="confirmPassword"
+                  label="Confirm Password"
+                  type="confirmPassword"
+                  id="confirmPassword"
+                  onChange={(event) => handleChange(event)}
+                />
+              </Grid>
+            </Grid>
+            <Button
+              colorScheme="teal"
+              size="lg"
+              type="submit"
+              rightIcon={<ArrowForwardIcon />}
+              width="full"
+              mt={4}
+              loadingText="Registering"
+            >
+              Register
+            </Button>
+          </form>
+        </div>
+      </Container>
+    </Box>
   );
-};
-
-RegistrationArea.propTypes = {
-  onRegistration: PropTypes.func.isRequired,
 };
 
 const RegistrationHeader = ({ title, subtitle }) => {
@@ -68,106 +151,6 @@ RegistrationHeader.propTypes = {
 RegistrationHeader.defaultProps = {
   title: "Create Your Account",
   subtitle: "Join with us to make your dream journey....",
-};
-
-const RegistrationForm = ({ onRegistration }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      onRegistration();
-    }, 3000);
-  };
-  return (
-    <Box my={8} textAlign="center">
-      <form onSubmit={handleSubmit}>
-        <Accordion defaultIndex={[0]} allowMultiple allowToggle>
-          <AccordionItem>
-            <AccordionButton>
-              <Box flex="1" textAlign="left">
-                Section 1 title
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-            <AccordionPanel pb={4}>
-              <FormControl>
-                <FormLabel>Email Address:</FormLabel>
-                <Input
-                  type="email"
-                  placeholder="Enter your Email Address"
-                  name="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                />
-              </FormControl>
-              <FormControl mt={4}>
-                <FormLabel>Password:</FormLabel>
-                <Input
-                  type="password"
-                  placeholder="Enter your Password"
-                  name="password"
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                />
-              </FormControl>
-            </AccordionPanel>
-          </AccordionItem>
-
-          <AccordionItem>
-            <AccordionButton>
-              <Box flex="1" textAlign="left">
-                Section 2 title
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-            <AccordionPanel pb={4}>
-              <FormControl>
-                <FormLabel>Email Address:</FormLabel>
-                <Input
-                  type="email"
-                  placeholder="Enter your Email Address"
-                  name="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                />
-              </FormControl>
-              <FormControl mt={4}>
-                <FormLabel>Password:</FormLabel>
-                <Input
-                  type="password"
-                  placeholder="Enter your Password"
-                  name="password"
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                />
-              </FormControl>
-            </AccordionPanel>
-          </AccordionItem>
-        </Accordion>
-
-        <Button
-          type="submit"
-          colorScheme={VARIANT_COLOR}
-          rightIcon={<ArrowForwardIcon />}
-          width="full"
-          mt={4}
-          isLoading={isSubmitting}
-          loadingText="Creating Account"
-        >
-          Register
-        </Button>
-      </form>
-    </Box>
-  );
-};
-
-RegistrationForm.propTypes = {
-  onRegistration: PropTypes.func.isRequired,
 };
 
 export default RegistrationArea;

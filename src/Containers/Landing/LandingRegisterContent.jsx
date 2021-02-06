@@ -1,28 +1,13 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import PropTypes from "prop-types";
-import {
-  Box,
-  Button,
-  Flex,
-  Image,
-  Heading,
-  Stack,
-  Text,
-  Center,
-} from "@chakra-ui/react";
+import React from "react";
+import { Box, Flex } from "@chakra-ui/react";
 import RegistrationArea from "../../Components/Forms/RegistrationArea";
 
 const LandingRegisterContent = () => {
   return (
-    <Flex
-      borderRadius={10}
-      boxShadow="lg"
-      m={4}
-    >
-      <Box flex="1">
-        <RegistrationArea onRegistration={() => console.log("Logged in")}/>
-      </Box>
+    <Flex mt={5} style={{ flexDirection: 'column', minWidth: '100vw' }}>
+      <Flex style={{ justifyContent: "center", minWidth: "80%" }}>
+        <RegistrationArea onRegistration={() => console.log("Logged in")} />
+      </Flex>
     </Flex>
   );
 };
@@ -30,6 +15,5 @@ const LandingRegisterContent = () => {
 LandingRegisterContent.propTypes = {};
 
 LandingRegisterContent.defaultProps = {};
-
 
 export default LandingRegisterContent;
