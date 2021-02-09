@@ -1,4 +1,4 @@
-import axios from '../../utils/axios';
+import axios from '../../api/axios';
 
 import * as actionTypes from './action-types';
 
@@ -47,7 +47,7 @@ export const auth = (email, password, onLogin) => {
             email: email,
             password: password
         };
-        let url = 'session';
+        let url = 'session/auth';
         console.log(authData);
         axios.post(url, authData)
             .then(response => {

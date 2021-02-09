@@ -1,40 +1,38 @@
 import React, { Component } from 'react'
 
 import SeatPicker from 'react-seat-picker'
+import { Spinner } from "@chakra-ui/react";
 
-export default class SeatMap extends Component {
-    state = {
-        passengers: [],
-        passengerPointer: null,
-        unassigned: [],
-        maxRows: null,
-        maxColumns: null,
-        map: null
-    }
+import { getSeatMap } from '../../api';
+import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
 
+class SeatMap extends Component {
     constructor(props) {
         super(props)
-
-        //TODO: Get the seatmap using props.flightID and axios
-        const input = {
-            maxRows: 3,
-            maxColumns: 4,
-            map: [
-                { id: 1, number: "1B", class: "Platinum", price: 520000, reserved: true }, { id: 2, number: "1C", class: "Platinum", price: 520000, reserved: false },
-                { id: 3, number: "2B", class: "Business", price: 340000, reserved: false }, { id: 4, number: "2C", class: "Business", price: 340000, reserved: true },
-                { id: 5, number: "3A", class: "Economy", price: 180000, reserved: true }, { id: 6, number: "3B", class: "Economy", price: 180000, reserved: false },
-                { id: 7, number: "3C", class: "Economy", price: 180000, reserved: false }, { id: 8, number: "3D", class: "Economy", price: 180000, reserved: false },
-            ],
-        };
 
         this.state = {
             passengers: props.passengers,
             passengerPointer: props.passengers[0].id,
             unassigned: props.passengers.map(p => { return p.id }),
-            maxRows: input.maxRows,
-            maxColumns: input.maxColumns,
-            map: input.map
+            flightID: props.flightID,
+            loading: true,
+            maxRows: null,
+            maxColumns: null,
+            map: []
         }
+    }
+
+    componentDidMount() {
+        getSeatMap(this.state.flightID).then(input => {
+            if (input.data)
+                this.setState({
+                    maxRows: input.data.maxRows,
+                    maxColumns: input.data.maxColumns,
+                    map: input.data.seatMap,
+                    loading: false
+                });
+        }
+        );
     }
 
     nextChar = (c) => {
@@ -42,6 +40,7 @@ export default class SeatMap extends Component {
     }
 
     generateMap = () => {
+
         var seatMap = [...this.state.map];
 
         var map = [];
@@ -50,13 +49,13 @@ export default class SeatMap extends Component {
             var column = 'A';
             for (var j = 0; j < this.state.maxColumns; j++) {
                 var pointer = (i + 1) + column;
-                if (seatMap[0].number === pointer) {
+                if (seatMap.length > 0 && seatMap[0].seat_number === pointer) {
                     var seat = seatMap.shift();
                     map[i][j] = {
                         id: seat.id,
-                        number: seat.number,
-                        isReserved: seat.reserved,
-                        tooltip: seat.reserved ? "Reserved" : `${seat.class} Rs.${seat.price}`
+                        number: seat.seat_number,
+                        isReserved: seat.is_reserved,
+                        tooltip: seat.is_reserved ? "Reserved" : `${seat.class} Rs.${seat.amount}`
                     }
                 } else {
                     map[i][j] = null;
@@ -83,7 +82,7 @@ export default class SeatMap extends Component {
         passenger.seatID = seatID;
         passenger.seatNumber = seatNumber;
         passenger.class = this.state.map[seatIndex].class;
-        passenger.price = this.state.map[seatIndex].price;
+        passenger.amount = this.state.map[seatIndex].amount;
 
         const passengers = [...this.state.passengers];
         passengers[passengerIndex] = passenger;
@@ -117,7 +116,7 @@ export default class SeatMap extends Component {
         passenger.seatID = null;
         passenger.seatNumber = null;
         passenger.class = null;
-        passenger.price = null;
+        passenger.amount = null;
 
         const passengers = [...this.state.passengers];
         passengers[passengerIndex] = passenger;
@@ -151,9 +150,22 @@ export default class SeatMap extends Component {
     }
 
     render() {
-        return (
-            <div>
-                <h1>Passengers</h1>
+        let passengerTable = <Spinner
+            thickness="4px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            color="blue.500"
+            size="xl"
+        />
+        let seatMap = <Spinner
+            thickness="4px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            color="blue.500"
+            size="xl"
+        />
+        if (!this.state.loading) {
+            passengerTable =
                 <table width="75%" align>
                     <tr align="left">
                         <th>First Name</th>
@@ -168,12 +180,12 @@ export default class SeatMap extends Component {
                             <td>{p.last_name}</td>
                             <td>{p.seatNumber}</td>
                             <td>{p.class}</td>
-                            <td>{p.price}</td>
+                            <td>{p.amount}</td>
                         </tr>
                     })}
-                </table>
-                <h2>Total Price = {this.state.unassigned.length === 0 ? "Rs. " + this.state.passengers.reduce(((total, p) => total + p.price), 0) : null}</h2>
-                <h1>Seat Picker</h1>
+                </table>;
+
+            seatMap =
                 <div style={{ marginTop: '30px' }}>
                     <SeatPicker
                         addSeatCallback={this.addSeatCallback}
@@ -185,7 +197,18 @@ export default class SeatMap extends Component {
                         tooltipProps={{ multiline: true }}
                     />
                 </div>
+        }
+
+        return (
+            <div>
+                <h1>Passengers</h1>
+                {passengerTable}
+                <h2>Total Price = {this.state.unassigned.length === 0 ? "Rs. " + this.state.passengers.reduce(((total, p) => total + p.amount), 0) : null}</h2>
+                <h1>Seat Picker</h1>
+                {seatMap}
             </div>
         )
     }
 }
+
+export default withErrorHandler(SeatMap);
