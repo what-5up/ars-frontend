@@ -3,14 +3,14 @@ import { getRequest, postRequest, putRequest, deleteRequest } from "./utils";
 const URL = "scheduled-flights";
 
 /**
- * Returns a scheduled flight for the given id
+ * Return the scheduled flight for the given id
  * 
  * @param {number} id - scheduled flight id
  */
-export const getScheduledFlight = (id) => {console.log(`${URL}/${id}`); return getRequest(`${URL}/${id}`);};
+export const getScheduledFlight = (id) => getRequest(`${URL}/${id}`);
 
 /**
- * Returns an array of scheduled flights
+ * Return an array of scheduled flights
  * 
  * @param {object} params - query parameters to filter the records
  * @param {?string} params.origin - origin code
@@ -62,7 +62,7 @@ export const addScheduledFlight = (data) => postRequest(`${URL}`, data);
  */
 export const updateScheduledFlight = (id, data) => {
     data = Object.assign({ origin: null, destination: null, aircraftID: null, aircraftModel: null }, data);
-    return putRequest(`${URL}/${id}`, data)
+    return putRequest(`${URL}/${id}`, data);
 }
 
 /**

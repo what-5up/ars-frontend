@@ -4,4 +4,11 @@ export {
     updateScheduledFlight,
     deleteScheduledFlight,
     getSeatMap
-} from './scheduled-flights-api'
+} from './scheduled-flight-api'
+
+export {
+    getUser,
+    addUser,
+    updateUser,
+    deleteUser
+} from './user-api'

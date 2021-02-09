@@ -47,7 +47,7 @@ export const auth = (email, password, onLogin) => {
             email: email,
             password: password
         };
-        let url = 'session/auth';
+        let url = 'session';
         console.log(authData);
         axios.post(url, authData)
             .then(response => {
