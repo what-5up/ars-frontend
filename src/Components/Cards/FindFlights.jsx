@@ -7,7 +7,7 @@ import PeopleIcon from '@material-ui/icons/People';
 import RemoveIcon from '@material-ui/icons/Remove';
 import AddIcon from '@material-ui/icons/Add';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-
+import { Picklist, PicklistOption, DatePicker } from 'react-rainbow-components';
 const options = [
 	{ value: 'Abe', label: 'Abe', customAbbreviation: 'A' },
 	{ value: 'John', label: 'John', customAbbreviation: 'J' },
@@ -91,7 +91,7 @@ function FindFlights() {
 							<SelectWithIcon options={options} placeholder="To" />
 						</Box>
 						<Box flex="2" ml={3} h="100%">
-							{/* <DatePicker/> */}
+							<DatePicker/>
 							{/* <SingleDatePicker startDate={new Date(2020, 0, 15)} /> */}
 						</Box>
 					</Flex>
