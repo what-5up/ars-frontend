@@ -26,7 +26,7 @@ export default function LandingHomeContent({
       setImageIndex(imageIndex=>(imageIndex + 1) % images.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [images.length]);
   return (
     <Flex
       align="center"

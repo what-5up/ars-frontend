@@ -31,22 +31,24 @@ import {
 } from "@chakra-ui/react";
 import { HamburgerIcon } from "@chakra-ui/icons";
 import Media from "react-media";
-import { connect, useSelector } from 'react-redux';
+import { connect, useSelector } from "react-redux";
 import ThemeSelector from "../../Components/ThemeSelector/ThemeSelector";
 import LoginArea from "../../Components/Forms/LoginArea";
+import RegistrationArea from "../../Components/Forms/RegistrationArea";
+import MyProfilePopup from "../../Components/Popups/MyProfilePopup";
 
 const LandingHeader = () => {
   const { colorMode, _ } = useColorMode();
-  const isAuthenticated = useSelector(state => state.auth.token !== null);
+  const isAuthenticated = useSelector((state) => state.auth.token !== null);
   return (
     <Flex
       width="full"
-      // position="fixed"
-      // top="0"
       mb={4}
       borderBottomRadius="2rem"
       bgGradient={
-        colorMode === "light" ? "linear(to-r, #7928CA, #9883a8)"  : "linear(to-l, #382859, #3d4e69)"
+        colorMode === "light"
+          ? "linear(to-r, #7928CA, #9883a8)"
+          : "linear(to-l, #382859, #3d4e69)"
       }
     >
       <Box width="full" boxShadow="lg" borderBottomRadius="2rem">
@@ -62,8 +64,12 @@ const LandingHeader = () => {
           >
             {(matches) => (
               <>
-                {matches.small && <MenuDrawer isAuthenticated = {isAuthenticated} />}
-                {matches.medium && <MenuDrawer isAuthenticated = {isAuthenticated} />}
+                {matches.small && (
+                  <MenuDrawer isAuthenticated={isAuthenticated} />
+                )}
+                {matches.medium && (
+                  <MenuDrawer isAuthenticated={isAuthenticated} />
+                )}
                 {matches.large && (
                   <Stack
                     isInline
@@ -71,9 +77,16 @@ const LandingHeader = () => {
                     mt={4}
                     align="center"
                   >
-                    <Menu direction={"row"} isAuthenticated = {isAuthenticated}/>
-                    {!isAuthenticated ? <SignInArea withAvatar={true} isAuthenticated = {isAuthenticated} /> : null}
+                    <Menu direction={"row"} isAuthenticated={isAuthenticated} />
                     <ThemeSelector />
+                    {!isAuthenticated ? (
+                      <SignInArea
+                        withAvatar={false}
+                        isAuthenticated={isAuthenticated}
+                      />
+                    ) : (
+                      <MyProfilePopup />
+                    )}
                   </Stack>
                 )}
               </>
@@ -142,19 +155,14 @@ const Menu = ({ direction, isAuthenticated }) => {
       <MenuItems to="/">Home</MenuItems>
       <MenuItems to="/discover">Discover </MenuItems>
       <MenuItems to="/contact-us">Contact Us </MenuItems>
-      {!isAuthenticated ? 
-      <MenuItems to="/register" isLast>
-        Register
-      </MenuItems> : 
-      <MenuItems to="/signout" isLast>
-        Sign Out
-      </MenuItems>
-      }
+        {!isAuthenticated ? (
+          <RegisterArea isAuthenticated={isAuthenticated} />
+        ) : null}
     </Stack>
   );
 };
 
-const SigninButton = ({ onOpen }) => {
+const CustomButton = ({ title, onOpen }) => {
   return (
     <Button
       bg="transparent"
@@ -165,8 +173,10 @@ const SigninButton = ({ onOpen }) => {
       fontFamily={"Agustina Regular"}
       onClick={onOpen}
       px={0}
+      _hover={{ bg: "trasparent" }}
+      _selected={{ bg: "trasparent" }}
     >
-      Sign in
+      {title}
     </Button>
   );
 };
@@ -185,7 +195,7 @@ const SignInArea = ({ withAvatar, isAuthenticated }) => {
           />
         </WrapItem>
       </Wrap>
-      <SigninButton onOpen={!isAuthenticated ? onOpen : null} />
+      <CustomButton title="Sign In" onOpen={!isAuthenticated ? onOpen : null} />
       <Modal
         closeOnOverlayClick={false}
         isOpen={isOpen}
@@ -207,7 +217,36 @@ const SignInArea = ({ withAvatar, isAuthenticated }) => {
   );
 };
 
-const MenuDrawer = ( {isAuthenticated} ) => {
+const RegisterArea = ({ isAuthenticated }) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  return (
+    <>
+      <CustomButton
+        title="Register"
+        onOpen={!isAuthenticated ? onOpen : null}
+      />
+      <Modal
+        closeOnOverlayClick={false}
+        isOpen={isOpen}
+        onClose={onClose}
+        size="4xl"
+        motionPreset="slideInBottom"
+        isCentered
+        closeOnEsc
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalCloseButton />
+          <ModalBody>
+            <RegistrationArea />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+};
+
+const MenuDrawer = ({ isAuthenticated }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef();
 
@@ -237,7 +276,7 @@ const MenuDrawer = ( {isAuthenticated} ) => {
             </DrawerHeader>
 
             <DrawerBody>
-               <Menu direction={"column"} isAuthenticated = {isAuthenticated}/>
+              <Menu direction={"column"} isAuthenticated={isAuthenticated} />
               {!isAuthenticated ? <SignInArea withAvatar={false} /> : null}
             </DrawerBody>
 
@@ -249,4 +288,4 @@ const MenuDrawer = ( {isAuthenticated} ) => {
   );
 };
 
-export default connect(null, null)( LandingHeader );
+export default connect(null, null)(LandingHeader);
