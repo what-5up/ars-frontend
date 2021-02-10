@@ -42,9 +42,6 @@ const Content = () => {
 				<Route path={`/contact-us`}>
 					<LandingHomeContent />
 				</Route>
-				<Route path={`/register`}>
-					<LandingRegisterContent />
-				</Route>
 				<Route path="/signout" component={Signout} />
 				<Route path="/">
 					<LandingHomeContent />

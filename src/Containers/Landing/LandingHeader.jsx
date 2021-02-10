@@ -34,6 +34,7 @@ import Media from "react-media";
 import { connect, useSelector } from "react-redux";
 import ThemeSelector from "../../Components/ThemeSelector/ThemeSelector";
 import LoginArea from "../../Components/Forms/LoginArea";
+import RegistrationArea from "../../Components/Forms/RegistrationArea";
 import MyProfilePopup from "../../Components/Popups/MyProfilePopup";
 
 const LandingHeader = () => {
@@ -78,7 +79,7 @@ const LandingHeader = () => {
                   >
                     <Menu direction={"row"} isAuthenticated={isAuthenticated} />
                     <ThemeSelector />
-                    {isAuthenticated ? (
+                    {!isAuthenticated ? (
                       <SignInArea
                         withAvatar={false}
                         isAuthenticated={isAuthenticated}
@@ -154,18 +155,14 @@ const Menu = ({ direction, isAuthenticated }) => {
       <MenuItems to="/">Home</MenuItems>
       <MenuItems to="/discover">Discover </MenuItems>
       <MenuItems to="/contact-us">Contact Us </MenuItems>
-      {!isAuthenticated ? (
-        <MenuItems to="/register" isLast>
-          Register
-        </MenuItems>
-      ) : (
-        null
-      )}
+        {!isAuthenticated ? (
+          <RegisterArea isAuthenticated={isAuthenticated} />
+        ) : null}
     </Stack>
   );
 };
 
-const SigninButton = ({ onOpen }) => {
+const CustomButton = ({ title, onOpen }) => {
   return (
     <Button
       bg="transparent"
@@ -179,7 +176,7 @@ const SigninButton = ({ onOpen }) => {
       _hover={{ bg: "trasparent" }}
       _selected={{ bg: "trasparent" }}
     >
-      Sign in
+      {title}
     </Button>
   );
 };
@@ -198,7 +195,7 @@ const SignInArea = ({ withAvatar, isAuthenticated }) => {
           />
         </WrapItem>
       </Wrap>
-      <SigninButton onOpen={!isAuthenticated ? onOpen : null} />
+      <CustomButton title="Sign In" onOpen={!isAuthenticated ? onOpen : null} />
       <Modal
         closeOnOverlayClick={false}
         isOpen={isOpen}
@@ -213,6 +210,35 @@ const SignInArea = ({ withAvatar, isAuthenticated }) => {
           <ModalCloseButton />
           <ModalBody>
             <LoginArea onLogin={onClose} />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+};
+
+const RegisterArea = ({ isAuthenticated }) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  return (
+    <>
+      <CustomButton
+        title="Register"
+        onOpen={!isAuthenticated ? onOpen : null}
+      />
+      <Modal
+        closeOnOverlayClick={false}
+        isOpen={isOpen}
+        onClose={onClose}
+        size="4xl"
+        motionPreset="slideInBottom"
+        isCentered
+        closeOnEsc
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalCloseButton />
+          <ModalBody>
+            <RegistrationArea />
           </ModalBody>
         </ModalContent>
       </Modal>
