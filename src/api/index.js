@@ -1,4 +1,12 @@
 export {
+    addGuest
+} from './guest-api'
+
+export {
+    addPassengers
+} from './passenger-api'
+
+export {
     getScheduledFlights,
     addScheduledFlight,
     updateScheduledFlight,
@@ -12,3 +20,4 @@ export {
     updateUser,
     deleteUser
 } from './user-api'
+
