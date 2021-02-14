@@ -29,7 +29,7 @@ const getUsers = () => {
  * 
  * @returns {Promise<object>} {userID}
  */
-export const addUser = (data) => postRequest(`${URL}`, data);
+export const addUser = (data) => postRequest(URL, data);
 
 /**
  * Update the user for the given id
@@ -104,5 +104,3 @@ export const addBookingByUser = (id, data) => postRequest(`${URL}/${id}/${BOOKIN
  * @returns {Promise<object>}
  */
 export const updateBooking = (userID, bookingID, state) => putRequest(`${URL}/${userID}/${BOOKING_URL}/${bookingID}`, {state: state} );
-
-

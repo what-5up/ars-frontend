@@ -46,7 +46,7 @@ export const getScheduledFlights = (params) => {
  * 
  * @return {Promise<object>}
  */
-export const addScheduledFlight = (data) => postRequest(`${URL}`, data);
+export const addScheduledFlight = (data) => postRequest(URL, data);
 
 /**
  * Updates the scheduled flight of the given id

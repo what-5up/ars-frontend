@@ -15,6 +15,10 @@ export {
 } from './scheduled-flight-api'
 
 export {
+    getTravelerClasses
+} from './traveller-class-api'
+
+export {
     getUser,
     addUser,
     updateUser,
