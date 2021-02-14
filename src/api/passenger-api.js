@@ -17,4 +17,4 @@ const URL = "passengers";
  * 
  * @return {Promise<object>}
  */
-export const addPassengers = (data) => postRequest(`${URL}`, data);
+export const addPassengers = (data) => postRequest(URL, data);
