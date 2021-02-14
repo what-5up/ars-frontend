@@ -36,6 +36,14 @@ export const deleteRequest = async (url) => {
 	}
 };
 
+export const generateOptionalParametersQuery = (params) => {
+    let optionalParams = [];
+    Object.keys(params).forEach(key => {
+        if (params[key] !== null) optionalParams.push(`${key}=${params[key]}`)
+    })
+    return (optionalParams.length > 0) ? `?${optionalParams.join('&')}` : ''
+}
+
 const generateSuccessOutput = (response) => {
 	return  {
 		data: response.data.results,
