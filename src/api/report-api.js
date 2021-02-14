@@ -26,7 +26,7 @@ export const getBookingsByPassengerType = (params) => {
 }
 
 /**
- * Return all the bookings categorized by the passenger type
+ * Return number of passengers travelling to a given destination
  * 
  * @param {object} params - query parameters to filter the records
  * @param {?string} params.destination - destination code
@@ -35,7 +35,7 @@ export const getBookingsByPassengerType = (params) => {
  * 
  * @return {Promise<object>} [{ dest_code, dest_name, no_of_passengers }]
  */
-export const getBookingsByPassengerType = (params) => {
+export const getPassengerCountByDest = (params) => {
     params = Object.assign({ destination: null, startDate: null, endDate: null }, params);
     return getRequest(`${URL}/3${generateOptionalParametersQuery(params)}`);
 }

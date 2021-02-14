@@ -7,6 +7,14 @@ export {
 } from './passenger-api'
 
 export {
+    getPassengersByFlightNo,
+    getBookingsByPassengerType,
+    getPassengerCountByDest,
+    getRevenueByAircraftModel,
+    getPastFlightDetails
+} from './report-api'
+
+export {
     getScheduledFlights,
     addScheduledFlight,
     updateScheduledFlight,
