@@ -1,4 +1,4 @@
-import { getRequest, postRequest, putRequest, deleteRequest } from "./utils";
+import { postRequest } from "./utils";
 
 const URL = "guests";
 
