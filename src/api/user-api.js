@@ -1,7 +1,7 @@
 import { getRequest, postRequest, putRequest, deleteRequest } from "./utils";
 
 const URL = "users";
-const BOOKING_URL = "booking";
+const BOOKING_URL = "bookings";
 
 /**
  * Return the user for the given user id

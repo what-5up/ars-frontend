@@ -1,6 +1,6 @@
 import { getRequest, postRequest, putRequest, deleteRequest } from "./utils";
 
-const URL = "guest";
+const URL = "guests";
 
 /**
  * Add an guest to the database
