@@ -15,6 +15,11 @@ export {
 } from './report-api'
 
 export {
+    getRoutes,
+    getRoute
+} from './route-api'
+
+export {
     getScheduledFlights,
     addScheduledFlight,
     updateScheduledFlight,
