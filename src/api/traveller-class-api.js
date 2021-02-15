@@ -1,6 +1,6 @@
 import { getRequest, postRequest, putRequest, deleteRequest } from "./utils";
 
-const URL = "traveler-classses";
+const URL = "traveler-class";
 
 /**
  * Returns all the traveller classes of the system

@@ -3,8 +3,6 @@ import {
 	Box,
 	Flex,
 	Input,
-	InputGroup,
-	InputLeftElement,
 	FormLabel,
 	Button,
 	Heading,
@@ -16,13 +14,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { addGuest } from '../../api/guest-api';
 import { getTitles } from '../../api/title-api';
-const title = [
-	{ value: 'Mr', label: 'Mr' },
-	{ value: 'Mrs', label: 'Mrs' },
-	{ value: 'Ms.', label: 'Ms.' },
-	{ value: 'Master', label: 'Master' },
-	{ value: 'Rev.', label: 'Rev.' },
-];
+
 const gender = [
 	{ value: 'm', label: 'Male' },
 	{ value: 'f', label: 'Female' },

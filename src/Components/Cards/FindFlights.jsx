@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Flex, Button, Text, Input, FormErrorMessage, FormControl } from '@chakra-ui/react';
 import Select, { components } from 'react-select';
 import PeopleIcon from '@material-ui/icons/People';
@@ -6,29 +6,26 @@ import RemoveIcon from '@material-ui/icons/Remove';
 import AddIcon from '@material-ui/icons/Add';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
-import Fab from "@material-ui/core/Fab";
-import FlightIcon from "@material-ui/icons/Flight";
+import Fab from '@material-ui/core/Fab';
+import FlightIcon from '@material-ui/icons/Flight';
 import SearchIcon from '@material-ui/icons/Search';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import { getTravelerClasses } from '../../api/traveller-class-api';
+import { getAllRoutes } from '../../api/route-api';
+
 const options = [
 	{ value: 'Abe', label: 'Abe', customAbbreviation: 'A' },
 	{ value: 'John', label: 'John', customAbbreviation: 'J' },
 	{ value: 'Dustin', label: 'Dustin', customAbbreviation: 'D' },
 ];
 
-const classes = [
-	{ value: 'Economy', label: 'Economy' },
-	{ value: 'Business', label: 'Business' },
-	{ value: 'Premium Economy', label: 'Premium Economy' },
-	{ value: 'First', label: 'First' },
-];
 
 const DropdownIndicator = (props) => {
 	return (
 		components.DropdownIndicator && (
 			<components.DropdownIndicator {...props}>
-				<LocationOnIcon style={{color:"#5f6368"}}/>
+				<LocationOnIcon style={{ color: '#5f6368' }} />
 			</components.DropdownIndicator>
 		)
 	);
@@ -85,6 +82,23 @@ function FindFlights() {
 		['Infant', 'on Seat', 'infantsOnSeat'],
 		['Infants', 'on Lap', 'infantsOnLap'],
 	]);
+	const [classes, setClasses] = useState([]);
+	useEffect(async () => {
+		let classes = await getTravelerClasses();
+		classes = classes.data.map((item) => {
+			return { label: item.class, value: item.id };
+		});
+		setClasses(classes)
+	}, []);
+
+	useEffect(async () => {
+		let routes = await getAllRoutes();
+		// classes = classes.data.map((item) => {
+		// 	return { label: item.class, value: item.id };
+		// });
+		console.log(routes);
+		// setClasses(routes)
+	}, []);
 	let [showDropdown, setShowDropdown] = useState(false);
 	let convertedAttr = convertArrToObj(types);
 	console.log(convertedAttr);
