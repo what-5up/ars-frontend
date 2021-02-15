@@ -1,6 +1,6 @@
 import { getRequest, postRequest, putRequest, deleteRequest } from "./utils";
 
-const URL = "titles";
+const URL = "title";
 
 /**
  * Returns all the titles of the system

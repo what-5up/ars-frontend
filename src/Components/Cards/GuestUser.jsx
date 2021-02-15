@@ -1,10 +1,21 @@
-import React, { useState } from 'react';
-import { Box, Flex, Input, InputGroup, InputLeftElement, FormLabel, Button, Heading , FormControl, FormErrorMessage} from '@chakra-ui/react';
+import React, { useState, useEffect } from 'react';
+import {
+	Box,
+	Flex,
+	Input,
+	InputGroup,
+	InputLeftElement,
+	FormLabel,
+	Button,
+	Heading,
+	FormControl,
+	FormErrorMessage,
+} from '@chakra-ui/react';
 import Select from 'react-select';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import {addUser} from '../../api/user-api'
-
+import { addGuest } from '../../api/guest-api';
+import { getTitles } from '../../api/title-api';
 const title = [
 	{ value: 'Mr', label: 'Mr' },
 	{ value: 'Mrs', label: 'Mrs' },
@@ -19,6 +30,17 @@ const gender = [
 ];
 
 function GuestUser() {
+	const [title, setTitle] = useState([]);
+	useEffect(async () => {
+		let titles = await getTitles();
+		titles = titles.data;
+		titles = titles.map((title) => {
+			return { value: title.id, label: title.title_name };
+		});
+		console.log(titles);
+
+		setTitle(titles)
+	}, []);
 	return (
 		<Formik
 			initialValues={{
@@ -26,13 +48,12 @@ function GuestUser() {
 				lastName: '',
 				title: '',
 				gender: '',
-				email: '' 	
+				email: '',
 			}}
 			validationSchema={Yup.object({
 				firstName: Yup.string().required('Required'),
 				lastName: Yup.string().required('Required'),
 				title: Yup.string()
-					.oneOf(title.map((item) => item.value))
 					.required('Required'),
 				email: Yup.string().email().required('Required'),
 				gender: Yup.string()
@@ -41,7 +62,7 @@ function GuestUser() {
 			})}
 			onSubmit={(values) => {
 				alert(JSON.stringify(values, null, 2));
-				addUser(values)
+				addGuest(values);
 			}}
 		>
 			{(props) => (
