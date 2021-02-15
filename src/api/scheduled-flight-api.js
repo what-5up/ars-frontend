@@ -1,4 +1,4 @@
-import { getRequest, postRequest, putRequest, deleteRequest } from "./utils";
+import { getRequest, postRequest, putRequest, deleteRequest, generateOptionalParametersQuery } from "./utils";
 
 const URL = "scheduled-flights";
 
@@ -28,12 +28,7 @@ export const getScheduledFlight = (id) => getRequest(`${URL}/${id}`);
  */
 export const getScheduledFlights = (params) => {
     params = Object.assign({ origin: null, destination: null, aircraftID: null, aircraftModel: null }, params);
-    let optionalParams = [];
-    Object.keys(params).forEach(key => {
-        if (params[key] !== null) optionalParams.push(`${key}=${params[key]}`)
-    })
-
-    return getRequest(`${URL}${(optionalParams.length > 0) ? `?${optionalParams.join(`&`)}` : ''}`);
+    return getRequest(`${URL}${generateOptionalParametersQuery(params)}`);
 }
 
 /**
