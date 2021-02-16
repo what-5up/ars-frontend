@@ -17,6 +17,7 @@ export const getScheduledFlight = (id) => getRequest(`${URL}/${id}`);
  * @param {?string} params.destination - destination code
  * @param {?number} params.aircraftID - id of the scheduled flight id
  * @param {?string} params.aircraftModel - aircraft model name
+ * @param {?number} params.passengers - number of passengers
  * 
  * @example //returns the scheduled flights from BIA to SIN of the aircraft model Boeing 737
  * getScheduledFlights({origin: "BIA"});
@@ -27,7 +28,7 @@ export const getScheduledFlight = (id) => getRequest(`${URL}/${id}`);
  * @return {Promise<object>} array of {departure, origin_code, origin, destination_code, destination, aircraft_id, aircraft_model}
  */
 export const getScheduledFlights = (params) => {
-    params = Object.assign({ origin: null, destination: null, aircraftID: null, aircraftModel: null }, params);
+    params = Object.assign({ origin: null, destination: null, aircraftID: null, aircraftModel: null, passengers: null }, params);
     return getRequest(`${URL}${generateOptionalParametersQuery(params)}`);
 }
 

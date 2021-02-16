@@ -14,6 +14,6 @@ export const getRoutes = () => getRequest(URL);
  * 
  * @param {number} id flight no
  * 
- * @return {Promise<object>} { id, origin_code, origin, destination_code, destination }
+ * @return {Promise<object>} { id, origin_code, origin, origin_rregion, destination_code, destination, destination_region }
  */
 export const getRoute = (id) => getRequest(`${URL}/${id}`);
