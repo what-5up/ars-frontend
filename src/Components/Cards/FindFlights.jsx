@@ -12,14 +12,14 @@ import SearchIcon from '@material-ui/icons/Search';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { getTravelerClasses } from '../../api/traveller-class-api';
-import { getAllRoutes } from '../../api/route-api';
+import { getRoutes } from '../../api/route-api';
+import { getScheduledFlights } from '../../api/scheduled-flight-api';
 
 const options = [
 	{ value: 'Abe', label: 'Abe', customAbbreviation: 'A' },
 	{ value: 'John', label: 'John', customAbbreviation: 'J' },
 	{ value: 'Dustin', label: 'Dustin', customAbbreviation: 'D' },
 ];
-
 
 const DropdownIndicator = (props) => {
 	return (
@@ -75,57 +75,90 @@ const convertArrToObj = (arr) => {
 	return obj;
 };
 
+const types = [
+	['Adult', '', 'adult'],
+	['Children', 'Aged 2-12', 'children'],
+	['Infant', 'on Seat', 'infantsOnSeat'],
+	['Infants', 'on Lap', 'infantsOnLap'],
+];
+
 function FindFlights() {
-	let [types, setTypes] = useState([
-		['Adult', '', 'adult'],
-		['Children', 'Aged 2-12', 'children'],
-		['Infant', 'on Seat', 'infantsOnSeat'],
-		['Infants', 'on Lap', 'infantsOnLap'],
-	]);
 	const [classes, setClasses] = useState([]);
+	const [origins, setOrigins] = useState([]);
+	const [destinations, setDestinations] = useState([]);
 	useEffect(async () => {
 		let classes = await getTravelerClasses();
+		console.log(classes);
 		classes = classes.data.map((item) => {
 			return { label: item.class, value: item.id };
 		});
-		setClasses(classes)
+		setClasses(classes);
 	}, []);
 
 	useEffect(async () => {
-		let routes = await getAllRoutes();
-		// classes = classes.data.map((item) => {
-		// 	return { label: item.class, value: item.id };
-		// });
+		let routes = await getRoutes();
 		console.log(routes);
-		// setClasses(routes)
+
+		let tempDestinations = [];
+		let tempOrigins = [];
+
+		// let uniqueOrigins = new Set(routes.data.map(item => {return {origin_code:item.origin_code, origin:item.origin}}));
+		// origins  = Array.from(uniqueOrigins);
+
+		routes.data.forEach((item) => {
+			let index = tempOrigins.findIndex((entry) => item.origin_code == entry.value);
+			if (index < 0) {
+				tempOrigins.push({ value: item.origin_code, label: item.origin ,customAbbreviation: item.origin_region});
+				tempDestinations.push([]);
+				tempDestinations[tempDestinations.length - 1].push({
+					id: item.id,
+					value: item.destination_code,
+					label: item.destination,
+					customAbbreviation: item.destination_region
+				});
+			} else {
+				tempDestinations[index].push({
+					id: item.id,
+					value: item.destination_code,
+					label: item.destination,
+					customAbbreviation: item.destination_region
+				});
+			}
+		});
+
+		setOrigins(tempOrigins);
+		setDestinations(tempDestinations);
+		console.log(tempOrigins);
+		console.log(tempDestinations);
 	}, []);
 	let [showDropdown, setShowDropdown] = useState(false);
 	let convertedAttr = convertArrToObj(types);
-	console.log(convertedAttr);
 	return (
 		<Formik
 			initialValues={{
-				from: '',
-				to: '',
+				origin: '',
+				destination: '',
 				travelClass: '',
 				date: '',
 				totalPassengers: 0,
 				...convertedAttr,
 			}}
 			validationSchema={Yup.object({
-				from: Yup.string()
-					.oneOf(options.map((item) => item.value))
+				origin: Yup.string()
+					// .oneOf(options.map((item) => item.value))
 					.required('Required'),
-				to: Yup.string()
-					.oneOf(options.map((item) => item.value))
+				destination: Yup.string()
+					// .oneOf(options.map((item) => item.value))
 					.required('Required'),
 				travelClass: Yup.string()
-					.oneOf(classes.map((item) => item.value))
+					// .oneOf(classes.map((item) => item.value))
 					.required('Required'),
 				date: Yup.date().required('Required'),
 			})}
-			onSubmit={(values) => {
+			onSubmit={async (values) => {
 				alert(JSON.stringify(values, null, 2));
+				let flights = await getScheduledFlights();
+				console.log(flights);
 			}}
 		>
 			{(props) => (
@@ -187,7 +220,6 @@ function FindFlights() {
 										backgroundColor="white"
 									>
 										{types.map((type, index) => {
-											console.log(type);
 											return (
 												<FormControl
 													isInvalid={props.errors[type[2]] && props.touched[type[2]]}
@@ -223,49 +255,62 @@ function FindFlights() {
 						<Flex mb={3} style={{ justifyContent: 'center' }}>
 							<Flex style={{ width: '90%', height: '56px' }}>
 								<Box flex="2" mr={3} h="100%">
-									<FormControl isInvalid={props.errors.from && props.touched.from}>
+									<FormControl isInvalid={props.errors.origin && props.touched.origin}>
 										<Select
-											options={options}
+											options={origins}
 											isSearchable={true}
-											components={{ DropdownIndicator }}
+											components={{  IndicatorSeparator: () => null, DropdownIndicator }}
+											
 											formatOptionLabel={formatOptionLabel}
 											classNamePrefix="vyrill"
 											styles={customStyles}
 											placeholder="From"
 											value={
 												options
-													? options.find((option) => option.value === props.values.from)
+													? options.find((option) => option.value === props.values.origin)
 													: ''
 											}
-											onChange={(option) => props.setFieldValue('from', option.value)}
-											onBlur={() => props.setFieldTouched('from', true)}
-											error={props.errors.from}
-											touched={props.touched.from}
+											onChange={(option) => {
+												props.setFieldValue('origin', option.value);
+												props.setFieldValue('destination', 'abcd');
+												console.log(props.values.destination);
+											}}
+											onBlur={() => props.setFieldTouched('origin', true)}
+											error={props.errors.origin}
+											touched={props.touched.origin}
 										/>
 										<FormErrorMessage>{props.errors.from}</FormErrorMessage>
 									</FormControl>
 								</Box>
 								<Box flex="2" ml={3} h="100%">
-									<FormControl isInvalid={props.errors.to && props.touched.to}>
+									<FormControl isInvalid={props.errors.destination && props.touched.destination}>
 										<Select
-											options={options}
+											options={
+												props.values.origin == ''
+													? []
+													: destinations[
+															origins.findIndex(
+																(entry) => props.values.origin == entry.value
+															)
+													  ]
+											}
 											isSearchable={true}
 											components={{ DropdownIndicator }}
 											formatOptionLabel={formatOptionLabel}
 											classNamePrefix="vyrill"
 											styles={customStyles}
-											placeholder="From"
+											placeholder="To"
 											value={
 												options
-													? options.find((option) => option.value === props.values.to)
+													? options.find((option) => option.value === props.values.destination)
 													: ''
 											}
-											onChange={(option) => props.setFieldValue('to', option.value)}
-											onBlur={() => props.setFieldTouched('to', true)}
-											error={props.errors.to}
-											touched={props.touched.to}
+											onChange={(option) => props.setFieldValue('destination', option.value)}
+											onBlur={() => props.setFieldTouched('destination', true)}
+											error={props.errors.destination}
+											touched={props.touched.destination}
 										/>
-										<FormErrorMessage>{props.errors.to}</FormErrorMessage>
+										<FormErrorMessage>{props.errors.destination}</FormErrorMessage>
 									</FormControl>
 								</Box>
 								<Box flex="2" ml={3} h="100%">
