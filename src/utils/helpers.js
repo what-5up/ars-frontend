@@ -9,3 +9,16 @@ export const updateObject = (oldObject, updatedProperties) => {
         ...updatedProperties
     };
 };
+
+export const addOrUpdateArray = (arr,obj) => {
+    let copy = [];
+    let index = arr.findIndex(item => item.key == obj.key)
+    if(index < 0){
+        arr.push(obj)
+    }
+    else{
+        arr[index] = {...arr[index], ...obj}
+    }
+    copy = arr
+    return copy
+}

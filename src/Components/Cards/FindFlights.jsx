@@ -82,7 +82,7 @@ const types = [
 	['Infants', 'on Lap', 'infantsOnLap'],
 ];
 
-function FindFlights() {
+const  FindFlights = ({setFlights}) => {
 	const [classes, setClasses] = useState([]);
 	const [origins, setOrigins] = useState([]);
 	const [destinations, setDestinations] = useState([]);
@@ -153,12 +153,13 @@ function FindFlights() {
 				travelClass: Yup.string()
 					// .oneOf(classes.map((item) => item.value))
 					.required('Required'),
-				date: Yup.date().required('Required'),
+				date: Yup.date()
 			})}
 			onSubmit={async (values) => {
-				alert(JSON.stringify(values, null, 2));
-				let flights = await getScheduledFlights();
+				// alert(JSON.stringify(values, null, 2));
+				let flights = await getScheduledFlights(values);
 				console.log(flights);
+				setFlights(flights.data);
 			}}
 		>
 			{(props) => (
@@ -272,7 +273,7 @@ function FindFlights() {
 											}
 											onChange={(option) => {
 												props.setFieldValue('origin', option.value);
-												props.setFieldValue('destination', 'abcd');
+												props.setFieldValue('destination', '');
 												console.log(props.values.destination);
 											}}
 											onBlur={() => props.setFieldTouched('origin', true)}

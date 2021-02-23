@@ -8,12 +8,22 @@ import {
 	Heading,
 	FormControl,
 	FormErrorMessage,
+	Divider,
+	useDisclosure,
+	Modal,
+	ModalOverlay,
+	ModalCloseButton,
+	ModalBody,
+	ModalContent,
 } from '@chakra-ui/react';
 import Select from 'react-select';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { addGuest } from '../../api/guest-api';
 import { getTitles } from '../../api/title-api';
+import { ArrowForwardIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
+import LoginArea from '../Forms/LoginArea';
+import { connect, useSelector, useDispatch } from 'react-redux';
 
 const gender = [
 	{ value: 'm', label: 'Male' },
@@ -21,17 +31,18 @@ const gender = [
 	{ value: 'o', label: 'Other' },
 ];
 
-function GuestUser() {
+const GuestUser = ({ routeForward, closeModal }) => {
 	const [title, setTitle] = useState([]);
+	const signup = useDisclosure();
+	const dispatch = useDispatch();
+
 	useEffect(async () => {
 		let titles = await getTitles();
 		titles = titles.data;
 		titles = titles.map((title) => {
 			return { value: title.id, label: title.title_name };
 		});
-		console.log(titles);
-
-		setTitle(titles)
+		setTitle(titles);
 	}, []);
 	return (
 		<Formik
@@ -45,31 +56,21 @@ function GuestUser() {
 			validationSchema={Yup.object({
 				firstName: Yup.string().required('Required'),
 				lastName: Yup.string().required('Required'),
-				title: Yup.string()
-					.required('Required'),
+				title: Yup.string().required('Required'),
 				email: Yup.string().email().required('Required'),
 				gender: Yup.string()
 					.oneOf(gender.map((item) => item.value))
 					.required('Required'),
 			})}
-			onSubmit={(values) => {
+			onSubmit={async (values) => {
 				alert(JSON.stringify(values, null, 2));
-				addGuest(values);
+				let response = await addGuest(values);
+				console.log(response);
+				routeForward({ id: response.data.userID });
 			}}
 		>
 			{(props) => (
-				<Box
-					p={2}
-					mx={3}
-					boxShadow="xs"
-					border="1px"
-					borderColor="gray.200"
-					borderRadius="20px"
-					style={{
-						boxShadow: '0 1px 3px 0 rgb(60 64 67 / 30%), 0 4px 8px 3px rgb(60 64 67 / 15%)',
-						minWidth: '70%',
-					}}
-				>
+				<Box p={2}>
 					<Flex direction="column" ml={3}>
 						<Flex mb={1} mt={3} style={{ justifyContent: 'center' }} mx="5">
 							<Heading mb={4} fontWeight="500" fontSize="2rem">
@@ -79,12 +80,11 @@ function GuestUser() {
 						<Flex mb={5} mt={3} style={{ justifyContent: 'center' }} mx="5">
 							<Box flex="3" mr={3} maxWidth="150px">
 								<FormControl isInvalid={props.errors.title && props.touched.title}>
-									<FormLabel>Title</FormLabel>
 									<Select
 										id="title"
 										name="title"
 										options={title}
-										// placeholder="Title"
+										placeholder="Title"
 										value={title ? title.find((option) => option.value === props.values.title) : ''}
 										onChange={(option) => props.setFieldValue('title', option.value)}
 										onBlur={() => props.setFieldTouched('title', true)}
@@ -96,11 +96,10 @@ function GuestUser() {
 							</Box>
 							<Box flex="3" mr={3}>
 								<FormControl isInvalid={props.errors.firstName && props.touched.firstName}>
-									<FormLabel>First Name</FormLabel>
 									<Input
 										id="firstName"
 										type="text"
-										// placeholder="First Name"
+										placeholder="First Name"
 										{...props.getFieldProps('firstName')}
 									/>
 									<FormErrorMessage>{props.errors.firstName}</FormErrorMessage>
@@ -108,11 +107,10 @@ function GuestUser() {
 							</Box>
 							<Box flex="3">
 								<FormControl isInvalid={props.errors.lastName && props.touched.lastName}>
-									<FormLabel>Last Name</FormLabel>
 									<Input
 										id="lastName"
 										type="text"
-										// placeholder="Last Name"
+										placeholder="Last Name"
 										{...props.getFieldProps('lastName')}
 									/>
 									<FormErrorMessage>{props.errors.lastName}</FormErrorMessage>
@@ -120,15 +118,14 @@ function GuestUser() {
 							</Box>
 						</Flex>
 						<Flex mb={5} style={{ justifyContent: 'center' }}>
-							<Flex minWidth="55%">
-								<Box flex="1" mr={3}>
+							<Flex minWidth="80%">
+								<Box flex="2" mr={3}>
 									<FormControl isInvalid={props.errors.gender && props.touched.gender}>
-										<FormLabel>Gender</FormLabel>
 										<Select
 											id="gender"
 											name="gender"
 											options={gender}
-											// placeholder="Gender"
+											placeholder="Gender"
 											value={
 												gender
 													? gender.find((option) => option.value === props.values.gender)
@@ -144,11 +141,10 @@ function GuestUser() {
 								</Box>
 								<Box flex="5">
 									<FormControl isInvalid={props.errors.email && props.touched.email}>
-										<FormLabel>Email</FormLabel>
 										<Input
 											id="email"
 											type="text"
-											// placeholder="Last Name"
+											placeholder="Email"
 											{...props.getFieldProps('email')}
 										/>
 										<FormErrorMessage>{props.errors.email}</FormErrorMessage>
@@ -156,16 +152,58 @@ function GuestUser() {
 								</Box>
 							</Flex>
 						</Flex>
+						<Flex my={3}>
+							<Divider />
+						</Flex>
+
 						<Flex mb={3} style={{ justifyContent: 'center' }}>
-							<Button onClick={props.submitForm}>Continue as a guest user</Button>
+							<Button
+								onClick={props.submitForm}
+								colorScheme="teal"
+								rightIcon={<ArrowForwardIcon />}
+								width="full"
+								mt={4}
+							>
+								Continue as a guest user
+							</Button>
 						</Flex>
 						<Flex mb={3} style={{ justifyContent: 'center' }}>
-							<Button>Sign-In and Continue</Button>
+							<Button
+								onClick={() => {
+									closeModal();
+									signup.onOpen();
+								}}
+								colorScheme="teal"
+								rightIcon={<ArrowForwardIcon />}
+								width="full"
+							>
+								Sign-In and Continue
+							</Button>
 						</Flex>
 					</Flex>
+					<Modal
+						closeOnOverlayClick={false}
+						isOpen={signup.isOpen}
+						onClose={() => {
+							console.log('Here');
+							signup.onClose();
+						}}
+						size="lg"
+						motionPreset="slideInBottom"
+						isCentered
+						closeOnEsc
+					>
+						<ModalOverlay />
+						<ModalContent>
+							<ModalCloseButton />
+							<ModalBody>
+								<LoginArea onLogin={() => console.log('Logged in')} />
+							</ModalBody>
+						</ModalContent>
+					</Modal>
 				</Box>
 			)}
 		</Formik>
 	);
-}
+};
 export default GuestUser;

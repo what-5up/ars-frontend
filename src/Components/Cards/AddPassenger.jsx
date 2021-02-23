@@ -1,105 +1,69 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Flex, Input, Button, Heading, Divider, FormErrorMessage, FormControl, FormLabel } from '@chakra-ui/react';
+import { Box, Flex, Input, Button, Divider, FormErrorMessage, FormControl, FormLabel } from '@chakra-ui/react';
 import Select from 'react-select';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import {getTitles} from '../../api/title-api'
+import {gender} from '../../utils/constants';
 
-const title = [
-	{ value: 'Mr', label: 'Mr' },
-	{ value: 'Mrs', label: 'Mrs' },
-	{ value: 'Ms.', label: 'Ms.' },
-	{ value: 'Master', label: 'Master' },
-	{ value: 'Rev.', label: 'Rev.' },
-];
-const gender = [
-	{ value: 'Male', label: 'Male' },
-	{ value: 'Female', label: 'Female' },
-	{ value: 'Other', label: 'Other' },
-];
-
-// const API_URL = 'https://api.printful.com/countries';
-const API_URL = 'https://restcountries.eu/rest/v2/all';
-
-const fetchCountries = async () => {
-	let respone = await fetch(API_URL);
-	let data = await respone.json();
-	// data = data.result;
-	data = data.map((item) => {
-		return { value: item.name, label: item.name };
-	});
-	console.log(data);
-	return data;
-};
-
-const AddPassenger = () => {
-	let [countries, setCountries] = useState([]);
-
+const AddPassenger = ({ initialValues, addPassenger, countries }) => {
+	const [title, setTitle] = useState([]);
 	useEffect(async () => {
-		let data = await fetchCountries();
-		setCountries(data);
+		let titles = await getTitles();
+		titles = titles.data;
+		titles = titles.map((title) => {
+			return { value: title.id, label: title.title_name };
+		});
+		setTitle(titles);
 	}, []);
 	return (
 		<Formik
 			initialValues={{
-				firstName: '',
-				lastName: '',
+				first_name: '',
+				last_name: '',
 				title: '',
 				gender: '',
 				country: '',
-				dateOfBirth: '',
-				passportNumber: '',
-				passportExpDate: '',
+				birthday: '',
+				passport_no: '',
+				passport_expiry: '',
+				...initialValues,
 			}}
 			validationSchema={Yup.object({
-				firstName: Yup.string().required('Required'),
-				lastName: Yup.string().required('Required'),
+				first_name: Yup.string().required('Required'),
+				last_name: Yup.string().required('Required'),
 				title: Yup.string()
-					.oneOf(title.map((item) => item.value))
+					// .oneOf(title.map((item) => item.value))
 					.required('Required'),
 				gender: Yup.string()
 					.oneOf(gender.map((item) => item.value))
 					.required('Required'),
-				country: Yup.string()
-					.oneOf(countries.map((item) => item.value))
-					.required('Required'),
-				dateOfBirth: Yup.date().max(new Date(),"Enter a valid birthday").required('Required'),
-				passportNumber: Yup.number().required('Required'),
-				passportExpDate: Yup.date().required('Required'),
+				country: Yup.string(),
+				// .oneOf(countries.map((item) => item.value))
+				// .required('Required'),,
+				birthday: Yup.date().max(new Date(), 'Enter a valid birthday').required('Required'),
+				passport_no: Yup.number().required('Required'),
+				passport_expiry: Yup.date().required('Required'),
 			})}
 			onSubmit={(values) => {
-				alert(JSON.stringify(values, null, 2));
+				addPassenger(values);
 			}}
 		>
 			{(props) => (
-				<Box
-					p={2}
-					mx={3}
-					boxShadow="xs"
-					border="1px"
-					borderColor="gray.200"
-					borderRadius="20px"
-					style={{
-						boxShadow: '0 1px 3px 0 rgb(60 64 67 / 30%), 0 4px 8px 3px rgb(60 64 67 / 15%)',
-						minWidth: '80%',
-					}}
-				>
-					{/* <Form > */}
+				<Box p={2} width="80%">
 					<Flex direction="column" ml={3}>
-						<Flex mb={1} mt={3} style={{ justifyContent: 'center' }} mx="5">
-							<Heading mb={4} fontWeight="500" fontSize="2rem">
-								Passenger
-							</Heading>
-						</Flex>
 						<Flex mb={5} mt={3} style={{ justifyContent: 'center' }} mx="5">
 							<Box flex="3" mr={3} maxWidth="150px">
 								<FormControl isInvalid={props.errors.title && props.touched.title}>
 									<FormLabel>Title</FormLabel>
 									<Select
-										id="title"
 										name="title"
 										options={title}
-										// placeholder="Title"
-										value={title ? title.find((option) => option.value === props.values.title) : ''}
+										value={
+											title
+												? title.find((option) => option.value === props.values.title)
+												: props.initialValues.title
+										}
 										onChange={(option) => props.setFieldValue('title', option.value)}
 										onBlur={() => props.setFieldTouched('title', true)}
 										error={props.errors.title}
@@ -109,27 +73,25 @@ const AddPassenger = () => {
 								</FormControl>
 							</Box>
 							<Box flex="3" mr={3}>
-								<FormControl isInvalid={props.errors.firstName && props.touched.firstName}>
+								<FormControl isInvalid={props.errors.first_name && props.touched.first_name}>
 									<FormLabel>First Name</FormLabel>
 									<Input
-										id="firstName"
 										type="text"
-										// placeholder="First Name"
-										{...props.getFieldProps('firstName')}
+										value={props.initialValues.first_name}
+										{...props.getFieldProps('first_name')}
 									/>
-									<FormErrorMessage>{props.errors.firstName}</FormErrorMessage>
+									<FormErrorMessage>{props.errors.first_name}</FormErrorMessage>
 								</FormControl>
 							</Box>
 							<Box flex="3">
-								<FormControl isInvalid={props.errors.lastName && props.touched.lastName}>
+								<FormControl isInvalid={props.errors.last_name && props.touched.last_name}>
 									<FormLabel>Last Name</FormLabel>
 									<Input
-										id="lastName"
 										type="text"
-										// placeholder="Last Name"
-										{...props.getFieldProps('lastName')}
+										value={props.initialValues.last_name}
+										{...props.getFieldProps('last_name')}
 									/>
-									<FormErrorMessage>{props.errors.lastName}</FormErrorMessage>
+									<FormErrorMessage>{props.errors.last_name}</FormErrorMessage>
 								</FormControl>
 							</Box>
 						</Flex>
@@ -139,14 +101,12 @@ const AddPassenger = () => {
 									<FormControl isInvalid={props.errors.gender && props.touched.gender}>
 										<FormLabel>Gender</FormLabel>
 										<Select
-											id="gender"
 											name="gender"
 											options={gender}
-											// placeholder="Gender"
 											value={
 												gender
 													? gender.find((option) => option.value === props.values.gender)
-													: ''
+													: props.initialValues.gender
 											}
 											onChange={(option) => props.setFieldValue('gender', option.value)}
 											onBlur={() => props.setFieldTouched('gender', true)}
@@ -160,14 +120,12 @@ const AddPassenger = () => {
 									<FormControl isInvalid={props.errors.country && props.touched.country}>
 										<FormLabel>Country</FormLabel>
 										<Select
-											id="country"
 											options={countries}
-											// placeholder="Country"
 											name="country"
 											value={
 												countries
 													? countries.find((option) => option.value === props.values.country)
-													: ''
+													: props.initialValues.countries
 											}
 											onChange={(option) => props.setFieldValue('country', option.value)}
 											onBlur={() => props.setFieldTouched('country', true)}
@@ -178,17 +136,15 @@ const AddPassenger = () => {
 									</FormControl>
 								</Box>
 								<Box flex="1">
-									{/* <DatePicker style={{ borderRadius: 0 }} /> */}
-									<FormControl isInvalid={props.errors.dateOfBirth && props.touched.dateOfBirth}>
+									<FormControl isInvalid={props.errors.birthday && props.touched.birthday}>
 										<FormLabel>Date of Birth</FormLabel>
 										<Input
-											id="dateOfBirth"
 											type="date"
-											max = {new Date()}
-											// placeholder="Date of Birth"
-											{...props.getFieldProps('dateOfBirth')}
+											max={new Date()}
+											value={props.initialValues.date}
+											{...props.getFieldProps('birthday')}
 										/>
-										<FormErrorMessage>{props.errors.dateOfBirth}</FormErrorMessage>
+										<FormErrorMessage>{props.errors.birthday}</FormErrorMessage>
 									</FormControl>
 								</Box>
 							</Flex>
@@ -197,30 +153,30 @@ const AddPassenger = () => {
 							<Flex width="50%">
 								<Box flex="5" mr={3}>
 									<FormControl
-										isInvalid={props.errors.passportNumber && props.touched.passportNumber}
+										isInvalid={props.errors.passport_no && props.touched.passport_no}
 									>
 										<FormLabel>Passport Number</FormLabel>
 										<Input
-											id="passportNumber"
+											name="passport_no"
 											type="number"
-											// placeholder="Passport Number"
-											{...props.getFieldProps('passportNumber')}
+											value={props.initialValues.passport_no}
+											{...props.getFieldProps('passport_no')}
 										/>
-										<FormErrorMessage>{props.errors.passportNumber}</FormErrorMessage>
+										<FormErrorMessage>{props.errors.passport_no}</FormErrorMessage>
 									</FormControl>
 								</Box>
 								<Box flex="5">
 									<FormControl
-										isInvalid={props.errors.passportExpDate && props.touched.passportExpDate}
+										isInvalid={props.errors.passport_expiry && props.touched.passport_expiry}
 									>
 										<FormLabel>Passport Expiry Date</FormLabel>
 										<Input
-											id="passportExpDate"
+											name="passport_expiry"
 											type="date"
-											// placeholder="Passport Expiry Date"
-											{...props.getFieldProps('passportExpDate')}
+											value={props.initialValues.passport_expiry}
+											{...props.getFieldProps('passport_expiry')}
 										/>
-										<FormErrorMessage>{props.errors.passportExpDate}</FormErrorMessage>
+										<FormErrorMessage>{props.errors.passport_expiry}</FormErrorMessage>
 									</FormControl>
 								</Box>
 							</Flex>
@@ -230,7 +186,7 @@ const AddPassenger = () => {
 						</Flex>
 						<Flex mb={3} style={{ justifyContent: 'center' }}>
 							<Button type="submit" onClick={props.submitForm}>
-								Continue
+								Submit
 							</Button>
 						</Flex>
 					</Flex>
