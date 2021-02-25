@@ -18,3 +18,9 @@ export const BookingStatesEnum = {
     CANCELLED: 'cancelled'
 }
 Object.freeze(BookingStatesEnum);
+
+export const gender = [
+	{ value: 'm', label: 'Male' },
+	{ value: 'f', label: 'Female' },
+	{ value: 'o', label: 'Other' },
+];
