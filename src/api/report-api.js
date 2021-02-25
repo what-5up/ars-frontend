@@ -1,6 +1,6 @@
 import { getRequest, generateOptionalParametersQuery } from "./utils";
 
-const URL = "report";
+const URL = "reports";
 
 /**
  * Return all the passengers for the next immediate flight. Categorized by the boundary age of 18.
@@ -9,7 +9,7 @@ const URL = "report";
  * 
  * @return {Promise<object>} { above18, below18 } { route, departure, first_name, last_name, passenger_age }
  */
-export const getPassengersByFlightNo = (route = null) => getRequest(`${URL}/1${route!==null ? `?route=${route}` : ''}`);
+export const getPassengersByFlightNo = (route = null) => getRequest(`${URL}/1${route !== null ? `?route=${route}` : ''}`);
 
 /**
  * Return all the bookings categorized by the passenger type
@@ -43,13 +43,20 @@ export const getPassengerCountByDest = (params) => {
 /**
  * Return a list of revenue by aircraft model by each month
  * 
+ * @param {object} params - query parameters to filter the records
+ * @param {?string} params.model - aircraft model
+ * @param {?string} params.month - yyyy-MM
+ * 
  * @return {Promise<object>} [model = [{month: "month", revenue:"revenue"}]]
  */
-export const getRevenueByAircraftModel = () => getRequest(`${URL}/4`);
+export const getRevenueByAircraftModel = (params) => {
+    params = Object.assign({ model: null, month: null, endDate: null }, params);
+    return getRequest(`${URL}/4${generateOptionalParametersQuery(params)}`);
+}
 
 /**
  * Return the past details of flights
  * 
  * @return {Promise<object>} [{ id, route, departure, delayed_departure, class, passengers }]
  */
-export const getPastFlightDetails = () =>  getRequest(`${URL}/5`);
+export const getPastFlightDetails = () => getRequest(`${URL}/5`);

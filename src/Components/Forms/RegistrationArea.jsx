@@ -1,9 +1,10 @@
-import { React, useState } from "react";
+import { React, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { Input, Select, Box, Button, Heading } from "@chakra-ui/react";
 import { ArrowForwardIcon } from "@chakra-ui/icons";
 import Grid from "@material-ui/core/Grid";
 import Container from "@material-ui/core/Container";
+import { getTitles } from '../../api/title-api';
 
 const RegistrationArea = () => {
   return (
@@ -47,7 +48,13 @@ RegistrationHeader.defaultProps = {
 };
 
 const RegistrationForm = () => {
-  const titleList = ["Mr.", "Mrs.", "Miss", "Rev"];
+  const [titleList, setTitleList] = useState([]);
+	useEffect(async () => {
+		let titles = await getTitles();
+		titles = titles.data;
+
+		setTitleList(titles);
+	}, []);
   const [data, setData] = useState({
     title: "",
     firstName: "",
