@@ -57,7 +57,7 @@ export const addScheduledFlight = (data) => postRequest(URL, data);
  * @return {Promise<object>}
  */
 export const updateScheduledFlight = (id, data) => {
-    data = Object.assign({ origin: null, destination: null, aircraftID: null, aircraftModel: null }, data);
+    data = Object.assign({ route: null, departure: null, assignedAircraftID: null, delayedDeparture: null }, data);
     return putRequest(`${URL}/${id}`, data);
 }
 
