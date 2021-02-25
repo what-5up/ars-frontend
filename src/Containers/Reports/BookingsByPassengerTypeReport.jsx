@@ -65,15 +65,18 @@ const BookingsByPassengerTypeReport = (props) => {
 
 const FilterComponent = ({ handleDateChange, handleSortChange }) => {
   const [orderBy, setOrderBy] = useState("accountType");
+  const [order, setOrder] = useState("asc");
   const handleChange = (event) => {
     var value = event.target.value;
     handleDateChange({ [event.target.name]: value });
   };
-  const handleClick = (order) => {
-    handleSortChange(orderBy, order);
+  const handleClick = (ord) => {
+    setOrder(ord);
+    handleSortChange(orderBy, ord);
   };
   const handleOrderChange = (event) => {
     setOrderBy(event.target.value);
+    handleSortChange(orderBy, order);
   };
   return (
     <Box m={4} px={2}>

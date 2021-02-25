@@ -59,4 +59,4 @@ export const getRevenueByAircraftModel = (params) => {
  * 
  * @return {Promise<object>} [{ id, route, departure, delayed_departure, class, passengers }]
  */
-export const getPastFlightDetails = () => getRequest(`${URL} / 5`);
+export const getPastFlightDetails = () => getRequest(`${URL}/5`);

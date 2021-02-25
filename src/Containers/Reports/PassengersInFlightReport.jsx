@@ -25,12 +25,13 @@ import ReportHeader from "../../Components/Headers/ReportHeader";
 import { getPassengersByFlightNo } from "../../api/report-api";
 
 const PassengersInFlightReport = (props) => {
-  const [data, setData] = useState([]);
+  const [fetchedData, setFetchedData] = useState([]);
+  const [dataToShow, setDataToShow] = useState([]);
   const [filterValues, setFilterValues] = useState({
     route: null,
   });
   useEffect(async () => {
-    let response = await getPassengersByFlightNo(filterValues);
+    let response = await getPassengersByFlightNo(filterValues.route);
     response = response.results;
     let dummydata = [
       {
@@ -54,29 +55,28 @@ const PassengersInFlightReport = (props) => {
         age: 18,
       },
     ];
-
-    setData(dummydata);
+    setFetchedData(dummydata);
+    setDataToShow(dummydata);
   }, [filterValues]);
   const handleFilterChange = (filterChange) => {
     setFilterValues({ ...filterValues, ...filterChange });
   };
   const handleSortChange = (orderBy, order) => {
-    var sortedData = _.orderBy(data, [orderBy], [order]);
-    setData(sortedData);
+    var sortedData = _.orderBy(dataToShow, [orderBy], [order]);
+    setDataToShow(sortedData);
   };
-  const handleAgeSelect=(val)=>{
-    var filteredData = _.filter(data,(row)=>{
-      if (val==='below18') {
-        return row.age<=18;
-      } 
-      else if(val==='above18') {
-        return row.age>18;
+  const handleAgeSelect = (val) => {
+    var filteredData = _.filter(fetchedData, (row) => {
+      if (val === "below18") {
+        return row.age <= 18;
+      } else if (val === "above18") {
+        return row.age > 18;
       } else {
         return true;
       }
-    })
-    setData(filteredData);
-  }
+    });
+    setDataToShow(filteredData);
+  };
   return (
     <Box textAlign="center" mx="10px">
       <ReportHeader header="Passengers Travelling in a Flight" />
@@ -86,7 +86,7 @@ const PassengersInFlightReport = (props) => {
         handleAgeSelect={handleAgeSelect}
       />
       <PassengersInFlightReportContent
-        content={data}
+        content={dataToShow}
         tableCaption="Passengers Travelling in a Flight"
       />
     </Box>
@@ -99,15 +99,18 @@ const FilterComponent = ({
   handleAgeSelect,
 }) => {
   const [orderBy, setOrderBy] = useState("firstName");
+  const [order, setOrder] = useState("asc");
   const handleChange = (event) => {
     var value = event.target.value;
     handleDateChange({ [event.target.name]: value });
   };
-  const handleClick = (order) => {
-    handleSortChange(orderBy, order);
+  const handleClick = (ord) => {
+    setOrder(ord);
+    handleSortChange(orderBy, ord);
   };
   const handleOrderChange = (event) => {
     setOrderBy(event.target.value);
+    handleSortChange(orderBy, order);
   };
   const [age, setAge] = useState("all");
   const radioChange = (val) => {

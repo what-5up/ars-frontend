@@ -4,6 +4,7 @@ import BookingsByPassengerTypeReport from "../../Containers/Reports/BookingsByPa
 import PassengersForDestinationReport from "../../Containers/Reports/PassengersForDestinationReport";
 import PassengersInFlightReport from "../../Containers/Reports/PassengersInFlightReport";
 import RevenueReport from "../../Containers/Reports/RevenueReport";
+import FlightDetailsReport from "../../Containers/Reports/FlightDetailsReport";
 
 const Dashboard = () => {
 	return (
@@ -19,6 +20,9 @@ const Dashboard = () => {
 			</Flex>
 			<Flex justifyContent= 'center' minWidth= '80%' >
 				<RevenueReport />
+			</Flex>
+			<Flex justifyContent= 'center' minWidth= '80%' >
+				<FlightDetailsReport />
 			</Flex>
 		</Flex>
 	);
