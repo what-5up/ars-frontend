@@ -70,6 +70,11 @@ const AccountTypesPage = () => {
     var newData = fetchedData.filter((type) => type.typeId !== id);
     setFetchedData(newData);
   };
+  const handleNew = (newValues) => {
+    //   TODO: send data to backend
+    var newData = fetchedData.concat(newValues);
+    setFetchedData(newData);
+  };
   const handleUpdate = (newValues) => {
     //   TODO: send data to backend
     var newData = fetchedData.map((type) => {
@@ -83,6 +88,7 @@ const AccountTypesPage = () => {
       <AccountTypesTable
         content={fetchedData}
         tableCaption={""}
+        handleNew={handleNew}
         handleUpdate={handleUpdate}
         handleDelete={handleDelete}
       />
@@ -93,42 +99,49 @@ const AccountTypesPage = () => {
 const AccountTypesTable = ({
   content,
   tableCaption,
+  handleNew,
   handleUpdate,
   handleDelete,
 }) => {
   return (
-    <Table mt={5} variant="striped" colorScheme="gray">
-      <TableCaption>{tableCaption}</TableCaption>
-      <Thead>
-        <Tr>
-          <Th>Account Type</Th>
-          <Th>Discount</Th>
-          <Th isNumeric>Bookings Criteria</Th>
-          <Th></Th>
-          <Th></Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        {content.map((row) => {
-          return (
-            <Tr key={row.typeId}>
-              <Td>{row.accountType}</Td>
-              <Td>{`${row.discount} %`}</Td>
-              <Td isNumeric>{row.bookingsCriteria}</Td>
-              <Td>
-                <UpdateModal values={row} handleUpdate={handleUpdate} />
-              </Td>
-              <Td>
-                <DeleteModal typeId={row.typeId} handleDelete={handleDelete} />
-              </Td>
-            </Tr>
-          );
-        })}
-      </Tbody>
-    </Table>
+    <>
+    <UpdateModal values={{}} handleUpdate={handleNew} forNew={true}/>
+      <Table mt={5} variant="striped" colorScheme="gray">
+        <TableCaption>{tableCaption}</TableCaption>
+        <Thead>
+          <Tr>
+            <Th>Account Type</Th>
+            <Th>Discount</Th>
+            <Th isNumeric>Bookings Criteria</Th>
+            <Th></Th>
+            <Th></Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {content.map((row) => {
+            return (
+              <Tr key={row.typeId}>
+                <Td>{row.accountType}</Td>
+                <Td>{`${row.discount} %`}</Td>
+                <Td isNumeric>{row.bookingsCriteria}</Td>
+                <Td>
+                  <UpdateModal values={row} handleUpdate={handleUpdate} />
+                </Td>
+                <Td>
+                  <DeleteModal
+                    typeId={row.typeId}
+                    handleDelete={handleDelete}
+                  />
+                </Td>
+              </Tr>
+            );
+          })}
+        </Tbody>
+      </Table>
+    </>
   );
 };
-const UpdateModal = ({ values, handleUpdate }) => {
+const UpdateModal = ({ values, handleUpdate, forNew }) => {
   const [formValues, setFormValues] = useState(values);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const handleSubmit = (event) => {
@@ -142,10 +155,19 @@ const UpdateModal = ({ values, handleUpdate }) => {
   };
   return (
     <div>
-      <Button bg="transparent" _hover={{ bg: "trasparent" }} onClick={onOpen}>
-        <CreateIcon />
-        <Text mx={2}>Update</Text>
-      </Button>
+      {forNew ? (
+        <Button colorScheme="teal" onClick={onOpen} m={4}>
+          <AddIcon />
+          <Text mx={2}>
+            {forNew ? "Add New Account Type" : "Add New Account Type"}
+          </Text>
+        </Button>
+      ) : (
+        <Button bg="transparent" _hover={{ bg: "trasparent" }} onClick={onOpen}>
+          <CreateIcon />
+          <Text mx={2}>Update</Text>
+        </Button>
+      )}
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
         <ModalContent>
