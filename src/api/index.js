@@ -1,4 +1,11 @@
 export {
+    getAccountTypes,
+    addAccountType,
+    updateAccountType,
+    deleteAccountType
+} from './account-types'
+
+export {
     addGuest
 } from './guest-api'
 
