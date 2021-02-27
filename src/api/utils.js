@@ -2,7 +2,7 @@ import axios from './axios';
 
 export const getRequest = async (url, body) => {
 	try {
-		let response = (body) ? await axios.get(url,body) : await axios.get(url);
+		let response = (body) ? await axios.get(url, body) : await axios.get(url);
 		return generateSuccessOutput(response);
 	} catch (error) {
 		return generateErrorOutput(error);
@@ -15,7 +15,7 @@ export const postRequest = async (url, data) => {
 		return generateSuccessOutput(response);
 	} catch (error) {
 		return generateErrorOutput(error);
-	} 
+	}
 };
 
 export const putRequest = async (url, data) => {
@@ -37,23 +37,29 @@ export const deleteRequest = async (url) => {
 };
 
 export const generateOptionalParametersQuery = (params) => {
-    let optionalParams = [];
-    Object.keys(params).forEach(key => {
-        if (params[key] !== null) optionalParams.push(`${key}=${params[key]}`)
-    })
-    return (optionalParams.length > 0) ? `?${optionalParams.join('&')}` : ''
+	let optionalParams = [];
+	Object.keys(params).forEach(key => {
+		if (params[key] !== null) optionalParams.push(`${key}=${params[key]}`)
+	})
+	return (optionalParams.length > 0) ? `?${optionalParams.join('&')}` : ''
 }
 
 const generateSuccessOutput = (response) => {
-	return  {
+	return {
 		data: response.data.results,
 		message: response.data.message,
 	}
 }
 
 const generateErrorOutput = (error) => {
-	return {  
-		error: error,
-		message : error.response.data.message
-	}
+	if (error.message = "Network Error")
+		return {
+			error: error,
+			message: error.message
+		}
+	else
+		return {
+			error: error,
+			message: error.response.data.message
+		}
 }
