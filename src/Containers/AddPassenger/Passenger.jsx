@@ -6,14 +6,18 @@ import {
 	AccordionButton,
 	AccordionItem,
 	Box,
-	AccordionIcon,
 	AccordionPanel,
 	Heading,
+	Text,
+	Divider
 } from '@chakra-ui/react';
 import AddPassenger from '../../Components/Cards/AddPassenger';
-import {addOrUpdateArray} from '../../utils/helpers';
+import { addOrUpdateArray } from '../../utils/helpers';
 import { useLocation, useHistory } from 'react-router-dom';
-import {addPassengers} from '../../api/passenger-api'
+import { addPassengers } from '../../api/passenger-api';
+import PassengerPlaceholder from '../../Components/Cards/PassengerPlaceholder';
+import PassengerFlight from '../../Components/Cards/PassengerFlight';
+
 const API_URL = 'https://restcountries.eu/rest/v2/all';
 
 const fetchCountries = async () => {
@@ -30,62 +34,105 @@ const Passenger = () => {
 	let [countries, setCountries] = useState([]);
 	const location = useLocation();
 	const locationParams = location.state;
+	const count = 4; //location.state.count;
 	const history = useHistory();
-	const handleClick = async() => {
-		let res = await addPassengers({passengers:passengers})
-		console.log(res);
-		// history.push('/seatmap',{passengers:passengers, ...locationParams})
+	const handleClick = async () => {
+		history.push('/seatmap',{passengers:passengers, ...locationParams})
+	};
+
+	const checkToContinue = () => {
+		let canContinue = true;
+		for(let i =0;i <passengers.length;i++){
+			if(!passengers[i].hasOwnProperty('first_name')){
+				canContinue = false
+				break;
+			}
+		}
+		return !canContinue;
 	}
+
 	useEffect(async () => {
-		let data = await fetchCountries();
-		setCountries(data);
+		let tempArr = [];
+		for (let i = 0; i < count; i++) {
+			tempArr.push({ key: i, disabled: true });
+			if (i != 0) {
+				tempArr[0]['disabled'] = false;
+			}
+		}
+		setPassengers(tempArr);
 	}, []);
-	const AddEmptyObject = () => {
-		let len = passengers.length
-		setPassengers([...[...passengers,{key:len}]])
-	}
+	
+
+
 	const addOrUpdatePassengers = (obj) => {
-		setPassengers([...addOrUpdateArray(passengers,obj)])
-	}
+		let newPassengers = passengers;
+		let index = passengers.findIndex((item) => item.disabled == true);
+		if (index > 0) {
+			newPassengers = addOrUpdateArray(passengers, { ...passengers[index], disabled: false });
+		}
+		setPassengers([...addOrUpdateArray(newPassengers, obj)]);
+	};
 	return (
-		<Box width="80%" mx="auto">
-			<Heading textAlign="center" mt="3">
-				Add Passengers
+		<Box width="100%" mx="auto">
+			<Heading  ml="12" mt="3" mb="5">
+				Passengers
 			</Heading>
-			<Flex justifyContent="flex-end" mx="6" mb="3">
-				<Button mr="3" onClick={AddEmptyObject}>Add More</Button>
-				<Button onClick={handleClick}>Continue</Button>
-			</Flex>
-			<Flex w="100%" justifyContent="center">
-				{passengers.length === 0 ? (
-					<AddPassenger initialValues ={{key:0}} addPassenger={addOrUpdatePassengers} countries={countries}/>
-				) : (
-					<Flex width="100%">
-					<Accordion allowToggle w="100%">
-						{passengers.map((item,index) => (
-							<AccordionPart key={index} isExpanded={false} initialValues={item} addPassenger={addOrUpdatePassengers} countries={countries}/>
-						))}
-					</Accordion>
+			<Divider/>
+			<Flex>
+				<Flex flexDirection="column" w="70%">
+					<Flex w="100%" justifyContent="center">
+						<Accordion w="90%" allowMultiple allowToggle>
+							{passengers.map((item) => (
+								<PassengerAccordion
+									key={item.key}
+									index={item.key}
+									disabled={item.disabled}
+									addOrUpdatePassengers={addOrUpdatePassengers}
+									countries={countries}
+								/>
+							))}
+						</Accordion>
 					</Flex>
-				)}
+					<Flex justifyContent="flex-end" mx="12" mb="3">
+						<Button onClick={handleClick} isDisabled={checkToContinue()} colorScheme="teal" minWidth="full" mt={4}>
+							Continue
+						</Button>
+					</Flex>
+				</Flex>
+
+				<Flex flex={3} w="30%">
+					<Flex w="100%" justifyContent="center">
+						<PassengerFlight />
+					</Flex>
+				</Flex>
 			</Flex>
 		</Box>
 	);
 };
 
-const AccordionPart = ({initialValues, addPassenger, countries}) => {
+const PassengerAccordion = ({ index, disabled, countries, addOrUpdatePassengers }) => {
 	return (
-		<AccordionItem isExpanded={false} >
+		<AccordionItem
+			boxShadow="xs"
+			borderRadius="0px"
+			mb={3}
+			style={{
+				boxShadow: '0 1px 3px 0 rgb(60 64 67 / 30%), 0 4px 8px 3px rgb(60 64 67 / 15%)',
+				minWidth: '80%',
+				borderColor: 'gray.200',
+			}}
+			isDisabled={disabled}
+			_expanded
+		>
 			<h2>
 				<AccordionButton>
-					<Box flex="1" textAlign="left">
-						{'firstn_ame' in initialValues && 'last_name' in initialValues ?`${initialValues.first_name} ${initialValues.last_name}`:'' }
+					<Box mb={2} mt={3} mx="5">
+						<Text fontSize="2xl">{`Passenger ${index + 1}`}</Text>
 					</Box>
-					<AccordionIcon />
 				</AccordionButton>
 			</h2>
 			<AccordionPanel pb={4}>
-				<AddPassenger initialValues = {initialValues} addPassenger={addPassenger} countries={countries}/>
+				<AddPassenger initialValues={{ key: 0 }} addPassenger={addOrUpdatePassengers} countries={countries} />
 			</AccordionPanel>
 		</AccordionItem>
 	);

@@ -68,13 +68,13 @@ const Content = () => {
 					</Box>
 				</Route>
 				<Route path={`/passenger`}>
-					{location.state == undefined ? (
+					{/* {location.state == undefined ? (
 						<Redirect to={{ pathname: '/' }} />
-					) : (
+					) : ( */}
 						<Box style={{ width: '100vw' }}>
 							<Passenger />
 						</Box>
-					)}
+					{/* )} */}
 				</Route>
 				<Route path="/signout" component={Signout} />
 				<Route path="/">
