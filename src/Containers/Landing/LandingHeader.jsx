@@ -155,9 +155,7 @@ const Menu = ({ direction, isAuthenticated }) => {
       <MenuItems to="/">Home</MenuItems>
       <MenuItems to="/discover">Discover </MenuItems>
       <MenuItems to="/contact-us">Contact Us </MenuItems>
-        {!isAuthenticated ? (
-          <RegisterArea isAuthenticated={isAuthenticated} />
-        ) : null}
+      {!isAuthenticated ? <RegisterArea /> : null}
     </Stack>
   );
 };
@@ -217,14 +215,11 @@ const SignInArea = ({ withAvatar, isAuthenticated }) => {
   );
 };
 
-const RegisterArea = ({ isAuthenticated }) => {
+const RegisterArea = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
-      <CustomButton
-        title="Register"
-        onOpen={!isAuthenticated ? onOpen : null}
-      />
+      <CustomButton title="Register" onOpen={onOpen} />
       <Modal
         closeOnOverlayClick={false}
         isOpen={isOpen}
