@@ -5,6 +5,8 @@ import { AUTH_REDIRECT_PATH } from '../../utils/constants';
 const initialState = {
     token: null,
     userID: null,
+    accType: null,
+    userType: null,
     error: null,
     loading: false,
     authRedirectPath: AUTH_REDIRECT_PATH
@@ -18,6 +20,8 @@ const authSuccess = (state, action) => {
     return updateObject( state, { 
         token: action.token,
         userID: action.userID,
+        accType: action.accType,
+        userType: action.userType,
         error: null,
         loading: false
      } );
@@ -31,7 +35,7 @@ const authFail = (state, action) => {
 };
 
 const authLogout = (state, action) => {
-    return updateObject(state, { token: null, userID: null });
+    return updateObject(state, { token: null, userID: null, accType: null, userType: null });
 };
 
 const setAuthRedirectPath = (state, action) => {

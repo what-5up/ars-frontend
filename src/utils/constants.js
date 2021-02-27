@@ -24,3 +24,11 @@ export const gender = [
 	{ value: 'f', label: 'Female' },
 	{ value: 'o', label: 'Other' },
 ];
+
+export const DesignationEnum = {
+    ADMIN : 'a',
+    SALES_REPRESENTATIVE : 's',
+    MANAGEMENT : 'm',
+    CREW_SCHEDULE_COORDINATOR: 'c',
+    USER : 'u'
+}

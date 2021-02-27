@@ -35,6 +35,10 @@ export {
 } from './scheduled-flight-api'
 
 export {
+    login
+} from './session-api'
+
+export {
     getTravelerClasses
 } from './traveller-class-api'
 

@@ -157,7 +157,7 @@ const UpdateModal = ({ values, handleUpdate, forNew }) => {
     <div>
       {forNew ? (
         <Button colorScheme="teal" onClick={onOpen} m={4}>
-          <AddIcon />
+          {/* <AddIcon /> */}
           <Text mx={2}>
             {forNew ? "Add New Account Type" : "Add New Account Type"}
           </Text>

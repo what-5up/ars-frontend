@@ -1,4 +1,6 @@
-import axios from '../../api/axios';
+import { login } from '../../api';
+import jwt_decode from "jwt-decode";
+import { DesignationEnum } from '../../utils/constants';
 
 import * as actionTypes from './action-types';
 
@@ -8,11 +10,15 @@ export const authStart = () => {
     };
 };
 
-export const authSuccess = (token, userID) => {
+export const authSuccess = (token, userID, accType, userType = null) => {
+    console.log(accType);
     return {
         type: actionTypes.AUTH_SUCCESS,
         token: token,
-        userID: userID
+        userID: userID,
+        accType: accType,
+        userType: userType
+
     };
 };
 
@@ -27,6 +33,8 @@ export const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('expirationDate');
     localStorage.removeItem('userID');
+    localStorage.removeItem('accType');
+    localStorage.removeItem('userType');
     return {
         type: actionTypes.AUTH_LOGOUT
     };
@@ -47,21 +55,41 @@ export const auth = (email, password, onLogin) => {
             email: email,
             password: password
         };
-        let url = 'session';
         console.log(authData);
-        axios.post(url, authData)
-            .then(response => {
-                console.log(response);
-                const expirationDate = new Date(new Date().getTime() + response.data.expiresIn * 1000);
-                localStorage.setItem('token', response.data.token);
+        login(authData)
+            .then(result => {
+                console.log(result);
+
+                //decoding the jwt token
+                const token = result.data;
+                const decoded = jwt_decode(token);
+                const expiresIn = decoded.expiresIn;
+                const userID = decoded.userID;
+                const accType = decoded.accType;
+                const expirationDate = new Date(new Date().getTime() + expiresIn * 1000);
+
+                localStorage.setItem('token', token);
                 localStorage.setItem('expirationDate', expirationDate);
-                localStorage.setItem('userID', response.data.userID);
-                dispatch(authSuccess(response.data.token, response.data.userID));
+                localStorage.setItem('userID', userID);
+
+                //setting account type
+                //if system officer
+                if (Object.values(DesignationEnum).includes(accType)) {
+                    localStorage.setItem('accType', accType);
+                    dispatch(authSuccess(token, userID, accType, null));
+                }
+                //if user
+                else {
+                    localStorage.setItem('accType', DesignationEnum.USER);
+                    localStorage.setItem('userType', accType);
+                    dispatch(authSuccess(token, userID, DesignationEnum.USER, accType));
+                }
                 onLogin();
-                dispatch(checkAuthTimeout(response.data.expiresIn));
+                dispatch(checkAuthTimeout(expiresIn));
             })
             .catch(err => {
-                dispatch(authFail(err.response.data.message));
+                console.log(err);
+                dispatch(authFail(err.result.results.data.message));
             });
     };
 };
@@ -84,9 +112,11 @@ export const authCheckState = () => {
                 dispatch(logout());
             } else {
                 const userID = localStorage.getItem('userID');
-                dispatch(authSuccess(token, userID));
-                dispatch(checkAuthTimeout((expirationDate.getTime() - new Date().getTime()) / 1000 ));
-            }   
+                const accType = localStorage.getItem('accType');
+                const userType = localStorage.getItem('userType');
+                dispatch(authSuccess(token, userID, accType, userType));
+                dispatch(checkAuthTimeout((expirationDate.getTime() - new Date().getTime()) / 1000));
+            }
         }
     };
 };
