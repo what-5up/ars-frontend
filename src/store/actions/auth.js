@@ -56,10 +56,8 @@ export const auth = (email, password, onLogin) => {
             password: password
         };
         console.log(authData);
-        login(authData)
-            .then(result => {
-                console.log(result);
-
+        login(authData).then(result => {
+            if (result.data) { 
                 //decoding the jwt token
                 const token = result.data;
                 const decoded = jwt_decode(token);
@@ -86,11 +84,11 @@ export const auth = (email, password, onLogin) => {
                 }
                 onLogin();
                 dispatch(checkAuthTimeout(expiresIn));
-            })
-            .catch(err => {
-                console.log(err);
-                dispatch(authFail(err.result.results.data.message));
-            });
+            }
+            else {
+                dispatch(authFail(result.message));
+            }
+        });
     };
 };
 

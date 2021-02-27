@@ -19,7 +19,6 @@ const Main = () => {
   const accType = useSelector(state => state.auth.accType);
 
   const MainPage = ({accType}) => {
-    console.log(accType);
     switch (accType) {
       case DesignationEnum.MANAGEMENT:
         return <Dashboard />

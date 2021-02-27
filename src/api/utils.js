@@ -15,7 +15,7 @@ export const postRequest = async (url, data) => {
 		return generateSuccessOutput(response);
 	} catch (error) {
 		return generateErrorOutput(error);
-	}
+	} 
 };
 
 export const putRequest = async (url, data) => {
@@ -52,8 +52,8 @@ const generateSuccessOutput = (response) => {
 }
 
 const generateErrorOutput = (error) => {
-	return  {
+	return {  
 		error: error,
-		message : error.message
+		message : error.response.data.message
 	}
 }
