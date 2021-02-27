@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 
-import SeatPicker from 'react-seat-picker'
-import { Spinner } from "@chakra-ui/react";
+import SeatPicker from '../../Components/SeatPicker';
+import { Spinner, HStack } from "@chakra-ui/react";
 
 import { getSeatMap } from '../../api';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
@@ -166,7 +166,7 @@ class SeatMap extends Component {
         />
         if (!this.state.loading) {
             passengerTable =
-                <table width="75%" align>
+                <table width="100%" align>
                     <tr align="left">
                         <th>First Name</th>
                         <th>Last Name</th>
@@ -200,13 +200,23 @@ class SeatMap extends Component {
         }
 
         return (
-            <div>
-                <h1>Passengers</h1>
-                {passengerTable}
-                <h2>Total Price = {this.state.unassigned.length === 0 ? "Rs. " + this.state.passengers.reduce(((total, p) => total + p.amount), 0) : null}</h2>
-                <h1>Seat Picker</h1>
-                {seatMap}
-            </div>
+
+            <HStack spacing="24px" align="stretch">
+                 <div>
+                    <h1>Seat Picker</h1>
+                    {seatMap}
+                </div>
+                <div>
+                    <h1>Passengers</h1>
+                    {passengerTable}
+                    <h2>Total Price = {this.state.unassigned.length === 0 ? "Rs. " + this.state.passengers.reduce(((total, p) => total + p.amount), 0) : null}</h2>
+                </div>
+               
+
+            </HStack>
+
+
+
         )
     }
 }

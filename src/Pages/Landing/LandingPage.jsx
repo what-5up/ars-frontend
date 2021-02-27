@@ -10,7 +10,7 @@ import DiscoverFlights from '../../Containers/DiscoverFlights/DiscoverFlights';
 import Passenger from '../../Containers/AddPassenger/Passenger';
 import GuestUser from '../../Components/Cards/GuestUser';
 import Dashboard from "../Management/Dashboard";
-import SeatMap from  '../../Components/SeatMap/SeatMap'
+import SeatMap from  '../../Containers/SeatMap/SeatMap'
 
 export default function LandingPage() {
 	return (
