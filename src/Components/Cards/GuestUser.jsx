@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
 	Box,
 	Flex,
@@ -24,17 +24,19 @@ import { getTitles } from '../../api/title-api';
 import { ArrowForwardIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import LoginArea from '../Forms/LoginArea';
 import { connect, useSelector, useDispatch } from 'react-redux';
+import {gender} from '../../utils/constants';
+import * as actions from '../../store/actions/index';
 
-const gender = [
-	{ value: 'm', label: 'Male' },
-	{ value: 'f', label: 'Female' },
-	{ value: 'o', label: 'Other' },
-];
 
 const GuestUser = ({ routeForward, closeModal }) => {
 	const [title, setTitle] = useState([]);
 	const signup = useDisclosure();
 	const dispatch = useDispatch();
+	const onAuth = useCallback(
+		(token, userID, expiresIn) => dispatch(actions.authSuccess(token, userID, expiresIn)),
+		[dispatch]
+	  )
+	
 
 	useEffect(async () => {
 		let titles = await getTitles();
@@ -66,6 +68,7 @@ const GuestUser = ({ routeForward, closeModal }) => {
 				alert(JSON.stringify(values, null, 2));
 				let response = await addGuest(values);
 				console.log(response);
+				onAuth(response.data.token,response.data.userID, response.data.expiresIn)
 				routeForward({ id: response.data.userID });
 			}}
 		>
@@ -117,7 +120,7 @@ const GuestUser = ({ routeForward, closeModal }) => {
 								</FormControl>
 							</Box>
 						</Flex>
-						<Flex mb={5} style={{ justifyContent: 'center' }}>
+						<Flex mb={5} mt={5} style={{ justifyContent: 'center' }}>
 							<Flex minWidth="80%">
 								<Box flex="2" mr={3}>
 									<FormControl isInvalid={props.errors.gender && props.touched.gender}>
