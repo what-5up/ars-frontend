@@ -21,149 +21,152 @@ import { getSeatMap } from '../../api';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 
 class SeatMap extends Component {
-	constructor(props) {
-		super(props);
+    constructor(props) {
+        super(props)
 
-		this.state = {
-			passengers: props.passengers,
-			passengerPointer: props.passengers[0].id,
-			unassigned: props.passengers.map((p) => {
-				return p.id;
-			}),
-			flightID: props.flightID,
-			loading: true,
-			maxRows: null,
-			maxColumns: null,
-			map: [],
-		};
-	}
+        this.state = {
+            passengers: props.passengers,
+            passengerPointer: props.passengers[0].id,
+            unassigned: props.passengers.map(p => { return p.id }),
+            flightID: props.flightID,
+            loading: true,
+            maxRows: null,
+            maxColumns: null,
+            map: []
+        }
+    }
 
-	componentDidMount() {
-		getSeatMap(this.state.flightID).then((input) => {
-			if (input.data)
-				this.setState({
-					maxRows: input.data.maxRows,
-					maxColumns: input.data.maxColumns,
-					map: input.data.seatMap,
-					loading: false,
-				});
-		});
-	}
+    componentDidMount() {
+        getSeatMap(this.state.flightID).then(input => {
+            if (input.data)
+                this.setState({
+                    maxRows: input.data.maxRows,
+                    maxColumns: input.data.maxColumns,
+                    map: input.data.seatMap,      
+                });
+            this.setState({loading: false});
+        }
+        );
+    }
 
-	nextChar = (c) => {
-		return String.fromCharCode(c.charCodeAt(0) + 1);
-	};
+    nextChar = (c) => {
+        return String.fromCharCode(c.charCodeAt(0) + 1);
+    }
 
-	generateMap = () => {
-		var seatMap = [...this.state.map];
+    generateMap = () => {
 
-		var map = [];
-		for (var i = 0; i < this.state.maxRows; i++) {
-			map[i] = [];
-			var column = 'A';
-			for (var j = 0; j < this.state.maxColumns; j++) {
-				var pointer = i + 1 + column;
-				if (seatMap.length > 0 && seatMap[0].seat_number === pointer) {
-					var seat = seatMap.shift();
-					map[i][j] = {
-						id: seat.id,
-						number: seat.seat_number,
-						isReserved: seat.is_reserved,
-						tooltip: seat.is_reserved ? 'Reserved' : `${seat.class} Rs.${seat.amount}`,
-					};
-				} else {
-					map[i][j] = null;
-				}
-				column = this.nextChar(column);
-			}
-		}
-		return map;
-	};
+        var seatMap = [...this.state.map];
 
-	assignSeatToPassenger = (passengerID, seatID, seatNumber) => {
-		const passengerIndex = this.state.passengers.findIndex((passenger) => {
-			return passenger.id === passengerID;
-		});
+        let className = 'Economy';
 
-		const passenger = {
-			...this.state.passengers[passengerIndex],
-		};
+        var map = [];
+        for (var i = 0; i < this.state.maxRows; i++) {
+            map[i] = [];
+            var column = 'A';
+            for (var j = 0; j < this.state.maxColumns; j++) {
+                var pointer = (i + 1) + column;
+                if (seatMap.length > 0 && seatMap[0].seat_number === pointer) {
+                    var seat = seatMap.shift();
+                    map[i][j] = {
+                        id: seat.id,
+                        number: seat.seat_number,
+                        isUnavailable: seat.class !== className,
+                        isReserved: seat.is_reserved,
+                        tooltip: seat.class !== className ? seat.class : seat.is_reserved ? "Reserved" :`${seat.class} Rs.${seat.amount}`
+                    }
+                } else {
+                    map[i][j] = null;
+                }
+                column = this.nextChar(column);
+            }
+        }
+        return map;
+    }
 
-		const seatIndex = this.state.map.findIndex((seat) => {
-			return seat.id === seatID;
-		});
+    assignSeatToPassenger = (passengerID, seatID, seatNumber) => {
+        const passengerIndex = this.state.passengers.findIndex(passenger => {
+            return passenger.id === passengerID;
+        });
 
-		passenger.seatID = seatID;
-		passenger.seatNumber = seatNumber;
-		passenger.class = this.state.map[seatIndex].class;
-		passenger.amount = this.state.map[seatIndex].amount;
+        const passenger = {
+            ...this.state.passengers[passengerIndex]
+        };
 
-		const passengers = [...this.state.passengers];
-		passengers[passengerIndex] = passenger;
+        const seatIndex = this.state.map.findIndex(seat => {
+            return seat.id === seatID;
+        })
 
-		this.setState({ passengers: passengers });
+        passenger.seatID = seatID;
+        passenger.seatNumber = seatNumber;
+        passenger.class = this.state.map[seatIndex].class;
+        passenger.amount = this.state.map[seatIndex].amount;
 
-		console.log(`Assigned seat ${seatNumber} to ${passenger.first_name} ${passenger.last_name}`);
+        const passengers = [...this.state.passengers];
+        passengers[passengerIndex] = passenger;
 
-		const unassigned = [...this.state.unassigned];
-		const index = unassigned.indexOf(this.state.passengerPointer);
-		if (index > -1) {
-			unassigned.splice(index, 1);
-		}
-		this.setState({
-			unassigned: unassigned,
-			passengerPointer: unassigned[0],
-		});
-	};
+        this.setState({ passengers: passengers });
 
-	removeSeatFromPassenger = (seatID) => {
-		const passengerIndex = this.state.passengers.findIndex((passenger) => {
-			return passenger.seatID === seatID;
-		});
+        console.log(`Assigned seat ${seatNumber} to ${passenger.first_name} ${passenger.last_name}`);
 
-		const passenger = {
-			...this.state.passengers[passengerIndex],
-		};
+        const unassigned = [...this.state.unassigned];
+        const index = unassigned.indexOf(this.state.passengerPointer);
+        if (index > -1) {
+            unassigned.splice(index, 1);
+        }
+        this.setState(
+            {
+                unassigned: unassigned,
+                passengerPointer: unassigned[0]
+            }
+        );
+    }
 
-		passenger.seatID = null;
-		passenger.seatNumber = null;
-		passenger.class = null;
-		passenger.amount = null;
+    removeSeatFromPassenger = (seatID) => {
+        const passengerIndex = this.state.passengers.findIndex(passenger => {
+            return passenger.seatID === seatID;
+        });
 
-		const passengers = [...this.state.passengers];
-		passengers[passengerIndex] = passenger;
+        const passenger = {
+            ...this.state.passengers[passengerIndex]
+        };
 
-		this.setState({ passengers: passengers });
+        passenger.seatID = null;
+        passenger.seatNumber = null;
+        passenger.class = null;
+        passenger.amount = null;
 
-		console.log(`Removed seat from ${passenger.first_name} ${passenger.last_name}`);
+        const passengers = [...this.state.passengers];
+        passengers[passengerIndex] = passenger;
 
-		const unassigned = [...this.state.unassigned];
-		unassigned.push(passenger.id);
-		unassigned.sort((a, b) => {
-			return a - b;
-		});
+        this.setState({ passengers: passengers });
 
-		this.setState({
-			unassigned: unassigned,
-			passengerPointer: unassigned[0],
-		});
-	};
+        console.log(`Removed seat from ${passenger.first_name} ${passenger.last_name}`);
 
-	addSeatCallback = ({ row, number, id }, addCb) => {
-		this.setState(async () => {
-			this.assignSeatToPassenger(this.state.passengerPointer, id, number);
-			addCb(row, number, id);
-		});
-	};
+        const unassigned = [...this.state.unassigned];
+        unassigned.push(passenger.id);
+        unassigned.sort((a, b) => { return a - b });
 
-	removeSeatCallback = ({ row, number, id }, removeCb) => {
-		this.setState(async () => {
-			this.removeSeatFromPassenger(id);
-			removeCb(row, number);
-		});
-	};
+        this.setState({
+            unassigned: unassigned,
+            passengerPointer: unassigned[0]
+        });
+    }
 
-	render() {
+    addSeatCallback = ({ row, number, id }, addCb) => {
+        this.setState(async () => {
+            this.assignSeatToPassenger(this.state.passengerPointer, id, number);
+            addCb(row, number, id);
+        })
+    }
+
+    removeSeatCallback = ({ row, number, id }, removeCb) => {
+        this.setState(async () => {
+            this.removeSeatFromPassenger(id);
+            removeCb(row, number);
+        })
+    }
+
+    render() {
 		let passengerTable = <Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="blue.500" size="xl" />;
 		let seatMap = <Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="blue.500" size="xl" />;
 		if (!this.state.loading) {

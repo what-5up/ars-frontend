@@ -249,6 +249,7 @@ export class SeatPicker extends Component {
         isSelected,
         orientation: seat.orientation,
         isReserved: seat.isReserved,
+        isUnavailable: seat.isUnavailable,
         tooltip,
         isEnabled: size < maxReservableSeats || continuous,
         selectSeat: this.selectSeat.bind(this, rowNumber, seat.number, seat.id),
@@ -279,6 +280,7 @@ SeatPicker.propTypes = {
       PropTypes.shape({
         number: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
         isReserved: PropTypes.bool,
+        isUnavailable: PropTypes.bool,
         tooltip: PropTypes.string,
         isSelected: PropTypes.bool,
       })
