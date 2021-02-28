@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, useLocation, Redirect } from 'react-router-dom';
-import { Box } from '@chakra-ui/react';
+import { Box, useColorMode } from '@chakra-ui/react';
 import { useTransition, animated } from 'react-spring';
 import Footer from '../../Components/Footer/Footer';
 import LandingHeader from '../../Containers/Landing/LandingHeader';
@@ -9,7 +9,7 @@ import Signout from '../../Containers/Routes/Signout';
 import DiscoverFlights from '../../Containers/DiscoverFlights/DiscoverFlights';
 import Passenger from '../../Containers/AddPassenger/Passenger';
 import SRDashBoard from "../SR/SRDashBoard";
-import SeatMap from  '../../Containers/SeatMap/SeatMap'
+import SeatMap from '../../Containers/SeatMap/SeatMap'
 
 export default function LandingPage() {
 	return (
@@ -30,6 +30,7 @@ const Content = () => {
 		enter: { opacity: 1 },
 		leave: { opacity: 0 },
 	});
+	const { colorMode, _ } = useColorMode();
 
 	return transitions.map(({ item, props, key }) => (
 		<animated.div key={key} style={props}>
@@ -44,35 +45,37 @@ const Content = () => {
 				</Route>
 				<Route path={`/seatmap`}>
 					<Box width="100vw">
-						<SeatMap class = "Economy"
-						price = {75000}
-						passengers={[
-							{
-								id: 1,
-								first_name: "Kane",
-								last_name: "Williamson"
-							},
-							{
-								id: 3,
-								first_name: "Dimuth",
-								last_name: "Karunaratne"
-							},
-							{
-								id: 10,
-								first_name: "Steve",
-								last_name: "Smith"
-							}
-						]}
-							flightID={10} />
+						<SeatMap
+							class="Economy"
+							price={75000}
+							passengers={[
+								{
+									id: 1,
+									first_name: "Kane",
+									last_name: "Williamson"
+								},
+								{
+									id: 3,
+									first_name: "Dimuth",
+									last_name: "Karunaratne"
+								},
+								{
+									id: 10,
+									first_name: "Steve",
+									last_name: "Smith"
+								}
+							]}
+							flightID={10}
+							colorMode={colorMode} />
 					</Box>
 				</Route>
 				<Route path={`/passenger`}>
 					{/* {location.state == undefined ? (
 						<Redirect to={{ pathname: '/' }} />
 					) : ( */}
-						<Box style={{ width: '100vw' }}>
-							<Passenger />
-						</Box>
+					<Box style={{ width: '100vw' }}>
+						<Passenger />
+					</Box>
 					{/* )} */}
 				</Route>
 				<Route path="/signout" component={Signout} />

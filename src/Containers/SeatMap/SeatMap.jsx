@@ -24,6 +24,7 @@ import SeatPicker from '../../Components/SeatPicker';
 import { getSeatMap } from '../../api';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 import PassengerFlight from '../../Components/Cards/PassengerFlight';
+import { formatPrice } from '../../utils/helpers';
 
 class SeatMap extends Component {
     constructor(props) {
@@ -167,6 +168,11 @@ class SeatMap extends Component {
         })
     }
 
+    //TODO: Implement onClick of Continue button
+    handleContinue = () => {
+
+    }
+
     render() {
         let passengerTable = <Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="blue.500" size="xl" />;
         let seatMap = <Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="blue.500" size="xl" />;
@@ -176,8 +182,7 @@ class SeatMap extends Component {
                 <Table variant="simple">
                     <Thead>
                         <Tr>
-                            <Th>First Name</Th>
-                            <Th>Last Name</Th>
+                            <Th>Passenger</Th>
                             <Th>Seat Number</Th>
                         </Tr>
                     </Thead>
@@ -185,28 +190,25 @@ class SeatMap extends Component {
                         {this.state.passengers.map((p) => {
                             let style =
                                 this.state.passengerPointer === p.id
-                                    ? { backgroundColor: '#e9ecef', fontWeight: 'bold' }
+                                    ? this.props.colorMode === "light" ? 
+                                    { backgroundColor: '#e9ecef', fontWeight: 'bold' }
+                                    : { backgroundColor: '#000028', fontWeight: 'bold' }
                                     : {};
                             return (
                                 <Tr key={p.id} style={style}>
-                                    <Td>{p.first_name}</Td>
-                                    <Td>{p.last_name}</Td>
+                                    <Td>{`${p.first_name} ${p.last_name}`}</Td>
                                     <Td>{p.seatNumber}</Td>
                                 </Tr>
                             );
                         })}
                     </Tbody>
-                    <Tfoot>
-                        <Tr>
-                            <Th>Total Price</Th>
-                            <Th></Th>
-                            <Th isNumeric>
-                                {this.state.unassigned.length === 0
-                                    ? 'Rs. ' + this.state.passengers.reduce((total, p) => total + p.amount, 0)
-                                    : null}
-                            </Th>
-                        </Tr>
-                    </Tfoot>
+                    <HStack my={4} verticalAlign="bottom">
+                        <Divider orientation="vertical" />
+                        <Text fontWeight="bold" color="grey">Total Price: </Text>
+                        <Heading fontSize="18px">{this.state.unassigned.length === 0
+                                    ? formatPrice(this.state.passengers.reduce((total, p) => total + p.amount, 0))
+                                    : null}</Heading>
+                    </HStack>
                 </Table>
             );
 
@@ -235,7 +237,7 @@ class SeatMap extends Component {
                     <HStack>
                         <Divider orientation="vertical" />
                         <Text fontWeight="bold" color="grey">Price: </Text>
-                        <Heading fontSize="18px">{this.props.price}</Heading>
+                        <Heading fontSize="17px">{formatPrice(this.props.price)}</Heading>
                     </HStack>
                 </VStack>
             )
@@ -244,28 +246,27 @@ class SeatMap extends Component {
         return (
             <Flex flexDirection="column" w="100%" mx="auto" justifyContent="center" >
                 <Flex justifyContent="center" my="5">
-                    <Heading>Reserver Your Seats</Heading>
+                    <Heading>Reserve Your Seats</Heading>
                 </Flex>
                 <HStack h="100%" >
-                    <Flex w="40%" justifyContent="center">{seatMap}</Flex>
+                    <Flex w="36%" justifyContent="center">{seatMap}</Flex>
                     <Divider orientation="vertical" />
-                    <Flex w="35%" justifyContent="left">
-                        <VStack align="left">
-                            {classPrice}
-                            <Box h={2} />
-                            <Divider />
-                            {passengerTable}
-                        </VStack>
-                    </Flex>
+                    <VStack w="32%" align="left">
+                        {classPrice}
+                        <Box h={2} />
+                        <Divider />
+                        {passengerTable}
+                    </VStack>
                     <Divider orientation="vertical" />
-                    <VStack w="25%" spacing={8} justify="center">
+                    <VStack w="32%" spacing={8} justify="right">
                         <PassengerFlight />
                         <Spacer />
                         <Button
                             size="lg"
                             w="80%"
                             colorScheme="purple"
-                            isDisabled={this.state.unassigned.length !== 0}>
+                            isDisabled={this.state.unassigned.length !== 0}
+                            onClick={this.handleContinue}>
                             Continue
                         </Button>
                     </VStack>

@@ -9,8 +9,8 @@ const Footer = () => {
       position="fixed"
       bottom="0"
       mt={4}
-      py={4}
-      bg={colorMode === "light" ? "white" : "rgba(0, 0, 40)"}
+      py={3}
+      bg={colorMode === "light" ? "rgba(146, 114, 174)" : "rgba(0, 0, 40)"}
       borderTopRadius="1rem"
     >
       <Box width="full" boxShadow="xs">
@@ -25,7 +25,7 @@ const Footer = () => {
 const FooterName = () => {
   return (
     <Heading
-      fontSize="20px"
+      fontSize="18px"
       fontFamily={"Agustina Regular"}
     >
       Designed by 5up
