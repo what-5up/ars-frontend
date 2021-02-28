@@ -9,7 +9,7 @@ import {
 	AccordionPanel,
 	Heading,
 	Text,
-	Divider
+	Divider,
 } from '@chakra-ui/react';
 import AddPassenger from '../../Components/Cards/AddPassenger';
 import { addOrUpdateArray } from '../../utils/helpers';
@@ -37,19 +37,19 @@ const Passenger = () => {
 	const count = 4; //location.state.count;
 	const history = useHistory();
 	const handleClick = async () => {
-		history.push('/seatmap',{passengers:passengers, ...locationParams})
+		history.push('/seatmap', { passengers: passengers, ...locationParams });
 	};
 
 	const checkToContinue = () => {
 		let canContinue = true;
-		for(let i =0;i <passengers.length;i++){
-			if(!passengers[i].hasOwnProperty('first_name')){
-				canContinue = false
+		for (let i = 0; i < passengers.length; i++) {
+			if (!passengers[i].hasOwnProperty('first_name')) {
+				canContinue = false;
 				break;
 			}
 		}
 		return !canContinue;
-	}
+	};
 
 	useEffect(async () => {
 		let tempArr = [];
@@ -61,8 +61,6 @@ const Passenger = () => {
 		}
 		setPassengers(tempArr);
 	}, []);
-	
-
 
 	const addOrUpdatePassengers = (obj) => {
 		let newPassengers = passengers;
@@ -73,12 +71,21 @@ const Passenger = () => {
 		setPassengers([...addOrUpdateArray(newPassengers, obj)]);
 	};
 	return (
-		<Box width="100%" mx="auto">
-			<Heading  ml="12" mt="3" mb="5">
-				Passengers
+		<Box
+			width="95%"
+			mx="auto"
+			p={5}
+			style={{
+				boxShadow: '0 1px 3px 0 rgb(60 64 67 / 30%), 0 4px 8px 3px rgb(60 64 67 / 15%)',
+				minWidth: '80%',
+				borderColor: 'gray.200',
+			}}
+		>
+			<Heading ml="12" mt="3" mb="5" fontWeight="400">
+				PASSENGER
 			</Heading>
-			<Divider/>
-			<Flex>
+			<Divider />
+			<Flex mt="5">
 				<Flex flexDirection="column" w="70%">
 					<Flex w="100%" justifyContent="center">
 						<Accordion w="90%" allowMultiple allowToggle>
@@ -94,7 +101,13 @@ const Passenger = () => {
 						</Accordion>
 					</Flex>
 					<Flex justifyContent="flex-end" mx="12" mb="3">
-						<Button onClick={handleClick} isDisabled={checkToContinue()} colorScheme="teal" minWidth="full" mt={4}>
+						<Button
+							onClick={handleClick}
+							isDisabled={checkToContinue()}
+							colorScheme="teal"
+							minWidth="full"
+							mt={4}
+						>
 							Continue
 						</Button>
 					</Flex>
@@ -122,7 +135,6 @@ const PassengerAccordion = ({ index, disabled, countries, addOrUpdatePassengers 
 				borderColor: 'gray.200',
 			}}
 			isDisabled={disabled}
-			_expanded
 		>
 			<h2>
 				<AccordionButton>
