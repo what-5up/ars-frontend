@@ -63,6 +63,16 @@ const Content = () => {
 									id: 10,
 									first_name: "Steve",
 									last_name: "Smith"
+								},
+								{
+									id: 14,
+									first_name: "Angelo",
+									last_name: "Mathews"
+								},
+								{
+									id: 15,
+									first_name: "Ajantha",
+									last_name: "Mendis"
 								}
 							]}
 							flightID={10}

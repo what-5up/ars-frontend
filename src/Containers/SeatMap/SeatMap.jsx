@@ -18,6 +18,7 @@ import {
     Spacer,
     Box,
     Button,
+    Container,
 } from '@chakra-ui/react';
 import SeatPicker from '../../Components/SeatPicker';
 
@@ -179,19 +180,22 @@ class SeatMap extends Component {
         let classPrice = null
         if (!this.state.loading) {
             passengerTable = (
+                [<Container overflowY="scroll" maxHeight="220px" w="100%" p={0} m={0}>
                 <Table variant="simple">
+                   
                     <Thead>
-                        <Tr>
-                            <Th>Passenger</Th>
-                            <Th>Seat Number</Th>
+                        <Tr  >
+                            <Th bg="white" position="sticky" top={0}>Passenger</Th>
+                            <Th bg="white" position="sticky" top={0}>Seat Number</Th>
                         </Tr>
                     </Thead>
-                    <Tbody>
+                    
+                    <Tbody >
                         {this.state.passengers.map((p) => {
                             let style =
                                 this.state.passengerPointer === p.id
                                     ? this.props.colorMode === "light" ? 
-                                    { backgroundColor: '#e9ecef', fontWeight: 'bold' }
+                                    { backgroundColor: '#e9ecef' , fontWeight: 'bold' }
                                     : { backgroundColor: '#000028', fontWeight: 'bold' }
                                     : {};
                             return (
@@ -202,18 +206,21 @@ class SeatMap extends Component {
                             );
                         })}
                     </Tbody>
-                    <HStack my={4} verticalAlign="bottom">
-                        <Divider orientation="vertical" />
-                        <Text fontWeight="bold" color="grey">Total Price: </Text>
-                        <Heading fontSize="18px">{this.state.unassigned.length === 0
-                                    ? formatPrice(this.state.passengers.reduce((total, p) => total + p.amount, 0))
-                                    : null}</Heading>
-                    </HStack>
                 </Table>
+               
+                </Container>,
+                 <HStack my={4} verticalAlign="bottom"  bg="white" position="sticky" bottom={0}>
+                 <Divider orientation="vertical" />
+                 <Text fontWeight="bold" color="grey">Total Price: </Text>
+                 <Heading fontSize="18px">{this.state.unassigned.length === 0
+                             ? formatPrice(this.state.passengers.reduce((total, p) => total + p.amount, 0))
+                             : null}</Heading>
+             </HStack>]
+               
             );
 
             seatMap = (
-                <div style={{ marginTop: '30px' }}>
+                <div>
                     <SeatPicker
                         addSeatCallback={this.addSeatCallback}
                         removeSeatCallback={this.removeSeatCallback}
