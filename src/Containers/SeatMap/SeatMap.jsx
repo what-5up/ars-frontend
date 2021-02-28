@@ -1,10 +1,24 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 
+import {
+	Flex,
+	Heading,
+	Text,
+	Divider,
+	Table,
+	Thead,
+	Tr,
+	Tbody,
+	Th,
+	Td,
+	HStack,
+	Spinner,
+	Tfoot,
+} from '@chakra-ui/react';
 import SeatPicker from '../../Components/SeatPicker';
-import { Spinner, HStack } from "@chakra-ui/react";
 
 import { getSeatMap } from '../../api';
-import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
+import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 
 class SeatMap extends Component {
     constructor(props) {
@@ -153,75 +167,81 @@ class SeatMap extends Component {
     }
 
     render() {
-        let passengerTable = <Spinner
-            thickness="4px"
-            speed="0.65s"
-            emptyColor="gray.200"
-            color="blue.500"
-            size="xl"
-        />
-        let seatMap = <Spinner
-            thickness="4px"
-            speed="0.65s"
-            emptyColor="gray.200"
-            color="blue.500"
-            size="xl"
-        />
-        if (!this.state.loading) {
-            passengerTable =
-                <table width="100%" align>
-                    <tr align="left">
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Seat Number</th>
-                        <th>Class</th>
-                        <th>Price (Rs.)</th>
-                    </tr>
-                    {this.state.passengers.map(p => {
-                        return <tr key={p.id}>
-                            <td>{p.first_name} {this.state.passengerPointer === p.id ? "***" : null}</td>
-                            <td>{p.last_name}</td>
-                            <td>{p.seatNumber}</td>
-                            <td>{p.class}</td>
-                            <td>{p.amount}</td>
-                        </tr>
-                    })}
-                </table>;
+		let passengerTable = <Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="blue.500" size="xl" />;
+		let seatMap = <Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="blue.500" size="xl" />;
+		if (!this.state.loading) {
+			passengerTable = (
+				<Table variant="simple">
+					<Thead>
+						<Tr>
+							<Th>First Name</Th>
+							<Th>Last Name</Th>
+							<Th>Seat Number</Th>
+							<Th>Class</Th>
+							<Th>Price (Rs.)</Th>
+						</Tr>
+					</Thead>
+					<Tbody>
+						{this.state.passengers.map((p) => {
+							let style =
+								this.state.passengerPointer === p.id
+									? { backgroundColor: '#e9ecef', fontWeight: 'bold' }
+									: {};
+							return (
+								<Tr key={p.id} style={style}>
+									<Td>{p.first_name}</Td>
+									<Td>{p.last_name}</Td>
+									<Td>{p.seatNumber}</Td>
+									<Td>{p.class}</Td>
+									<Td>{p.amount}</Td>
+								</Tr>
+							);
+						})}
+					</Tbody>
+					<Tfoot>
+						<Tr>
+							<Th>Total Price</Th>
+							<Th></Th>
+							<Th isNumeric>
+								{this.state.unassigned.length === 0
+									? 'Rs. ' + this.state.passengers.reduce((total, p) => total + p.amount, 0)
+									: null}
+							</Th>
+						</Tr>
+					</Tfoot>
+				</Table>
+			);
 
-            seatMap =
-                <div style={{ marginTop: '30px' }}>
-                    <SeatPicker
-                        addSeatCallback={this.addSeatCallback}
-                        removeSeatCallback={this.removeSeatCallback}
-                        rows={this.generateMap()}
-                        visible
-                        maxReservableSeats={this.state.passengers.length}
-                        selectedByDefault
-                        tooltipProps={{ multiline: true }}
-                    />
-                </div>
-        }
+			seatMap = (
+				<div style={{ marginTop: '30px', width:"100%" }}>
+					<SeatPicker
+						addSeatCallback={this.addSeatCallback}
+						removeSeatCallback={this.removeSeatCallback}
+						rows={this.generateMap()}
+						visible
+						maxReservableSeats={this.state.passengers.length}
+						selectedByDefault
+						tooltipProps={{ multiline: true }}
+                        style= {{width:"100%"}}
+					/>
+				</div>
+			);
+		}
 
-        return (
-
-            <HStack spacing="24px" align="stretch">
-                 <div>
-                    <h1>Seat Picker</h1>
-                    {seatMap}
-                </div>
-                <div>
-                    <h1>Passengers</h1>
-                    {passengerTable}
-                    <h2>Total Price = {this.state.unassigned.length === 0 ? "Rs. " + this.state.passengers.reduce(((total, p) => total + p.amount), 0) : null}</h2>
-                </div>
-               
-
-            </HStack>
-
-
-
-        )
-    }
+		return (
+			<Flex flexDirection="column" w="90%" mx="auto" justifyContent="center" >
+				<Flex justifyContent="center" my="5">
+					<Heading >Seat Map</Heading>
+				</Flex>
+				<Flex>
+					<Flex w="50%">{seatMap}</Flex>
+                    <Flex w="50%" justifyContent="center">
+						{passengerTable}
+					</Flex>
+				</Flex>
+			</Flex>
+		);
+	}
 }
 
 export default withErrorHandler(SeatMap);
