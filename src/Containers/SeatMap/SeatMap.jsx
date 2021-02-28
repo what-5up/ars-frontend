@@ -1,15 +1,7 @@
 import React, { Component } from 'react';
 
-import SeatPicker from 'react-seat-picker';
-import { Spinner } from '@chakra-ui/react';
 import {
 	Flex,
-	Button,
-	Accordion,
-	AccordionButton,
-	AccordionItem,
-	Box,
-	AccordionPanel,
 	Heading,
 	Text,
 	Divider,
@@ -19,8 +11,12 @@ import {
 	Tbody,
 	Th,
 	Td,
+	HStack,
+	Spinner,
 	Tfoot,
 } from '@chakra-ui/react';
+import SeatPicker from '../../Components/SeatPicker';
+
 import { getSeatMap } from '../../api';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 

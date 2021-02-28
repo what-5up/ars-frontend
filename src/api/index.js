@@ -1,4 +1,11 @@
 export {
+    getAccountTypes,
+    addAccountType,
+    updateAccountType,
+    deleteAccountType
+} from './account-types'
+
+export {
     addGuest
 } from './guest-api'
 
@@ -26,6 +33,10 @@ export {
     deleteScheduledFlight,
     getSeatMap
 } from './scheduled-flight-api'
+
+export {
+    login
+} from './session-api'
 
 export {
     getTravelerClasses

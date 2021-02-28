@@ -45,26 +45,24 @@ const Content = () => {
 				</Route>
 				<Route path={`/seatmap`}>
 					<Box width="100vw">
-						<SeatMap
-							passengers={[
-								{
-									id: 1,
-									first_name: 'Kane',
-									last_name: 'Williamson',
-								},
-								{
-									id: 3,
-									first_name: 'Dimuth',
-									last_name: 'Karunaratne',
-								},
-								{
-									id: 10,
-									first_name: 'Steve',
-									last_name: 'Smith',
-								},
-							]}
-							flightID={1}
-						/>
+						<SeatMap passengers={[
+							{
+								id: 1,
+								first_name: "Kane",
+								last_name: "Williamson"
+							},
+							{
+								id: 3,
+								first_name: "Dimuth",
+								last_name: "Karunaratne"
+							},
+							{
+								id: 10,
+								first_name: "Steve",
+								last_name: "Smith"
+							}
+						]}
+							flightID={10} />
 					</Box>
 				</Route>
 				<Route path={`/passenger`}>

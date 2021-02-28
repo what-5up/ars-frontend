@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import {
   Menu,
   MenuButton,
@@ -13,8 +14,16 @@ import {
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import UserAvatar from "../HeaderItems/UserAvatar";
 import EditMyProfilePopup from "./EditMyProfilePopup";
+import { connect, useSelector, useDispatch } from 'react-redux';
+import * as actions from '../../store/actions/index';
 
 const MyProfilePopup = ({ user }) => {
+  const dispatch = useDispatch()
+  const onLogout = useCallback(
+    () => dispatch(actions.logout()),
+    [dispatch]
+  )
+
   return (
     <Menu>
       <MenuButton bg="transparent" _hover={{ bg: "trasparent" }}>
@@ -33,7 +42,7 @@ const MyProfilePopup = ({ user }) => {
             <EditMyProfilePopup />
           </MenuItem>
           <MenuItem>Change Password</MenuItem>
-          <MenuItem>Sign Out</MenuItem>
+          <MenuItem onClick={onLogout}>Sign Out</MenuItem>
         </MenuGroup>
       </MenuList>
     </Menu>
@@ -59,4 +68,4 @@ const UserDetails = ({ user }) => {
 };
 
 
-export default MyProfilePopup;
+export default connect(null, null) (MyProfilePopup);

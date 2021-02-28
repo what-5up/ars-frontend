@@ -1,4 +1,6 @@
-import axios from '../../api/axios';
+import { login } from '../../api';
+import jwt_decode from 'jwt-decode';
+import { DesignationEnum } from '../../utils/constants';
 
 import * as actionTypes from './action-types';
 
@@ -8,15 +10,33 @@ export const authStart = () => {
 	};
 };
 
-export const authSuccess = (token, userID, expiresIn) => {
+export const authSuccess = (token) => {
+	const decoded = jwt_decode(token);
+	const expiresIn = decoded.expiresIn;
+	const userID = decoded.userID;
+	const accType = decoded.accType;
 	const expirationDate = new Date(new Date().getTime() + expiresIn * 1000);
+
 	localStorage.setItem('token', token);
 	localStorage.setItem('expirationDate', expirationDate);
 	localStorage.setItem('userID', userID);
+
+	//setting account type
+	//if system officer
+	if (Object.values(DesignationEnum).includes(accType)) {
+		localStorage.setItem('accType', accType);
+	}
+	//if user
+	else {
+		localStorage.setItem('accType', DesignationEnum.USER);
+		localStorage.setItem('userType', accType);
+	}
 	return {
 		type: actionTypes.AUTH_SUCCESS,
 		token: token,
 		userID: userID,
+		accType: accType,
+		userType: userType,
 	};
 };
 
@@ -31,6 +51,8 @@ export const logout = () => {
 	localStorage.removeItem('token');
 	localStorage.removeItem('expirationDate');
 	localStorage.removeItem('userID');
+	localStorage.removeItem('accType');
+	localStorage.removeItem('userType');
 	return {
 		type: actionTypes.AUTH_LOGOUT,
 	};
@@ -53,16 +75,17 @@ export const auth = (email, password, onLogin) => {
 		};
 		let url = 'session';
 		console.log(authData);
-		axios
-			.post(url, authData)
-			.then((response) => {
-				dispatch(authSuccess(response.data.token, response.data.userID, response.data.expiresIn));
+		login(authData).then((result) => {
+			if (result.data) {
+				dispatch(authSuccess(result.data));
+                let decoded = jwt_decode(token);
+                let expiresIn = decoded.expiresIn;
 				onLogin();
-				dispatch(checkAuthTimeout(response.data.expiresIn));
-			})
-			.catch((err) => {
-				dispatch(authFail(err.response.data.message));
-			});
+				dispatch(checkAuthTimeout(expiresIn));
+			} else {
+				dispatch(authFail(result.message));
+			}
+		});
 	};
 };
 
@@ -84,7 +107,9 @@ export const authCheckState = () => {
 				dispatch(logout());
 			} else {
 				const userID = localStorage.getItem('userID');
-				dispatch(authSuccess(token, userID));
+				const accType = localStorage.getItem('accType');
+				const userType = localStorage.getItem('userType');
+				dispatch(authSuccess(token, userID, accType, userType));
 				dispatch(checkAuthTimeout((expirationDate.getTime() - new Date().getTime()) / 1000));
 			}
 		}
