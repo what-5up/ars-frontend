@@ -14,7 +14,8 @@ export const authSuccess = (token) => {
 	const decoded = jwt_decode(token);
 	const expiresIn = decoded.expiresIn;
 	const userID = decoded.userID;
-	const accType = decoded.accType;
+	let accType = decoded.accType;
+    let userType = null;
 	const expirationDate = new Date(new Date().getTime() + expiresIn * 1000);
 
 	localStorage.setItem('token', token);
@@ -22,15 +23,15 @@ export const authSuccess = (token) => {
 	localStorage.setItem('userID', userID);
 
 	//setting account type
-	//if system officer
-	if (Object.values(DesignationEnum).includes(accType)) {
-		localStorage.setItem('accType', accType);
-	}
 	//if user
-	else {
-		localStorage.setItem('accType', DesignationEnum.USER);
-		localStorage.setItem('userType', accType);
+	if (!Object.values(DesignationEnum).includes(accType)) {
+		accType  = DesignationEnum.USER;
+        userType = accType;
 	}
+
+    localStorage.setItem('accType', accType);
+    localStorage.setItem('userType', userType);
+
 	return {
 		type: actionTypes.AUTH_SUCCESS,
 		token: token,
@@ -78,7 +79,7 @@ export const auth = (email, password, onLogin) => {
 		login(authData).then((result) => {
 			if (result.data) {
 				dispatch(authSuccess(result.data));
-                let decoded = jwt_decode(token);
+                let decoded = jwt_decode(result.data);
                 let expiresIn = decoded.expiresIn;
 				onLogin();
 				dispatch(checkAuthTimeout(expiresIn));
@@ -109,7 +110,7 @@ export const authCheckState = () => {
 				const userID = localStorage.getItem('userID');
 				const accType = localStorage.getItem('accType');
 				const userType = localStorage.getItem('userType');
-				dispatch(authSuccess(token, userID, accType, userType));
+				dispatch(authSuccess(token));
 				dispatch(checkAuthTimeout((expirationDate.getTime() - new Date().getTime()) / 1000));
 			}
 		}
