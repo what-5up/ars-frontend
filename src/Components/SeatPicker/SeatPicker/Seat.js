@@ -8,7 +8,7 @@ export default class Seat extends Component {
   };
 
   handleClick = () => {
-    !this.props.isReserved && this.props.selectSeat();
+    !this.props.isReserved && !this.props.isUnavailable && this.props.selectSeat();
   };
 
   render() {
@@ -17,13 +17,14 @@ export default class Seat extends Component {
       tooltip,
       isEnabled,
       isReserved,
+      isUnavailable,
       orientation,
     } = this.props;
     const className =
       "seat" +
       (isSelected ? " seat--selected" : "") +
-      (!isSelected && isEnabled && !isReserved ? " seat--enabled" : "") +
-      (isReserved ? " seat--reserved" : "") +
+      (!isSelected && isEnabled && !isReserved && !isUnavailable ? " seat--enabled" : "") +
+      (isReserved ? " seat--reserved" : "") + (isUnavailable ? " seat--unavailable" : "") +
       ` seat--${!orientation ? "north" : orientation}`;
     return (
       <div data-tip={tooltip} className={className} onClick={this.handleClick}>
@@ -37,6 +38,7 @@ export default class Seat extends Component {
 Seat.propTypes = {
   isSelected: PropTypes.bool,
   isReserved: PropTypes.bool,
+  isUnavailable: PropTypes.bool,
   tooltip: PropTypes.string,
   isEnabled: PropTypes.bool,
   orientation: PropTypes.oneOf(["north", "south", "east", "west"]),

@@ -28,9 +28,9 @@ class SeatMap extends Component {
                 this.setState({
                     maxRows: input.data.maxRows,
                     maxColumns: input.data.maxColumns,
-                    map: input.data.seatMap,
-                    loading: false
+                    map: input.data.seatMap,      
                 });
+            this.setState({loading: false});
         }
         );
     }
@@ -43,6 +43,8 @@ class SeatMap extends Component {
 
         var seatMap = [...this.state.map];
 
+        let className = 'Economy';
+
         var map = [];
         for (var i = 0; i < this.state.maxRows; i++) {
             map[i] = [];
@@ -54,8 +56,9 @@ class SeatMap extends Component {
                     map[i][j] = {
                         id: seat.id,
                         number: seat.seat_number,
+                        isUnavailable: seat.class !== className,
                         isReserved: seat.is_reserved,
-                        tooltip: seat.is_reserved ? "Reserved" : `${seat.class} Rs.${seat.amount}`
+                        tooltip: seat.class !== className ? seat.class : seat.is_reserved ? "Reserved" :`${seat.class} Rs.${seat.amount}`
                     }
                 } else {
                     map[i][j] = null;

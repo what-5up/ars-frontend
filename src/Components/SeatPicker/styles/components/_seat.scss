@@ -46,4 +46,9 @@
     cursor: not-allowed;
     background-color: $color-seat-reserved;
   }
+
+  &--unavailable {
+    cursor: not-allowed;
+    background-color: $color-seat-unavailable;
+  }
 }
