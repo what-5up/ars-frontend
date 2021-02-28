@@ -31,6 +31,7 @@ export const authSuccess = (token) => {
 		localStorage.setItem('accType', DesignationEnum.USER);
 		localStorage.setItem('userType', accType);
 	}
+    dispatch(checkAuthTimeout(expiresIn));
 	return {
 		type: actionTypes.AUTH_SUCCESS,
 		token: token,
@@ -73,15 +74,11 @@ export const auth = (email, password, onLogin) => {
 			email: email,
 			password: password,
 		};
-		let url = 'session';
 		console.log(authData);
 		login(authData).then((result) => {
 			if (result.data) {
 				dispatch(authSuccess(result.data));
-                let decoded = jwt_decode(token);
-                let expiresIn = decoded.expiresIn;
 				onLogin();
-				dispatch(checkAuthTimeout(expiresIn));
 			} else {
 				dispatch(authFail(result.message));
 			}
