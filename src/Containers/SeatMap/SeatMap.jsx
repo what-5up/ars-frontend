@@ -201,7 +201,7 @@ class SeatMap extends Component {
                             return (
                                 <Tr key={p.id} style={style}>
                                     <Td>{`${p.first_name} ${p.last_name}`}</Td>
-                                    <Td>{p.seatNumber}</Td>
+                                    <Td>{this.state.passengerPointer !== p.id ? p.seatNumber : "Pick a seat"}</Td>
                                 </Tr>
                             );
                         })}
