@@ -44,7 +44,9 @@ const Content = () => {
 				</Route>
 				<Route path={`/seatmap`}>
 					<Box width="100vw">
-						<SeatMap passengers={[
+						<SeatMap class = "Economy"
+						price = {75000}
+						passengers={[
 							{
 								id: 1,
 								first_name: "Kane",
