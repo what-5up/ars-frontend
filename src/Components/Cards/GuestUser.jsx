@@ -32,8 +32,9 @@ const GuestUser = ({ routeForward, closeModal }) => {
 	const [title, setTitle] = useState([]);
 	const signup = useDisclosure();
 	const dispatch = useDispatch();
+	const userID = useSelector((state) => state.auth.userID);
 	const onAuth = useCallback(
-		(token, userID, expiresIn) => dispatch(actions.authSuccess(token, userID, expiresIn)),
+		(values) => dispatch(actions.guestAuth(values)),
 		[dispatch]
 	  )
 	
@@ -64,11 +65,7 @@ const GuestUser = ({ routeForward, closeModal }) => {
 					.oneOf(gender.map((item) => item.value))
 					.required('Required'),
 			})}
-			onSubmit={async (values) => {
-				let response = await addGuest(values);
-				onAuth(response.data.token,response.data.userID, response.data.expiresIn)
-				routeForward({ id: response.data.userID });
-			}}
+			onSubmit={(values) => onAuth(values, routeForward)}
 		>
 			{(props) => (
 				<Box p={2}>

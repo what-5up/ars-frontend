@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, useLocation, Redirect } from 'react-router-dom';
-import { Box } from '@chakra-ui/react';
+import { Box, useColorMode } from '@chakra-ui/react';
 import { useTransition, animated } from 'react-spring';
 import Footer from '../../Components/Footer/Footer';
 import LandingHeader from '../../Containers/Landing/LandingHeader';
@@ -31,6 +31,7 @@ const Content = () => {
 		enter: { opacity: 1 },
 		leave: { opacity: 0 },
 	});
+	const { colorMode, _ } = useColorMode();
 
 	return transitions.map(({ item, props, key }) => (
 		<animated.div key={key} style={props}>
@@ -49,7 +50,7 @@ const Content = () => {
 						<Redirect to={{ pathname: '/' }} />
 					) : (
 						<Box style={{ width: '100vw' }}>
-							<SeatMap passengers = {location.state.passengers} flightID ={location.state.flightID}/>
+							<SeatMap passengers = {location.state.passengers} flightID ={location.state.flightID} colorMode={colorMode} class="Economy" price={75000}/>
 						</Box>
 					)}
 					</Box>
