@@ -26,8 +26,13 @@ import {} from '../../utils/helpers';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 
-const CostSummary = ({ origin_code, destination_code, day, time }) => {
+const CostSummary = ({ flight, reservedSeats,addBooking, totalCost }) => {
+	let date = new Date(flight.departure);
+	let time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+	let day = date.toLocaleDateString();
+
 	const { isOpen, onOpen, onClose } = useDisclosure();
+
 	return (
 		<Box w="50%" justifyContent="center" mx="auto">
 			<Flex flexDirection="column" justifyContent="center" mx="auto">
@@ -35,7 +40,7 @@ const CostSummary = ({ origin_code, destination_code, day, time }) => {
 					<Box pt={4} ml="5">
 						<VStack spacing={-0.5}>
 							<FlightTakeoffIcon style={{ fontSize: 40 }} />
-							<Heading pt={0}>{origin_code}</Heading>
+							<Heading pt={0}>{flight.origin_code}</Heading>
 							<Text color="gray.500">{day}</Text>
 							<Text color="gray.500">{time}</Text>
 						</VStack>
@@ -45,7 +50,7 @@ const CostSummary = ({ origin_code, destination_code, day, time }) => {
 						<VStack spacing={-0.5}>
 							<FlightLandIcon style={{ fontSize: 40 }} />
 
-							<Heading pt={0}>{destination_code}</Heading>
+							<Heading pt={0}>{flight.destination_code}</Heading>
 							<Text color="gray.500">10.10 am</Text>
 							<Text color="gray.500">June 20, 2021</Text>
 						</VStack>
@@ -56,7 +61,7 @@ const CostSummary = ({ origin_code, destination_code, day, time }) => {
 						<Text fontSize="2xl">Passengers </Text>
 					</Box>
 					<Box>
-						<Text fontSize="2xl">2</Text>
+						<Text fontSize="2xl">{reservedSeats.length}</Text>
 					</Box>
 				</Flex>
 				<Flex mb="3" justifyContent="space-between">
@@ -64,7 +69,7 @@ const CostSummary = ({ origin_code, destination_code, day, time }) => {
 						<Text fontSize="2xl">Flight </Text>
 					</Box>
 					<Box>
-						<Text fontSize="2xl">Price </Text>
+						<Text fontSize="2xl">{totalCost} </Text>
 					</Box>
 				</Flex>
 				<Flex mb="3" justifyContent="space-between">
@@ -87,7 +92,7 @@ const CostSummary = ({ origin_code, destination_code, day, time }) => {
 					</Box>
 				</Flex>
 				<Flex mb="3" justifyContent="center">
-					<Button colorScheme="teal" width="60%" leftIcon={<WatchLater />} textAlign="center">
+					<Button colorScheme="teal" width="60%" leftIcon={<WatchLater />} textAlign="center" onClick={() => {addBooking("hold_payment")}}>
 						Hold
 					</Button>
 				</Flex>
@@ -124,8 +129,9 @@ const CostSummary = ({ origin_code, destination_code, day, time }) => {
 							validationSchema={Yup.object({
 								transactionKey: Yup.number().required('Required'),
 							})}
-							onSubmit={(values) => {
+							onSubmit={async (values) => {
 								console.log(values);
+								await addBooking("complete_payment", values.transactionKey)
 								onClose();
 							}}
 						>
@@ -148,7 +154,7 @@ const CostSummary = ({ origin_code, destination_code, day, time }) => {
 											<Text mx={2}>Cancel</Text>
 										</Button>
 										<Button colorScheme="teal" onClick={props.submitForm} mx={4}>
-											<Text mx={2}>Confirm Booking</Text>
+											<Text mx={2} >Confirm Booking</Text>
 										</Button>
 									</Box>
 								</Box>

@@ -18,7 +18,7 @@ const DiscoverFlights = () => {
 	let history = useHistory();
 	const goToPassenger = (state = {},id) => {
 		let flight = flights.find(item => item.id == id)
-		history.push('/passenger', { ...state, flight: flight, travellerClass:travellerClass, count:passengerCount });
+		history.push('/passenger', { ...state, flight: flight, travellerClass:travellerClass, count:passengerCount, class:travellerClass });
 	};
 	const handleClick = (id) => {
 		console.log(isAuthenticated);

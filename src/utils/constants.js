@@ -32,3 +32,4 @@ export const DesignationEnum = {
     CREW_SCHEDULE_COORDINATOR: 'c',
     USER : 'u'
 }
+Object.freeze(DesignationEnum);

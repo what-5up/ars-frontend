@@ -60,6 +60,7 @@ const Passenger = () => {
 			tempArr.push({
 				id: i,
 				disabled: true,
+				existing:false
 			});
 			if (i == 0) {
 				tempArr[0]['disabled'] = false;
