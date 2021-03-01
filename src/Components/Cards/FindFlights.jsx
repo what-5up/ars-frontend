@@ -167,14 +167,12 @@ const FindFlights = ({ setFlights, setPassengerCount }) => {
 					.oneOf(classes.map((item) => item.value))
 					.required('Required'),
 				date: Yup.date().min(new Date(), 'Choose a date in the future'),
-				count: Yup.number().default(1).min(1).required('Required'),
+				count: Yup.number().default(1).min(1, "minimum one required").required('Required'),
 			})}
 			onSubmit={async (values) => {
-				console.log(values);
-				// setPassengerCount(values.count);
-				// let flights = await getScheduledFlights(values);
-				// console.log(flights.data);
-				// setFlights(flights.data);
+				setPassengerCount(values.count);
+				let flights = await getScheduledFlights(values);
+				setFlights(flights.data);
 			}}
 		>
 			{(props) => (
@@ -217,24 +215,15 @@ const FindFlights = ({ setFlights, setPassengerCount }) => {
 									<FormControl isInvalid={props.errors.count && props.touched.count}>
 										<Flex alignItems="center">
 											<PeopleIcon style={{ marginRight: '5px' }} />
-											<HStack>
-												<Button {...getIncrementButtonProps()} mr="0" borderRadius="0">
-													+
-												</Button>
-												<Input
-													{...getInputProps({ isReadOnly: true })}
-													id="count"
-													w="100px"
-													style={{marginLeft:0, borderRadius:0}}
-													onChange = {() => {
-														props.setFieldValue('count',getInputProps().value)
-													}}
-													// {...props.getFieldProps('count')}
-												/>
-												<Button {...getDecrementButtonProps()} style={{marginLeft:0, borderRadius:0}}>-</Button>
-											</HStack>
-											<FormErrorMessage>{props.errors.count}</FormErrorMessage>
+											<Input
+												id="count"
+												type="number"
+												defaultValue={1}
+												w="100px"
+												{...props.getFieldProps('count')}
+											/>
 										</Flex>
+										<FormErrorMessage>{props.errors.count}</FormErrorMessage>
 									</FormControl>
 
 									{/* <Button
