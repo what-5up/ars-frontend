@@ -25,9 +25,18 @@ import {
   Select,
   FormLabel,
   FormErrorMessage,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  AlertDialogCloseButton,
 } from "@chakra-ui/react";
 import { useLocation } from "react-router-dom";
+import AddIcon from "@material-ui/icons/Add";
 import CreateIcon from "@material-ui/icons/Create";
+import DeleteIcon from "@material-ui/icons/Delete";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { getRoutes } from "../../api/route-api";
@@ -73,6 +82,11 @@ const TicketPrices = () => {
     var value = event.target.value;
     setSelectedRoute(value);
   };
+  const handleDelete = async (id) => {
+    // TODO: send delete request to backend
+    var newData = fetchedData.filter((row) => row.id !== id);
+    setFetchedData(newData);
+  };
   return (
     <Box m={4} px={4}>
       <Heading>Prices</Heading>
@@ -80,7 +94,7 @@ const TicketPrices = () => {
         <InputLeftAddon children="Route" />
         <Select
           defaultValue={selectedRoute}
-		  value={selectedRoute}
+          value={selectedRoute}
           placeholder={"Select Route"}
           onChange={handleRouteSelect}
         >
@@ -97,50 +111,69 @@ const TicketPrices = () => {
         content={fetchedData}
         tableCaption={""}
         handleUpdate={handleUpdate}
+        handleDelete={handleDelete}
       />
     </Box>
   );
 };
 
-const PricesTable = ({ content, tableCaption, handleUpdate }) => {
+const PricesTable = ({ content, tableCaption, handleUpdate, handleDelete }) => {
   return (
-    <Table mt={5} variant="striped" colorScheme="gray">
-      <TableCaption>{tableCaption}</TableCaption>
-      <Thead>
-        <Tr>
-          <Th>Traveller Class</Th>
-          <Th isNumeric>Price (Rs.)</Th>
-          <Th></Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        {content.map((row) => {
-          return (
-            <Tr key={row.id}>
-              <Td>{row.travellerClass}</Td>
-              <Td isNumeric>{row.price}</Td>
-              <Td>
-                <UpdateModal values={row} handleUpdate={handleUpdate} />
-              </Td>
-            </Tr>
-          );
-        })}
-      </Tbody>
-    </Table>
+    <>
+      <UpdateModal values={{}} handleUpdate={handleUpdate} forNew={true} />
+      <Table mt={5} variant="striped" colorScheme="gray">
+        <TableCaption>{tableCaption}</TableCaption>
+        <Thead>
+          <Tr>
+            <Th>Traveller Class</Th>
+            <Th isNumeric>Price (Rs.)</Th>
+            <Th></Th>
+            <Th></Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {content.map((row) => {
+            return (
+              <Tr key={row.id}>
+                <Td>{row.travellerClass}</Td>
+                <Td isNumeric>{row.price}</Td>
+                <Td>
+                  <UpdateModal
+                    values={row}
+                    handleUpdate={handleUpdate}
+                    forNew={false}
+                  />
+                </Td>
+                <Td>
+                  <DeleteModal typeId={row.id} handleDelete={handleDelete} />
+                </Td>
+              </Tr>
+            );
+          })}
+        </Tbody>
+      </Table>
+    </>
   );
 };
-const UpdateModal = ({ values, handleUpdate }) => {
+const UpdateModal = ({ values, handleUpdate, forNew }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <div>
-      <Button bg="transparent" _hover={{ bg: "trasparent" }} onClick={onOpen}>
-        <CreateIcon />
-        <Text mx={2}>Update</Text>
-      </Button>
+      {forNew ? (
+        <Button colorScheme="teal" onClick={onOpen} m={4}>
+          <AddIcon />
+          <Text mx={2}>Add New Price</Text>
+        </Button>
+      ) : (
+        <Button bg="transparent" _hover={{ bg: "trasparent" }} onClick={onOpen}>
+          <CreateIcon />
+          <Text mx={2}>Update</Text>
+        </Button>
+      )}
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Update Price</ModalHeader>
+          <ModalHeader>{forNew ? "New Price" : "Update Price"}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Formik
@@ -212,6 +245,47 @@ const UpdateModal = ({ values, handleUpdate }) => {
           </ModalBody>
         </ModalContent>
       </Modal>
+    </div>
+  );
+};
+
+const DeleteModal = ({ typeId, handleDelete }) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = React.useRef();
+  const handleYes = () => {
+    handleDelete(typeId);
+  };
+  return (
+    <div>
+      <Button colorScheme="red" onClick={onOpen}>
+        <DeleteIcon />
+        <Text mx={2}>Delete</Text>
+      </Button>
+      <AlertDialog
+        motionPreset="slideInBottom"
+        leastDestructiveRef={cancelRef}
+        onClose={onClose}
+        isOpen={isOpen}
+        isCentered
+      >
+        <AlertDialogOverlay />
+
+        <AlertDialogContent>
+          <AlertDialogHeader>Discard Price?</AlertDialogHeader>
+          <AlertDialogCloseButton />
+          <AlertDialogBody>
+            Are you sure you want to discard this price?
+          </AlertDialogBody>
+          <AlertDialogFooter>
+            <Button ref={cancelRef} onClick={onClose}>
+              No
+            </Button>
+            <Button colorScheme="red" ml={3} onClick={handleYes}>
+              Yes
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
