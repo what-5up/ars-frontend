@@ -90,17 +90,10 @@ const types = [
 	['Infants', 'on Lap', 'infantsOnLap'],
 ];
 
-const FindFlights = ({ setFlights, setPassengerCount }) => {
+const FindFlights = ({ setFlights, setPassengerCount, setTravellerClass }) => {
 	const [classes, setClasses] = useState([]);
 	const [origins, setOrigins] = useState([]);
 	const [destinations, setDestinations] = useState([{ label: '', customAbbreviation: '' }]);
-	const { getInputProps, getIncrementButtonProps, getDecrementButtonProps } = useNumberInput({
-		step: 1,
-		defaultValue: 1,
-		min: 1,
-		max: 20,
-		// precision: 2,
-	});
 	useEffect(async () => {
 		let classes = await getTravelerClasses();
 		console.log(classes);
@@ -154,7 +147,7 @@ const FindFlights = ({ setFlights, setPassengerCount }) => {
 				destination: '',
 				travelClass: '',
 				date: '',
-				count: 1,
+				passengers: 1,
 			}}
 			validationSchema={Yup.object({
 				origin: Yup.string()
@@ -167,10 +160,11 @@ const FindFlights = ({ setFlights, setPassengerCount }) => {
 					.oneOf(classes.map((item) => item.value))
 					.required('Required'),
 				date: Yup.date().min(new Date(), 'Choose a date in the future'),
-				count: Yup.number().default(1).min(1, "minimum one required").required('Required'),
+				passengers: Yup.number().default(1).min(1, "minimum one required").required('Required'),
 			})}
 			onSubmit={async (values) => {
-				setPassengerCount(values.count);
+				setPassengerCount(values.passengers);
+				setTravellerClass(values.travelClass)
 				let flights = await getScheduledFlights(values);
 				setFlights(flights.data);
 			}}
@@ -212,18 +206,18 @@ const FindFlights = ({ setFlights, setPassengerCount }) => {
 									</FormControl>
 								</Box>
 								<Box position="relative" style={{ flex: 2, maxWidth: '140px' }}>
-									<FormControl isInvalid={props.errors.count && props.touched.count}>
+									<FormControl isInvalid={props.errors.passengers && props.touched.passengers}>
 										<Flex alignItems="center">
 											<PeopleIcon style={{ marginRight: '5px' }} />
 											<Input
-												id="count"
+												id="passengers"
 												type="number"
 												defaultValue={1}
 												w="100px"
-												{...props.getFieldProps('count')}
+												{...props.getFieldProps('passengers')}
 											/>
 										</Flex>
-										<FormErrorMessage>{props.errors.count}</FormErrorMessage>
+										<FormErrorMessage>{props.errors.passengers}</FormErrorMessage>
 									</FormControl>
 
 									{/* <Button
