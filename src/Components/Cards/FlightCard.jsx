@@ -65,7 +65,7 @@ const FlightCard = ({
 				</GridItem>
 				<GridItem rowSpan={1} colSpan={10} mb={0}>
 					<Box justifyItems="center">
-						<Flex
+						<Button
 							onClick={(event) => {
 								let selectedClass = event.target.closest('.travellerClass');
 								if (selectedClass && selectedClass.id != null) {
@@ -92,7 +92,7 @@ const FlightCard = ({
 									</Box>
 								);
 							})}
-						</Flex>
+						</Button>
 					</Box>
 				</GridItem>
 				<GridItem rowSpan={1} colSpan={10}>

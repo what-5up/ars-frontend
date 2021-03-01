@@ -20,30 +20,26 @@ const DiscoverFlights = () => {
 		history.push('/passenger', { ...state, flight: flight, travellerClass:travellerClass, count:passengerCount });
 	};
 	const handleClick = (id) => {
-		console.log(id);
 		console.log(isAuthenticated);
-		// if (travellerClass != '') {
-		// 	if (isAuthenticated) {
+		if (travellerClass != '') {
+			if (isAuthenticated) {
 				goToPassenger({},id);
-			// } else {
-			// 	onOpen();
-			// }
-		// } else {
-		// 	console.log("Not selected");
-		// }
+			} else {
+				onOpen();
+			}
+		} else {
+			console.log("Not selected");
+		}
 	};
 	const { isOpen, onOpen, onClose } = useDisclosure();
 
 	return (
 		<Flex mt={5} flexDirection="column" minWidth="100vw">
 			<Flex justifyContent="center" minWidth="80%">
-				<FindFlights setFlights={setFlights} setPassengerCount={setPassengerCount}/>
+				<FindFlights setFlights={setFlights} setPassengerCount={setPassengerCount} setTravellerClass={setTravellerClass}/>
 			</Flex>
 			<Flex justifyContent="center" minWidth="80%">
 				<SearchComponent />
-			</Flex>
-			<Flex justifyContent="center">
-				<AddedPassengers/>
 			</Flex>
 			<Flex justifyContent="center" minWidth="80%" mx="auto" flexDirection="column">
 				{flights.map((item, index) => {
