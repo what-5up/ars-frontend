@@ -15,7 +15,7 @@ import {
 	Flex,
 	InputGroup,
 	InputRightElement,
-  FormErrorMessage
+	FormErrorMessage,
 } from '@chakra-ui/react';
 import { ArrowForwardIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { connect, useSelector, useDispatch } from 'react-redux';
@@ -74,11 +74,11 @@ const LoginForm = ({ onLogin }) => {
 					password: '',
 				}}
 				validationSchema={Yup.object({
-					email: Yup.string().email('Invalid email').required('Required'),
+					email: Yup.string().max(100).email('Invalid email').required('Required'),
 					password: Yup.string().required('Required'),
 				})}
 				onSubmit={(values) => {
-          onAuth(values.email, values.password, onLogin);
+					onAuth(values.email, values.password, onLogin);
 				}}
 			>
 				{(props) => (

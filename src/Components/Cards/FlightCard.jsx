@@ -19,13 +19,23 @@ import FlightIcon from '@material-ui/icons/Flight';
 import FlightLandIcon from '@material-ui/icons/FlightLand';
 import FlightTakeoffIcon from '@material-ui/icons/FlightTakeoff';
 
-const FlightCard = ({id, origin, destination, departure, origin_code, destination_code, bookFlight, prices }) => {
+const FlightCard = ({
+	id,
+	origin,
+	destination,
+	departure,
+	origin_code,
+	destination_code,
+	bookFlight,
+	prices,
+	setTravellerClass,
+}) => {
 	let date = new Date(departure);
 	let time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 	let day = date.toLocaleDateString();
 	return (
 		<Box boxShadow="xl" borderRadius="10px" m="10px" p="8px">
-			<Grid h="190px" w="80vw" templateRows="repeat(2, 1fr)" templateColumns="repeat(20, 1fr)" gap={2}>
+			<Grid h="210px" w="80vw" templateRows="repeat(2, 1fr)" templateColumns="repeat(20, 1fr)" gap={2}>
 				<GridItem rowSpan={2} colSpan={3}>
 					<Box pt={4}>
 						<VStack spacing={-0.5}>
@@ -37,7 +47,7 @@ const FlightCard = ({id, origin, destination, departure, origin_code, destinatio
 						</VStack>
 					</Box>
 				</GridItem>
-				<GridItem rowSpan={2} colSpan={6}>
+				<GridItem rowSpan={2} colSpan={4}>
 					<Box w={{ base: '80%', sm: '60%', md: '50%' }} mb={{ base: 12, md: 0 }}>
 						<Image src={'/images/flight-icon.png'} size="100%" rounded="1rem" alt="flight image" />
 					</Box>
@@ -53,26 +63,48 @@ const FlightCard = ({id, origin, destination, departure, origin_code, destinatio
 						</VStack>
 					</Box>
 				</GridItem>
-				<GridItem rowSpan={1} colSpan={8}>
-					<Box pt={4}>
-						<Flex>
+				<GridItem rowSpan={1} colSpan={10} mb={0}>
+					<Box justifyItems="center">
+						<Flex
+							onClick={(event) => {
+								let selectedClass = event.target.closest('.travellerClass');
+								if (selectedClass && selectedClass.id != null) {
+									setTravellerClass(selectedClass.id.split('_')[1]);
+								}
+							}}
+						>
 							{prices.map((item) => {
 								return (
-									<>
+									<Box
+										className="travellerClass"
+										id={`${id}_${item.class}`}
+										boxShadow="xl"
+										borderRadius="10px"
+										m="10px"
+										p="6"
+										cursor="pointer"
+									>
 										<Stat>
-											<StatLabel>{item.class}</StatLabel>
+											<StatLabel>{item.class.toUpperCase()}</StatLabel>
 											<StatNumber>{item.amount}</StatNumber>
 										</Stat>
 										<Spacer />
-									</>
+									</Box>
 								);
 							})}
 						</Flex>
 					</Box>
 				</GridItem>
-				<GridItem rowSpan={1} colSpan={8}>
-					<Box align="center" justifyItems="center" mt={2}>
-						<Button bg="transparent" size="lg" _hover={{ bg: 'trasparent' }} onClick={() => {bookFlight(id)}}>
+				<GridItem rowSpan={1} colSpan={10}>
+					<Box align="center" justifyItems="center">
+						<Button
+							bg="transparent"
+							size="lg"
+							_hover={{ bg: 'trasparent' }}
+							onClick={() => {
+								bookFlight(id);
+							}}
+						>
 							<Fab color="primary" variant="extended">
 								<FlightIcon />
 								<Text mx={2}>Book This Flight</Text>

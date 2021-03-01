@@ -14,59 +14,58 @@ import {
 import AddPassenger from '../../Components/Cards/AddPassenger';
 import { addOrUpdateArray } from '../../utils/helpers';
 import { useLocation, useHistory } from 'react-router-dom';
-import { addPassengers } from '../../api/passenger-api';
-import PassengerPlaceholder from '../../Components/Cards/PassengerPlaceholder';
 import PassengerFlight from '../../Components/Cards/PassengerFlight';
 
 const API_URL = 'https://restcountries.eu/rest/v2/all';
 
-const fetchCountries = async () => {
-	let respone = await fetch(API_URL);
-	let data = await respone.json();
-	data = data.map((item) => {
-		return { value: item.name, label: item.name };
-	});
-	return data;
-};
 
 const Passenger = () => {
 	let [passengers, setPassengers] = useState([]);
 	let [countries, setCountries] = useState([]);
+	let [flight, setFlight] = useState({});
+	let [canContinue, setCanContinue] = useState(false);
 	const location = useLocation();
 	const locationParams = location.state;
-	const count = 4; //location.state.count;
 	const history = useHistory();
 	const handleClick = async () => {
-		history.push('/seatmap', { passengers: passengers, ...locationParams });
+		history.push('/seatmap', { passengers: passengers, flightID:flight.id, ...locationParams });
 	};
 
-	const checkToContinue = () => {
-		let canContinue = true;
-		for (let i = 0; i < passengers.length; i++) {
-			if (!passengers[i].hasOwnProperty('first_name')) {
-				canContinue = false;
-				break;
-			}
-		}
-		return !canContinue;
-	};
 
-	useEffect(async () => {
+	useEffect(() => {
+		setFlight(locationParams.flight)
 		let tempArr = [];
-		for (let i = 0; i < count; i++) {
-			tempArr.push({ key: i, disabled: true });
-			if (i != 0) {
+		for (let i = 0; i < locationParams.count; i++) {
+			tempArr.push({ id: i, disabled: true });
+			if (i == 0) {
 				tempArr[0]['disabled'] = false;
 			}
 		}
-		setPassengers(tempArr);
+		setPassengers([...tempArr]);
+	}, []);
+	
+	useEffect(() => {
+		async function fetchCountries() {
+			let respone = await fetch(API_URL);
+			let data = await respone.json();
+			data = data.map((item) => {
+				return { value: item.name, label: item.name };
+			});
+			return data;
+		}
+		setCountries(fetchCountries());
 	}, []);
 
 	const addOrUpdatePassengers = (obj) => {
 		let newPassengers = passengers;
 		let index = passengers.findIndex((item) => item.disabled == true);
 		if (index > 0) {
-			newPassengers = addOrUpdateArray(passengers, { ...passengers[index], disabled: false });
+			if(index == (obj.id + 1)){
+				newPassengers = addOrUpdateArray(passengers, { ...passengers[index], disabled: false });
+			}
+		}
+		else{
+			setCanContinue(true)
 		}
 		setPassengers([...addOrUpdateArray(newPassengers, obj)]);
 	};
@@ -91,8 +90,8 @@ const Passenger = () => {
 						<Accordion w="90%" allowMultiple allowToggle>
 							{passengers.map((item) => (
 								<PassengerAccordion
-									key={item.key}
-									index={item.key}
+									key={item.id}
+									index={item.id}
 									disabled={item.disabled}
 									addOrUpdatePassengers={addOrUpdatePassengers}
 									countries={countries}
@@ -103,7 +102,7 @@ const Passenger = () => {
 					<Flex justifyContent="flex-end" mx="12" mb="3">
 						<Button
 							onClick={handleClick}
-							isDisabled={checkToContinue()}
+							isDisabled={!canContinue}
 							colorScheme="teal"
 							minWidth="full"
 							mt={4}
@@ -115,7 +114,7 @@ const Passenger = () => {
 
 				<Flex flex={3} w="30%">
 					<Flex w="100%" justifyContent="center">
-						<PassengerFlight />
+						<PassengerFlight {...flight}/>
 					</Flex>
 				</Flex>
 			</Flex>
@@ -144,7 +143,7 @@ const PassengerAccordion = ({ index, disabled, countries, addOrUpdatePassengers 
 				</AccordionButton>
 			</h2>
 			<AccordionPanel pb={4}>
-				<AddPassenger initialValues={{ key: 0 }} addPassenger={addOrUpdatePassengers} countries={countries} />
+				<AddPassenger initialValues={{ id: index }} addPassenger={addOrUpdatePassengers} countries={countries} />
 			</AccordionPanel>
 		</AccordionItem>
 	);
