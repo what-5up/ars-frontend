@@ -10,6 +10,7 @@ const AddPassenger = ({ initialValues, addPassenger, countries }) => {
 	console.log(initialValues);
 	const [title, setTitle] = useState([]);
 	const [formValues, setFormValues] = useState({});
+
 	useEffect(async () => {
 		let titles = await getTitles();
 		titles = titles.data;
@@ -18,17 +19,20 @@ const AddPassenger = ({ initialValues, addPassenger, countries }) => {
 		});
 		setTitle(titles);
 	}, []);
-	useEffect(() => {
-		if (initialValues.birthday != '' && initialValues.passport_expiry != '') {
-			let passport_expiry = new Date(initialValues.passport_expiry);
-			let birthday = new Date(initialValues.birthday);
-			initialValues.birthday = birthday.toISOString().slice(0, 10)
-			initialValues.passport_expiry = passport_expiry.toISOString().slice(0, 10)
-		}
 
+	useEffect(() => {
+		if (initialValues.hasOwnProperty('birthday') && initialValues.hasOwnProperty('passport_expiry')) {
+			if (initialValues.birthday != '' && initialValues.passport_expiry != '') {
+				let passport_expiry = new Date(initialValues.passport_expiry);
+				let birthday = new Date(initialValues.birthday);
+				initialValues.birthday = birthday.toISOString().slice(0, 10);
+				initialValues.passport_expiry = passport_expiry.toISOString().slice(0, 10);
+			}
+		}
 		console.log(initialValues);
 		setFormValues(initialValues);
 	}, [initialValues]);
+	
 	return (
 		<Formik
 			initialValues={{
@@ -53,8 +57,9 @@ const AddPassenger = ({ initialValues, addPassenger, countries }) => {
 					.oneOf(gender.map((item) => item.value))
 					.required('Required'),
 				country: Yup.string()
-					.oneOf(countries.map((item) => item.value))
-					.required('Required'),
+					// .oneOf(countries.map((item) => item.value))
+					// .required('Required'),
+					,
 				birthday: Yup.date().max(new Date(), 'Enter a valid birthday').required('Required'),
 				passport_no: Yup.number().required('Required'),
 				passport_expiry: Yup.date().min(new Date()).required('Required'),

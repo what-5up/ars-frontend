@@ -81,7 +81,6 @@ const RegistrationForm = () => {
 					confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match'),
 				})}
 				onSubmit={async (values) => {
-					alert(values);
 					await addUser(values);
 				}}
 			>

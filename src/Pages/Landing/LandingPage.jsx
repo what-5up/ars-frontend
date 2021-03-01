@@ -50,20 +50,26 @@ const Content = () => {
 						<Redirect to={{ pathname: '/' }} />
 					) : (
 						<Box style={{ width: '100vw' }}>
-							<SeatMap passengers = {location.state.passengers} flightID ={location.state.flightID} colorMode={colorMode} class="Economy" price={75000}/>
+							<SeatMap  {...location.state} colorMode={colorMode}  price={75000} class="Economy"/>
 						</Box>
 					)}
 					</Box>
 				</Route>
 				<Route path={`/passenger`}>
-					<Box width="100vw">
-					{/* <Passenger /> */}
-					</Box>
 					{location.state == undefined ? (
 						<Redirect to={{ pathname: '/' }} />
 					) : (
 						<Box style={{ width: '100vw' }}>
 							<Passenger />
+						</Box>
+					)}
+				</Route>
+				<Route path={`/costsummary`}>
+					{location.state == undefined ? (
+						<Redirect to={{ pathname: '/' }} />
+					) : (
+						<Box style={{ width: '100vw' }}>
+							<CostSummary />
 						</Box>
 					)}
 				</Route>
