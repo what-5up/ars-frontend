@@ -12,7 +12,7 @@ export const updateObject = (oldObject, updatedProperties) => {
 
 export const addOrUpdateArray = (arr,obj) => {
     let copy = [];
-    let index = arr.findIndex(item => item.key == obj.key)
+    let index = arr.findIndex(item => item.id == obj.id)
     if(index < 0){
         arr.push(obj)
     }

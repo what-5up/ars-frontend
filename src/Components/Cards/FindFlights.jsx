@@ -1,5 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Flex, Button, Text, Input, FormErrorMessage, FormControl } from '@chakra-ui/react';
+import {
+	Box,
+	Flex,
+	Button,
+	Text,
+	Input,
+	FormErrorMessage,
+	FormControl,
+	NumberInput,
+	NumberInputField,
+	NumberInputStepper,
+	NumberIncrementStepper,
+	NumberDecrementStepper,
+	HStack,
+	useNumberInput,
+} from '@chakra-ui/react';
 import Select, { components } from 'react-select';
 import PeopleIcon from '@material-ui/icons/People';
 import RemoveIcon from '@material-ui/icons/Remove';
@@ -14,12 +29,6 @@ import * as Yup from 'yup';
 import { getTravelerClasses } from '../../api/traveller-class-api';
 import { getRoutes } from '../../api/route-api';
 import { getScheduledFlights } from '../../api/scheduled-flight-api';
-
-const options = [
-	{ value: 'Abe', label: 'Abe', customAbbreviation: 'A' },
-	{ value: 'John', label: 'John', customAbbreviation: 'J' },
-	{ value: 'Dustin', label: 'Dustin', customAbbreviation: 'D' },
-];
 
 const DropdownIndicator = (props) => {
 	return (
@@ -38,7 +47,6 @@ const customStyles = {
 		padding: 20,
 	}),
 	control: (provided) => ({
-		// none of react-select's styles are passed to <Control />
 		...provided,
 		height: '56px',
 	}),
@@ -82,10 +90,17 @@ const types = [
 	['Infants', 'on Lap', 'infantsOnLap'],
 ];
 
-const  FindFlights = ({setFlights}) => {
+const FindFlights = ({ setFlights, setPassengerCount }) => {
 	const [classes, setClasses] = useState([]);
 	const [origins, setOrigins] = useState([]);
-	const [destinations, setDestinations] = useState([]);
+	const [destinations, setDestinations] = useState([{ label: '', customAbbreviation: '' }]);
+	const { getInputProps, getIncrementButtonProps, getDecrementButtonProps } = useNumberInput({
+		step: 1,
+		defaultValue: 1,
+		min: 1,
+		max: 20,
+		// precision: 2,
+	});
 	useEffect(async () => {
 		let classes = await getTravelerClasses();
 		console.log(classes);
@@ -97,39 +112,38 @@ const  FindFlights = ({setFlights}) => {
 
 	useEffect(async () => {
 		let routes = await getRoutes();
-		console.log(routes);
 
 		let tempDestinations = [];
 		let tempOrigins = [];
 
-		// let uniqueOrigins = new Set(routes.data.map(item => {return {origin_code:item.origin_code, origin:item.origin}}));
-		// origins  = Array.from(uniqueOrigins);
-
 		routes.data.forEach((item) => {
 			let index = tempOrigins.findIndex((entry) => item.origin_code == entry.value);
 			if (index < 0) {
-				tempOrigins.push({ value: item.origin_code, label: item.origin ,customAbbreviation: item.origin_region});
+				tempOrigins.push({
+					value: item.origin_code,
+					label: item.origin,
+					customAbbreviation: item.origin_region,
+				});
 				tempDestinations.push([]);
 				tempDestinations[tempDestinations.length - 1].push({
 					id: item.id,
 					value: item.destination_code,
 					label: item.destination,
-					customAbbreviation: item.destination_region
+					customAbbreviation: item.destination_region,
 				});
 			} else {
 				tempDestinations[index].push({
 					id: item.id,
 					value: item.destination_code,
 					label: item.destination,
-					customAbbreviation: item.destination_region
+					customAbbreviation: item.destination_region,
 				});
 			}
 		});
 
 		setOrigins(tempOrigins);
-		setDestinations(tempDestinations);
-		console.log(tempOrigins);
-		console.log(tempDestinations);
+		// setDestinations(tempDestinations);
+		setDestinations(tempOrigins);
 	}, []);
 	let [showDropdown, setShowDropdown] = useState(false);
 	let convertedAttr = convertArrToObj(types);
@@ -140,25 +154,24 @@ const  FindFlights = ({setFlights}) => {
 				destination: '',
 				travelClass: '',
 				date: '',
-				totalPassengers: 0,
-				...convertedAttr,
+				count: 1,
 			}}
 			validationSchema={Yup.object({
 				origin: Yup.string()
-					// .oneOf(options.map((item) => item.value))
+					.oneOf(origins.map((item) => item.value))
 					.required('Required'),
 				destination: Yup.string()
-					// .oneOf(options.map((item) => item.value))
+					.oneOf(origins.map((item) => item.value))
 					.required('Required'),
-				travelClass: Yup.string()
-					// .oneOf(classes.map((item) => item.value))
+				travelClass: Yup.number()
+					.oneOf(classes.map((item) => item.value))
 					.required('Required'),
-				date: Yup.date()
+				date: Yup.date().min(new Date(), 'Choose a date in the future'),
+				count: Yup.number().default(1).min(1, "minimum one required").required('Required'),
 			})}
 			onSubmit={async (values) => {
-				// alert(JSON.stringify(values, null, 2));
+				setPassengerCount(values.count);
 				let flights = await getScheduledFlights(values);
-				console.log(flights);
 				setFlights(flights.data);
 			}}
 		>
@@ -199,7 +212,21 @@ const  FindFlights = ({setFlights}) => {
 									</FormControl>
 								</Box>
 								<Box position="relative" style={{ flex: 2, maxWidth: '140px' }}>
-									<Button
+									<FormControl isInvalid={props.errors.count && props.touched.count}>
+										<Flex alignItems="center">
+											<PeopleIcon style={{ marginRight: '5px' }} />
+											<Input
+												id="count"
+												type="number"
+												defaultValue={1}
+												w="100px"
+												{...props.getFieldProps('count')}
+											/>
+										</Flex>
+										<FormErrorMessage>{props.errors.count}</FormErrorMessage>
+									</FormControl>
+
+									{/* <Button
 										onClick={() => {
 											setShowDropdown(!showDropdown);
 										}}
@@ -207,7 +234,7 @@ const  FindFlights = ({setFlights}) => {
 										<PeopleIcon style={{ marginRight: '5px' }} />{' '}
 										{types.reduce((tot, item) => tot + props.values[item[2]], 0)}{' '}
 										<ArrowDropDownIcon />
-									</Button>
+									</Button> */}
 									<Flex
 										flexDirection="column"
 										maxW="400px"
@@ -260,56 +287,46 @@ const  FindFlights = ({setFlights}) => {
 										<Select
 											options={origins}
 											isSearchable={true}
-											components={{  IndicatorSeparator: () => null, DropdownIndicator }}
-											
+											components={{ IndicatorSeparator: () => null, DropdownIndicator }}
 											formatOptionLabel={formatOptionLabel}
 											classNamePrefix="vyrill"
 											styles={customStyles}
 											placeholder="From"
 											value={
-												options
-													? options.find((option) => option.value === props.values.origin)
+												origins
+													? origins.find((option) => option.value === props.values.origin)
 													: ''
 											}
 											onChange={(option) => {
 												props.setFieldValue('origin', option.value);
-												props.setFieldValue('destination', '');
-												console.log(props.values.destination);
 											}}
 											onBlur={() => props.setFieldTouched('origin', true)}
 											error={props.errors.origin}
 											touched={props.touched.origin}
 										/>
-										<FormErrorMessage>{props.errors.from}</FormErrorMessage>
+										<FormErrorMessage>{props.errors.origin}</FormErrorMessage>
 									</FormControl>
 								</Box>
 								<Box flex="2" ml={3} h="100%">
 									<FormControl isInvalid={props.errors.destination && props.touched.destination}>
 										<Select
-											options={
-												props.values.origin == ''
-													? []
-													: destinations[
-															origins.findIndex(
-																(entry) => props.values.origin == entry.value
-															)
-													  ]
-											}
+											options={destinations}
 											isSearchable={true}
 											components={{ DropdownIndicator }}
 											formatOptionLabel={formatOptionLabel}
 											classNamePrefix="vyrill"
 											styles={customStyles}
 											placeholder="To"
-											value={
-												options
-													? options.find((option) => option.value === props.values.destination)
-													: ''
-											}
+											// value={
+											// 	origins
+											// 		? origins.find((option) => option.value === props.values.destination) && null
+											// 		: ''
+											// }
 											onChange={(option) => props.setFieldValue('destination', option.value)}
 											onBlur={() => props.setFieldTouched('destination', true)}
 											error={props.errors.destination}
 											touched={props.touched.destination}
+											defaultValue=""
 										/>
 										<FormErrorMessage>{props.errors.destination}</FormErrorMessage>
 									</FormControl>
@@ -338,7 +355,7 @@ const  FindFlights = ({setFlights}) => {
 			)}
 		</Formik>
 	);
-}
+};
 
 const PassengerType = ({ id, type, description, formik }) => {
 	return (

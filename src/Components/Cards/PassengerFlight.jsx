@@ -12,8 +12,6 @@ import FlightLandIcon from '@material-ui/icons/FlightLand';
 import FlightTakeoffIcon from '@material-ui/icons/FlightTakeoff';
 
 const PassengerFlight = ({ origin_code, destination_code, departure }) => {
-	origin_code = 'BKK';
-	destination_code = 'CNN';
 	let date = new Date(departure);
 	let time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 	let day = date.toLocaleDateString();
@@ -30,7 +28,8 @@ const PassengerFlight = ({ origin_code, destination_code, departure }) => {
 			style={{
 				boxShadow: '0 1px 3px 0 rgb(60 64 67 / 30%), 0 4px 8px 3px rgb(60 64 67 / 15%)',
 				minWidth: '80%',
-				maxHeight: '300px',
+				height: '300px',
+
 			}}
 		>
 			<Flex mb={2} mt={3} mx="5">

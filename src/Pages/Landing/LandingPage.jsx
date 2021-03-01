@@ -8,8 +8,9 @@ import LandingHomeContent from '../../Containers/Landing/LandingHomeContent';
 import Signout from '../../Containers/Routes/Signout';
 import DiscoverFlights from '../../Containers/DiscoverFlights/DiscoverFlights';
 import Passenger from '../../Containers/AddPassenger/Passenger';
-import SRDashBoard from "../SR/SRDashBoard";
-import SeatMap from '../../Containers/SeatMap/SeatMap'
+import SRDashBoard from '../SR/SRDashBoard';
+import SeatMap from '../../Containers/SeatMap/SeatMap';
+import CostSummary from '../../Containers/CostSummary/CostSummary'
 
 export default function LandingPage() {
 	return (
@@ -40,53 +41,28 @@ const Content = () => {
 				</Route>
 				<Route path={`/contact-us`}>
 					<Box width="100vw">
-						<SRDashBoard />
+						<CostSummary />
 					</Box>
 				</Route>
 				<Route path={`/seatmap`}>
 					<Box width="100vw">
-						<SeatMap
-							class="Economy"
-							price={75000}
-							passengers={[
-								{
-									id: 1,
-									first_name: "Kane",
-									last_name: "Williamson"
-								},
-								{
-									id: 3,
-									first_name: "Dimuth",
-									last_name: "Karunaratne"
-								},
-								{
-									id: 10,
-									first_name: "Steve",
-									last_name: "Smith"
-								},
-								{
-									id: 14,
-									first_name: "Angelo",
-									last_name: "Mathews"
-								},
-								{
-									id: 15,
-									first_name: "Ajantha",
-									last_name: "Mendis"
-								}
-							]}
-							flightID={10}
-							colorMode={colorMode} />
+					{location.state == undefined ? (
+						<Redirect to={{ pathname: '/' }} />
+					) : (
+						<Box style={{ width: '100vw' }}>
+							<SeatMap passengers = {location.state.passengers} flightID ={location.state.flightID} colorMode={colorMode} class="Economy" price={75000}/>
+						</Box>
+					)}
 					</Box>
 				</Route>
 				<Route path={`/passenger`}>
-					{/* {location.state == undefined ? (
+					{location.state == undefined ? (
 						<Redirect to={{ pathname: '/' }} />
-					) : ( */}
-					<Box style={{ width: '100vw' }}>
-						<Passenger />
-					</Box>
-					{/* )} */}
+					) : (
+						<Box style={{ width: '100vw' }}>
+							<Passenger />
+						</Box>
+					)}
 				</Route>
 				<Route path="/signout" component={Signout} />
 				<Route path="/">

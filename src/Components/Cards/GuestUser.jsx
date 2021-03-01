@@ -65,9 +65,7 @@ const GuestUser = ({ routeForward, closeModal }) => {
 					.required('Required'),
 			})}
 			onSubmit={async (values) => {
-				alert(JSON.stringify(values, null, 2));
 				let response = await addGuest(values);
-				console.log(response);
 				onAuth(response.data.token,response.data.userID, response.data.expiresIn)
 				routeForward({ id: response.data.userID });
 			}}
@@ -95,7 +93,7 @@ const GuestUser = ({ routeForward, closeModal }) => {
 										touched={props.touched.title}
 									/>
 									<FormErrorMessage>{props.errors.title}</FormErrorMessage>
-								</FormControl>{' '}
+								</FormControl>
 							</Box>
 							<Box flex="3" mr={3}>
 								<FormControl isInvalid={props.errors.firstName && props.touched.firstName}>
@@ -209,4 +207,4 @@ const GuestUser = ({ routeForward, closeModal }) => {
 		</Formik>
 	);
 };
-export default GuestUser;
+export default connect(null, null)(GuestUser);;

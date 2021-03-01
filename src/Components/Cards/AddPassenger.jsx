@@ -32,18 +32,18 @@ const AddPassenger = ({ initialValues, addPassenger, countries }) => {
 			validationSchema={Yup.object({
 				first_name: Yup.string().required('Required'),
 				last_name: Yup.string().required('Required'),
-				title: Yup.string()
-					// .oneOf(title.map((item) => item.value))
+				title: Yup.number()
+					.oneOf(title.map((item) => item.value))
 					.required('Required'),
 				gender: Yup.string()
 					.oneOf(gender.map((item) => item.value))
 					.required('Required'),
-				country: Yup.string(),
-				// .oneOf(countries.map((item) => item.value))
-				// .required('Required'),,
+				country: Yup.string()
+					.oneOf(countries.map((item) => item.value))
+					.required('Required'),
 				birthday: Yup.date().max(new Date(), 'Enter a valid birthday').required('Required'),
 				passport_no: Yup.number().required('Required'),
-				passport_expiry: Yup.date().required('Required'),
+				passport_expiry: Yup.date().min(new Date()).required('Required'),
 			})}
 			onSubmit={(values) => {
 				addPassenger(values);
@@ -189,7 +189,9 @@ const AddPassenger = ({ initialValues, addPassenger, countries }) => {
 									e.target.innerHTML = 'Update';
 									props.submitForm();
 								}}
-								colorScheme="teal" minWidth={'300px'} mt={4}
+								colorScheme="teal"
+								minWidth={'300px'}
+								mt={4}
 							>
 								Submit
 							</Button>
