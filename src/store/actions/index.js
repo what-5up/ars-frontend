@@ -1,5 +1,6 @@
 export {
-    auth,
+    systemAuth,
+    guestAuth,
     logout,
     setAuthRedirectPath,
     authCheckState,

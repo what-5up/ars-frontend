@@ -62,7 +62,7 @@ const LoginForm = ({ onLogin }) => {
 	const error = useSelector((state) => state.auth.error);
 	const isLoading = useSelector((state) => state.auth.loading);
 	const dispatch = useDispatch();
-	const onAuth = useCallback((email, password, onLogin) => dispatch(actions.auth(email, password, onLogin)), [
+	const onAuth = useCallback((email, password, onLogin) => dispatch(actions.systemAuth(email, password, onLogin)), [
 		dispatch,
 	]);
 
