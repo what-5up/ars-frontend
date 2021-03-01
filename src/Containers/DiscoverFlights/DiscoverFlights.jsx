@@ -47,6 +47,7 @@ const DiscoverFlights = () => {
 						<FlightCard
 							key={index}
 							{...item}
+							setFlights = {setFlights}
 							bookFlight={handleClick}
 							setTravellerClass={setTravellerClass}
 						/>
