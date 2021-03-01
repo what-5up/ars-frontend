@@ -7,7 +7,9 @@ import { getTitles } from '../../api/title-api';
 import { gender } from '../../utils/constants';
 
 const AddPassenger = ({ initialValues, addPassenger, countries }) => {
+	console.log(initialValues);
 	const [title, setTitle] = useState([]);
+	const [formValues, setFormValues] = useState({});
 	useEffect(async () => {
 		let titles = await getTitles();
 		titles = titles.data;
@@ -16,6 +18,17 @@ const AddPassenger = ({ initialValues, addPassenger, countries }) => {
 		});
 		setTitle(titles);
 	}, []);
+	useEffect(() => {
+		if (initialValues.birthday != '' && initialValues.passport_expiry != '') {
+			let passport_expiry = new Date(initialValues.passport_expiry);
+			let birthday = new Date(initialValues.birthday);
+			initialValues.birthday = birthday.toISOString().slice(0, 10)
+			initialValues.passport_expiry = passport_expiry.toISOString().slice(0, 10)
+		}
+
+		console.log(initialValues);
+		setFormValues(initialValues);
+	}, [initialValues]);
 	return (
 		<Formik
 			initialValues={{
@@ -27,8 +40,9 @@ const AddPassenger = ({ initialValues, addPassenger, countries }) => {
 				birthday: '',
 				passport_no: '',
 				passport_expiry: '',
-				...initialValues,
+				...formValues,
 			}}
+			enableReinitialize={true}
 			validationSchema={Yup.object({
 				first_name: Yup.string().required('Required'),
 				last_name: Yup.string().required('Required'),

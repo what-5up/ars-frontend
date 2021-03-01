@@ -14,6 +14,7 @@ const DiscoverFlights = () => {
 	let [travellerClass, setTravellerClass] = useState('');
 	let [flights, setFlights] = useState([]);
 	let [passengerCount, setPassengerCount] = useState(0);
+	
 	let history = useHistory();
 	const goToPassenger = (state = {},id) => {
 		let flight = flights.find(item => item.id == id)

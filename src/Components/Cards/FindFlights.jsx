@@ -166,6 +166,7 @@ const FindFlights = ({ setFlights, setPassengerCount, setTravellerClass }) => {
 				setPassengerCount(values.passengers);
 				setTravellerClass(values.travelClass)
 				let flights = await getScheduledFlights(values);
+				console.log(flights);
 				setFlights(flights.data);
 			}}
 		>

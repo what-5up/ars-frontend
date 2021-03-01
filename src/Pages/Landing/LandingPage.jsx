@@ -55,6 +55,9 @@ const Content = () => {
 					</Box>
 				</Route>
 				<Route path={`/passenger`}>
+					<Box width="100vw">
+					{/* <Passenger /> */}
+					</Box>
 					{location.state == undefined ? (
 						<Redirect to={{ pathname: '/' }} />
 					) : (
