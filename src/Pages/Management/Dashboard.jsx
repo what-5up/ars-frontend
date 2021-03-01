@@ -60,9 +60,6 @@ const Buttons = () => {
     </div>
   );
 };
-
-export default Dashboard;
-
 const Content = () => {
   const location = useLocation();
   const transitions = useTransition(location, (location) => location.pathname, {
@@ -108,3 +105,7 @@ const Content = () => {
     </animated.div>
   ));
 };
+
+export default Dashboard;
+
+

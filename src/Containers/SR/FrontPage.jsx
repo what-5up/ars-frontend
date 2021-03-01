@@ -8,14 +8,19 @@ import {
   Button,
   VStack,
 } from "@chakra-ui/react";
+import { useHistory } from "react-router-dom";
 
 const FrontPage = () => {
   const [notAllocated, setNotAllocated] = useState([]);
+  let history = useHistory();
   useEffect(() => {
     // TODO: fetch non allocated flight list
-    var fetchedResult = [29, 33, 34];
+    var fetchedResult = [5,10,24];
     setNotAllocated(fetchedResult);
   }, []);
+  const goToPricePage = (id) => {
+    history.push("/prices", { route: id });
+  };
   return (
     <>
       {notAllocated.length === 0 ? (
@@ -60,7 +65,11 @@ const FrontPage = () => {
               <VStack mt={4}>
                 {notAllocated.map((id) => {
                   return (
-                    <Button colorScheme="teal" variant="ghost">
+                    <Button
+                      colorScheme="teal"
+                      variant="ghost"
+                      onClick={() => goToPricePage(id)}
+                    >
                       {`Flight No ${id}`}
                     </Button>
                   );
