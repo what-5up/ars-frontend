@@ -50,6 +50,15 @@ export const updateUser = (id, data) => {
     return putRequest(`${URL}/${id}`, data);
 }
 /**
+ * Get passengers added by user previously
+ * 
+ * @param {number} id
+ * 
+ * @returns {Promise<object>} 
+ */
+export const getAddedPassengers = (id) => getRequest(`${URL}/${id}/passengers`);
+
+/**
  * Delete the user for the given id
  * 
  * @param {number} id
