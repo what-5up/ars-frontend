@@ -10,7 +10,7 @@ import {
 	Heading,
 	Text,
 	Divider,
-	AccordionIcon
+	AccordionIcon,
 } from '@chakra-ui/react';
 import AddPassenger from '../../Components/Cards/AddPassenger';
 import { addOrUpdateArray } from '../../utils/helpers';
@@ -24,37 +24,42 @@ const API_URL = 'https://restcountries.eu/rest/v2/all';
 
 const Passenger = () => {
 	let userID = useSelector((state) => state.auth.userID);
-	console.log(userID);
 	let [passengers, setPassengers] = useState([]);
 	let [countries, setCountries] = useState([]);
 	let [flight, setFlight] = useState({});
 	let [currentIndex, setCurrentIndex] = useState(0);
 	let [canContinue, setCanContinue] = useState(false);
 	let [addedPassengers, setAddedPassengers] = useState([]);
+
 	const location = useLocation();
 	const locationParams = location.state;
 	const history = useHistory();
+
 	const handleClick = async () => {
 		history.push('/seatmap', { passengers: passengers, flightID: flight.id, ...locationParams });
 	};
 
-	// /users/:userID/passengers
+	const addOrUpdatePassengers = (obj) => {
+		let newPassengers = passengers;
+		let index = passengers.findIndex((item) => item.disabled == true);
+		if (index > 0) {
+			if (index == obj.id + 1) {
+				newPassengers = addOrUpdateArray(passengers, { ...passengers[index], disabled: false });
+				setCurrentIndex(index);
+			}
+		} else {
+			setCanContinue(true);
+		}
+		setPassengers([...addOrUpdateArray(newPassengers, obj)]);
+	};
 
 	useEffect(() => {
-		setFlight(locationParams.flight)
+		setFlight(locationParams.flight);
 		let tempArr = [];
 		for (let i = 0; i < locationParams.count; i++) {
 			tempArr.push({
 				id: i,
 				disabled: true,
-				first_name: 'a',
-				last_name: '',
-				title: '',
-				gender: '',
-				country: '',
-				birthday: '',
-				passport_no: '',
-				passport_expiry: '',
 			});
 			if (i == 0) {
 				tempArr[0]['disabled'] = false;
@@ -64,10 +69,9 @@ const Passenger = () => {
 	}, []);
 
 	useEffect(async () => {
-		// setFlight(locationParams.flight)
 		let prevPassengers = [];
 		prevPassengers = await getAddedPassengers(userID);
-		prevPassengers = prevPassengers.data
+		prevPassengers = prevPassengers.data;
 		setAddedPassengers(prevPassengers);
 	}, []);
 
@@ -83,21 +87,6 @@ const Passenger = () => {
 		setCountries(fetchCountries());
 	}, []);
 
-	const addOrUpdatePassengers = (obj) => {
-		let newPassengers = passengers;
-		console.log(obj);
-		let index = passengers.findIndex((item) => item.disabled == true);
-		if (index > 0) {
-			if (index == obj.id + 1) {
-				newPassengers = addOrUpdateArray(passengers, { ...passengers[index], disabled: false });
-				setCurrentIndex(index)
-			}
-		} else {
-			setCanContinue(true);
-		}
-		setPassengers([...addOrUpdateArray(newPassengers, obj)]);
-		console.log(passengers);
-	};
 	return (
 		<Box
 			width="95%"
@@ -147,7 +136,11 @@ const Passenger = () => {
 						<PassengerFlight {...flight} />
 					</Flex>
 					<Flex w="100%" justifyContent="center" mt="3">
-						<AddedPassengers passengers={addedPassengers} id={currentIndex} addPassenger={addOrUpdatePassengers}/>
+						<AddedPassengers
+							passengers={addedPassengers}
+							id={currentIndex}
+							addPassenger={addOrUpdatePassengers}
+						/>
 					</Flex>
 				</Flex>
 			</Flex>
@@ -171,10 +164,10 @@ const PassengerAccordion = ({ initialValues, index, disabled, countries, addOrUp
 			<h2>
 				<AccordionButton>
 					<Flex justifyContent="space-between" w="100%">
-					<Box mb={2} mt={3} mx="5">
-						<Text fontSize="2xl">{`Passenger ${index + 1}`}</Text>
-					</Box>
-					<AccordionIcon my="auto" mr={2} fontSize="40px"/>
+						<Box mb={2} mt={3} mx="5">
+							<Text fontSize="2xl">{`Passenger ${index + 1}`}</Text>
+						</Box>
+						<AccordionIcon my="auto" mr={2} fontSize="40px" />
 					</Flex>
 				</AccordionButton>
 			</h2>
