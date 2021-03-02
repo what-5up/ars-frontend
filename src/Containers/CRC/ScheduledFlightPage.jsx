@@ -105,10 +105,28 @@ const ScheduledFlightPage = () => {
       setDataToShow(newData);
     }
   };
+  const datesAreOnSameDay = (first, second) =>
+    first.getFullYear() === second.getFullYear() &&
+    first.getMonth() === second.getMonth() &&
+    first.getDate() === second.getDate();
+
+  const handleDateSelect = (value) => {
+    if (value === "") {
+      setDataToShow(fetchedData);
+    } else {
+      var newData = fetchedData.filter((row) =>
+        datesAreOnSameDay(new Date(row.departure), new Date(value))
+      );
+      setDataToShow(newData);
+    }
+  };
   return (
     <Box m={4} px={4}>
       <Heading>Scheduled Flights</Heading>
-      <FilterComponent handleRouteChange={handleRouteSelect} />
+      <FilterComponent
+        handleRouteChange={handleRouteSelect}
+        handleDateSelect={handleDateSelect}
+      />
       <ScheduledFlightTable
         content={dataToShow}
         tableCaption={""}
@@ -155,7 +173,7 @@ const ScheduledFlightTable = ({
   };
   const getAircraftString = (id) => {
     var aircraft = aircrafts.find((x) => x.id === id);
-    return aircraft?`ID: ${aircraft.id}, Model: ${aircraft.model_name}`:id;
+    return aircraft ? `ID: ${aircraft.id}, Model: ${aircraft.model_name}` : id;
   };
   return (
     <>
@@ -210,8 +228,10 @@ const ScheduledFlightTable = ({
   );
 };
 
-const FilterComponent = ({ handleRouteChange }) => {
+const FilterComponent = ({ handleRouteChange, handleDateSelect }) => {
   const [routes, setRoutes] = useState([]);
+  const [route, setRoute] = useState("all");
+  const [dat, setDat] = useState(null)
   useEffect(async () => {
     var routs = await getRoutes();
     routs = routs.data || [];
@@ -219,7 +239,18 @@ const FilterComponent = ({ handleRouteChange }) => {
   }, []);
   const handleRouteSelect = (event) => {
     var value = event.target.value;
+    if (value === "all") {
+      value = '';
+    }
     handleRouteChange(value);
+    setRoute(value);
+    setDat("mm/dd/yyyy");
+  };
+  const handleChange = (event) => {
+    var value = event.target.value;
+    handleDateSelect(value);
+    setRoute('all');
+    setDat(value)
   };
   return (
     <Box m={4} px={2}>
@@ -227,7 +258,8 @@ const FilterComponent = ({ handleRouteChange }) => {
         <Box flex="2" ml={3} h="100%">
           <InputGroup>
             <InputLeftAddon children="Route" />
-            <Select placeholder={"Select Route"} onChange={handleRouteSelect}>
+            <Select placeholder={"Select Route"} onChange={handleRouteSelect} value={route}>
+              <option value="all">All</option>
               {routes.map((rout) => {
                 return (
                   <option
@@ -238,7 +270,18 @@ const FilterComponent = ({ handleRouteChange }) => {
             </Select>
           </InputGroup>
         </Box>
-        <Box flex="2" ml={3} h="100%"></Box>
+        <Box flex="2" ml={3} h="100%">
+          <InputGroup>
+            <InputLeftAddon children="Departure" />
+            <Input
+              type="date"
+              name="departure"
+              placeholder="Select"
+              value={dat}
+              onChange={(event) => handleChange(event)}
+            />
+          </InputGroup>
+        </Box>
       </Flex>
     </Box>
   );
