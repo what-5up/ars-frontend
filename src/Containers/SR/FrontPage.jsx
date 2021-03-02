@@ -9,13 +9,15 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useHistory } from "react-router-dom";
+import { getRoutesOfUnallocatedPrice } from "../../api/route-api";
 
 const FrontPage = () => {
   const [notAllocated, setNotAllocated] = useState([]);
   let history = useHistory();
-  useEffect(() => {
-    // TODO: fetch non allocated flight list
-    var fetchedResult = [5,10,24];
+  useEffect(async() => {
+    var response = await getRoutesOfUnallocatedPrice();
+    console.log(response);
+    var fetchedResult = response.data;
     setNotAllocated(fetchedResult);
   }, []);
   const goToPricePage = (id) => {
