@@ -123,8 +123,7 @@ const FindFlights = ({ setFlights, setPassengerCount, setTravellerClass }) => {
 		console.log(JSON.stringify(tempOrigins));
 		console.log(JSON.stringify(tempDestinations));
 		setOrigins(tempOrigins);
-		// setDestinations(tempDestinations);
-		setDestinations(tempOrigins);
+		setDestinations(tempDestinations);
 	}, []);
 	let [showDropdown, setShowDropdown] = useState(false);
 	let convertedAttr = convertArrToObj(types);
@@ -282,6 +281,7 @@ const FindFlights = ({ setFlights, setPassengerCount, setTravellerClass }) => {
 											}
 											onChange={(option) => {
 												props.setFieldValue('origin', option.value);
+												props.setFieldValue('destination', '');
 											}}
 											onBlur={() => props.setFieldTouched('origin', true)}
 											error={props.errors.origin}
@@ -293,20 +293,31 @@ const FindFlights = ({ setFlights, setPassengerCount, setTravellerClass }) => {
 								<Box flex="2" ml={3} h="100%">
 									<FormControl isInvalid={props.errors.destination && props.touched.destination}>
 										<Select
-											options={destinations.filter(item => item.value != props.values.origin)}
-											// options={destinations}
+											options={
+												props.values.origin === ''
+													? []
+													: destinations[
+															origins.findIndex(
+																(entry) => props.values.origin === entry.value
+															)
+													  ]
+											}
+											placeholder="To"
+											value={
+												destinations && props.values.destination
+													? destinations.find(
+															(option) => option.value === props.values.destination
+													  ) && null
+													: ''
+											}
+											onChange={(option) => {
+												props.setFieldValue('destination', option.value);
+											}}
 											isSearchable={true}
 											components={{ DropdownIndicator }}
 											formatOptionLabel={formatOptionLabel}
 											classNamePrefix="vyrill"
 											styles={customStyles}
-											placeholder="To"
-											// value={
-											// 	origins
-											// 		? origins.find((option) => option.value === props.values.destination) && null
-											// 		: ''
-											// }
-											onChange={(option) => props.setFieldValue('destination', option.value)}
 											onBlur={() => props.setFieldTouched('destination', true)}
 											error={props.errors.destination}
 											touched={props.touched.destination}
