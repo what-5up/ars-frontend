@@ -11,14 +11,15 @@ export const authStart = () => {
     };
 };
 
-export const authSuccess = (token, userID, accType, userType) => {
+export const authSuccess = (token, userID, accType, userType, userAuthenticated) => {
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     return {
         type: actionTypes.AUTH_SUCCESS,
         token: token,
         userID: userID,
         accType: accType,
-        userType: userType
+        userType: userType,
+        userAuthenticated: userAuthenticated
     };
 };
 
@@ -35,6 +36,7 @@ export const logout = () => {
     localStorage.removeItem('userID');
     localStorage.removeItem('accType');
     localStorage.removeItem('userType');
+    localStorage.removeItem('userAuthenticated');
     delete axios.defaults.headers.common['Authorization'];
     
     return {
@@ -72,6 +74,7 @@ export const systemAuth = (email, password, onLogin) => {
                 localStorage.setItem('token', token);
                 localStorage.setItem('expirationDate', expirationDate);
                 localStorage.setItem('userID', userID);
+                localStorage.setItem('userAuthenticated', true);
 
 				if (!Object.values(DesignationEnum).includes(accType)) {
 					accType  = DesignationEnum.USER;
@@ -81,7 +84,7 @@ export const systemAuth = (email, password, onLogin) => {
 				localStorage.setItem('accType', accType);
 				localStorage.setItem('userType', userType);
 
-				dispatch(authSuccess(token, userID, accType, userType))
+				dispatch(authSuccess(token, userID, accType, userType, true))
 			
                 onLogin();
                 dispatch(checkAuthTimeout(expiresIn));
@@ -145,7 +148,8 @@ export const authCheckState = () => {
                 const userID = localStorage.getItem('userID');
                 const accType = localStorage.getItem('accType');
                 const userType = localStorage.getItem('userType');
-                dispatch(authSuccess(token, userID, accType, userType));
+                const userAuthenticated = localStorage.getItem('userAuthenticated');
+                dispatch(authSuccess(token, userID, accType, userType, userAuthenticated));
                 dispatch(checkAuthTimeout((expirationDate.getTime() - new Date().getTime()) / 1000));
             }
         }

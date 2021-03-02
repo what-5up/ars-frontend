@@ -39,7 +39,7 @@ import MyProfilePopup from "../../Components/Popups/MyProfilePopup";
 
 const LandingHeader = () => {
   const { colorMode, _ } = useColorMode();
-  const isAuthenticated = useSelector((state) => state.auth.token !== null);
+  const isAuthenticated = useSelector((state) => state.auth.userAuthenticated);
   return (
     <Flex
       width="full"

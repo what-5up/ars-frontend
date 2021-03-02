@@ -19,7 +19,7 @@ import GuestUser from '../../Components/Cards/GuestUser';
 import { useHistory } from 'react-router-dom';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 const DiscoverFlights = () => {
-	let isAuthenticated = useSelector((state) => state.auth.token !== null);
+	let isAuthenticated = useSelector((state) => state.auth.userAuthenticated);
 
 	let [travellerClass, setTravellerClass] = useState('');
 	let [flights, setFlights] = useState([]);

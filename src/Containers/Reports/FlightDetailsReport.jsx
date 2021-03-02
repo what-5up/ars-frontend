@@ -76,8 +76,8 @@ const FlightDetailsReport = (props) => {
   const handleSortChange = (orderBy, order) => {
     var sortedData = _.orderBy(
       dataToShow,
-      ["origin", "destination", orderBy],
-      ["asc", "asc", order]
+      [orderBy, "origin", "destination"],
+      [order, "asc", "asc"]
     );
     setDataToShow(sortedData);
   };
@@ -124,7 +124,7 @@ const FilterComponent = ({
   };
   const handleOrderChange = (event) => {
     setOrderBy(event.target.value);
-    handleSortChange(orderBy, order);
+    handleSortChange(event.target.value, order);
   };
   return (
     <Box m={4} px={2}>

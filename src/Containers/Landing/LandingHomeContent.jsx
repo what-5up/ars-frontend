@@ -30,7 +30,7 @@ export default function LandingHomeContent({
   React.useEffect(() => {
     const interval = setInterval(() => {
       setImageIndex((imageIndex) => (imageIndex + 1) % images.length);
-    }, 3000);
+    }, 4500);
     return () => clearInterval(interval);
   }, [images.length]);
   return (
@@ -46,7 +46,7 @@ export default function LandingHomeContent({
     >
       <Stack
         spacing={4}
-        w={{ base: "80%", md: "40%" }}
+        w={{ base: "50%", md: "40%" }}
         align={["center", "center", "flex-start", "flex-start"]}
       >
         <Heading
@@ -60,28 +60,28 @@ export default function LandingHomeContent({
         </Heading>
         <Heading
           as="h2"
-          size="lg"
+          fontSize="36px"
           color="primary.900"
           opacity="0.8"
           fontWeight="normal"
           lineHeight={1.5}
           textAlign={["center", "center", "left", "left"]}
         >
-          {subtitle1}
+          {subtitle1[imageIndex]}
         </Heading>
         <Heading
           as="h2"
-          size="md"
+          fontSize="26px"
           color="primary.800"
           opacity="0.8"
           fontWeight="normal"
           lineHeight={1.5}
           textAlign={["center", "center", "left", "left"]}
         >
-          {subtitle2}
+          {subtitle2[imageIndex]}
         </Heading>
         <Text
-          fontSize="xs"
+          fontSize="s"
           mt={2}
           textAlign="center"
           color="primary.800"
@@ -91,12 +91,12 @@ export default function LandingHomeContent({
         </Text>
         <CreateNewAccountButton ctaText={ctaText} />
       </Stack>
-      <Box w={{ base: "80%", sm: "60%", md: "50%" }} mb={{ base: 12, md: 0 }}>
+      <Box w={{ base: "90%", sm: "70%", md: "65%" }} mb={{ base: 12, md: 0 }}>
         <Image
           src={images[imageIndex]}
-          size="100%"
           rounded="1rem"
           shadow="2xl"
+          size="50%"
         />
       </Box>
     </Flex>
@@ -113,13 +113,26 @@ LandingHomeContent.propTypes = {
 
 LandingHomeContent.defaultProps = {
   title: "Welcome",
-  subtitle1: "Plan ahead with guaranteed flexibility",
-  subtitle2:
-    "Benefit from guaranteed flexibility on bookings made until 30 April 2021* including unlimited date or destination changes and fee-free refunds.",
+  subtitle1: [
+    "Instant Booking",
+    "24x7 Availability",
+    "Account Benefits",
+    "Preferred Seats",
+    "Notification on Delays"
+  ],
+  subtitle2: [
+    "Book your flight instantly with our online system",
+    "Book your flight in anytime, anywhere",
+    "Earn upto 50% discounts and more",
+    "Reserve a seat of your choosing",
+    "Get instant emails on any update of your bookings"
+  ],
   images: [
-    "/images/artur-tumasjan-KZSNMN4VxR8-unsplash.jpg",
-    "/images/tobias-zils-FZRvB6KoRxE-unsplash.jpg",
-    "/images/chuttersnap-mytSmcgVHRE-unsplash.jpg",
+    "/images/instant.jpg",
+    "/images/247.jpg",
+    "/images/account.jpg",
+    "/images/seats.jpg",
+    "/images/delay.jpg"
   ],
   ctaText: "Create your account now",
 };
@@ -135,6 +148,8 @@ const CreateNewAccountButton = ({ ctaText }) => {
         lineHeight="1"
         size="md"
         onClick={onOpen}
+        colorScheme="purple"
+        variant="outline"
       >
         {ctaText}
       </Button>
