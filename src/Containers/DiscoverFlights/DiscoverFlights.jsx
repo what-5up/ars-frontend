@@ -12,6 +12,7 @@ import {
 } from '@chakra-ui/react';
 import { connect, useSelector } from 'react-redux';
 import FindFlights from '../../Components/Cards/FindFlights';
+import Booking from '../../Components/Cards/BookingCard';
 import SearchComponent from '../../Components/Cards/SearchComponent';
 import FlightCard from '../../Components/Cards/FlightCard';
 import GuestUser from '../../Components/Cards/GuestUser';
@@ -70,7 +71,7 @@ const DiscoverFlights = () => {
 				/>
 			</Flex>
 			<Flex justifyContent="center" minWidth="80%">
-				<SearchComponent />
+				<Booking/>
 			</Flex>
 			<Flex justifyContent="center" minWidth="80%" mx="auto" flexDirection="column">
 				{flights.length != 0 &&

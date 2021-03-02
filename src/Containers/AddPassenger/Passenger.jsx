@@ -72,10 +72,14 @@ const Passenger = () => {
 	}, []);
 
 	useEffect(async () => {
-		let prevPassengers = [];
-		prevPassengers = await getAddedPassengers(userID);
-		prevPassengers = prevPassengers.data || [];
-		setAddedPassengers(prevPassengers);
+		if(!location.state.isGuest){
+			let prevPassengers = [];
+		
+			prevPassengers = await getAddedPassengers(userID);
+			prevPassengers = prevPassengers.data || [];
+			setAddedPassengers(prevPassengers);
+		}
+		
 	}, []);
 
 	useEffect(async () => {

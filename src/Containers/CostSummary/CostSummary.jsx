@@ -69,7 +69,7 @@ const Cost = () => {
 			setTotalPrice(result.data.total_price);
 		}
 		setReservedSeats(tempReserved);
-	}, [reservedSeats, discount, totalPrice]);
+	}, []);
 
 	return (
 		<Box

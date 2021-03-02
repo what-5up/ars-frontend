@@ -68,6 +68,15 @@ export const getAddedPassengers = (id) => getRequest(`${URL}/${id}/passengers`);
 export const deleteUser = (id) => deleteRequest(`${URL}/${id}`);
 
 /**
+ * Delete the user for the given id
+ * 
+ * @param {number} id
+ * 
+ * @returns {Promise<object>} 
+ */
+export const deleteBooking = (userId,bookingId) => deleteRequest(`${URL}/${userId}/${BOOKING_URL}/${bookingId}`);
+
+/**
  * Get the booking of a user for the given id
  * 
  * @param {number} userID - user id
