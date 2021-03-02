@@ -31,6 +31,7 @@ import {
   InputLeftAddon,
   Select,
   useToast,
+  Flex,
 } from "@chakra-ui/react";
 import CreateIcon from "@material-ui/icons/Create";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -47,18 +48,22 @@ import {
 
 const ScheduledFlightPage = () => {
   const [fetchedData, setFetchedData] = useState([]);
+  const [dataToShow, setDataToShow] = useState([]);
   useEffect(async () => {
     var response = await getDetailedScheduledFlights();
     var data = response.data || [];
     setFetchedData(data);
+    setDataToShow(data);
   }, []);
   const handleDelete = (id) => {
     var newData = fetchedData.filter((row) => row.id !== id);
     setFetchedData(newData);
+    setDataToShow(newData);
   };
   const handleNew = (newValues) => {
     var newData = fetchedData.concat(newValues);
     setFetchedData(newData);
+    setDataToShow(newData);
   };
   const handleUpdate = (newValues) => {
     var newData = fetchedData.map((row) => {
@@ -74,6 +79,7 @@ const ScheduledFlightPage = () => {
         : row;
     });
     setFetchedData(newData);
+    setDataToShow(newData);
   };
   const handleAddDelay = (newValues) => {
     var newData = fetchedData.map((row) => {
@@ -89,12 +95,22 @@ const ScheduledFlightPage = () => {
         : row;
     });
     setFetchedData(newData);
+    setDataToShow(newData);
+  };
+  const handleRouteSelect = (value) => {
+    if (value === '') {
+      setDataToShow(fetchedData);
+    } else {
+      var newData = fetchedData.filter((row) => row.route == value);
+      setDataToShow(newData);
+    }
   };
   return (
     <Box m={4} px={4}>
       <Heading>Scheduled Flights</Heading>
+      <FilterComponent handleRouteChange={handleRouteSelect} />
       <ScheduledFlightTable
-        content={fetchedData}
+        content={dataToShow}
         tableCaption={""}
         handleNew={handleNew}
         handleUpdate={handleUpdate}
@@ -173,6 +189,41 @@ const ScheduledFlightTable = ({
     </>
   );
 };
+
+const FilterComponent = ({ handleRouteChange }) => {
+  const [routes, setRoutes] = useState([]);
+  useEffect(async () => {
+    var routs = await getRoutes();
+    routs = routs.data || [];
+    setRoutes(routs);
+  }, []);
+  const handleRouteSelect = (event) => {
+    var value = event.target.value;
+    handleRouteChange(value);
+  };
+  return (
+    <Box m={4} px={2}>
+      <Flex direction="row" ml={3}>
+        <Box flex="2" ml={3} h="100%">
+          <InputGroup>
+            <InputLeftAddon children="Route" />
+            <Select placeholder={"Select Route"} onChange={handleRouteSelect}>
+              {routes.map((rout) => {
+                return (
+                  <option
+                    value={rout.id}
+                  >{`${rout.id} ${rout.origin_code} -> ${rout.destination_code}`}</option>
+                );
+              })}
+            </Select>
+          </InputGroup>
+        </Box>
+        <Box flex="2" ml={3} h="100%"></Box>
+      </Flex>
+    </Box>
+  );
+};
+
 const UpdateModal = ({ values, handleUpdate, forNew }) => {
   const toast = useToast();
   const [routes, setRoutes] = useState([]);
