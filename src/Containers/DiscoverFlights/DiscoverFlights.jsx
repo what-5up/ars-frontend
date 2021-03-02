@@ -4,12 +4,12 @@ import { connect, useSelector } from 'react-redux';
 import FindFlights from '../../Components/Cards/FindFlights';
 import SearchComponent from '../../Components/Cards/SearchComponent';
 import FlightCard from '../../Components/Cards/FlightCard';
-import BookingCard from '../../Components/Cards/BookingCard';
 import GuestUser from '../../Components/Cards/GuestUser';
 import { useHistory } from 'react-router-dom';
-import AddedPassengers from '../../Components/Cards/AddedPassengers'
+import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
 
 const DiscoverFlights = () => {
+	
 	let isAuthenticated = useSelector((state) => state.auth.token !== null);
 	let [travellerClass, setTravellerClass] = useState('');
 	let [flights, setFlights] = useState([]);
@@ -28,9 +28,7 @@ const DiscoverFlights = () => {
 			} else {
 				onOpen();
 			}
-		} else {
-			console.log("Not selected");
-		}
+		} 
 	};
 	const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -43,7 +41,7 @@ const DiscoverFlights = () => {
 				<SearchComponent />
 			</Flex>
 			<Flex justifyContent="center" minWidth="80%" mx="auto" flexDirection="column">
-				{flights.map((item, index) => {
+				{flights.length != 0 && flights.map((item, index) => {
 					return (
 						<FlightCard
 							key={index}
@@ -78,4 +76,4 @@ const DiscoverFlights = () => {
 
 
 
-export default connect(null, null)(DiscoverFlights);
+export default connect(null, null)(withErrorHandler(DiscoverFlights));

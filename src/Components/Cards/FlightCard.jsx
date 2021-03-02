@@ -64,35 +64,33 @@ const FlightCard = ({
 					</Box>
 				</GridItem>
 				<GridItem rowSpan={1} colSpan={10} mb={0}>
-					<Box justifyItems="center">
-						<Button
-							onClick={(event) => {
-								let selectedClass = event.target.closest('.travellerClass');
-								if (selectedClass && selectedClass.id != null) {
-									setTravellerClass(selectedClass.id.split('_')[1]);
-								}
-							}}
-						>
-							{prices.map((item) => {
-								return (
-									<Box
-										className="travellerClass"
-										id={`${id}_${item.class}`}
-										boxShadow="xl"
-										borderRadius="10px"
-										m="10px"
-										p="6"
-										cursor="pointer"
-									>
+					<Box justifyItems="flex-end">
+						{prices.map((item) => {
+							return (
+								<Button
+									onClick={(event) => {
+										let selectedClass = event.target.closest('.travellerClass');
+										if (selectedClass && selectedClass.id != null) {
+											setTravellerClass(selectedClass.id.split('_')[1]);
+										}
+									}}
+									boxShadow="xl"
+									borderRadius="10px"
+									m="10px"
+									p="6"
+									cursor="pointer"
+									minHeight ="100px"
+								>
+									<Box className="travellerClass" id={`${id}_${item.class}`}>
 										<Stat>
 											<StatLabel>{item.class.toUpperCase()}</StatLabel>
 											<StatNumber>{item.amount}</StatNumber>
 										</Stat>
 										<Spacer />
 									</Box>
-								);
-							})}
-						</Button>
+								</Button>
+							);
+						})}
 					</Box>
 				</GridItem>
 				<GridItem rowSpan={1} colSpan={10}>
