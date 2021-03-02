@@ -96,7 +96,7 @@ const AccountTypesPage = () => {
       });
       setFetchedData(newData);
       toast({
-        title: "Account Type Deleted.",
+        title: "Account type added successfully",
         description: response.message,
         status: "success",
         duration: 9000,

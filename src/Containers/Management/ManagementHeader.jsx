@@ -97,7 +97,6 @@ const Menu = ({ direction }) => {
       divider={<StackDivider borderColor="gray.200" />}
     >
       <MenuItems to="/">Home</MenuItems>
-      <MenuItems to="/reports">Reports</MenuItems>
     </Stack>
   );
 };
