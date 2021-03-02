@@ -2,7 +2,6 @@ import { React, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
   Box,
-  Input,
   InputGroup,
   InputLeftAddon,
   Select,
@@ -18,21 +17,37 @@ import {
   Radio,
   RadioGroup,
   Stack,
+  Alert,
+  AlertIcon,
+  AlertTitle,
 } from "@chakra-ui/react";
 import { ArrowDownIcon, ArrowUpIcon } from "@chakra-ui/icons";
 import _ from "lodash";
 import ReportHeader from "../../Components/Headers/ReportHeader";
 import { getPassengersByFlightNo } from "../../api/report-api";
+import { getRoutes } from "../../api/route-api";
 
 const PassengersInFlightReport = (props) => {
   const [fetchedData, setFetchedData] = useState([]);
   const [dataToShow, setDataToShow] = useState([]);
+  const [routes, setRoutes] = useState([]);
   const [filterValues, setFilterValues] = useState({
     route: null,
   });
   useEffect(async () => {
     let response = await getPassengersByFlightNo(filterValues.route);
-    response = response.results;
+    response = response.data;
+    var data = response.above18.concat(response.below18);
+    var routs = await getRoutes();
+    routs = routs.data || [];
+    setRoutes(routs);
+    data = data.map((row) => {
+      return {
+        firstName: row.first_name,
+        lastName: row.last_name,
+        age: row.passenger_age,
+      };
+    });
     let dummydata = [
       {
         firstName: "A",
@@ -55,8 +70,8 @@ const PassengersInFlightReport = (props) => {
         age: 18,
       },
     ];
-    setFetchedData(dummydata);
-    setDataToShow(dummydata);
+    setFetchedData(data);
+    setDataToShow(data);
   }, [filterValues]);
   const handleFilterChange = (filterChange) => {
     setFilterValues({ ...filterValues, ...filterChange });
@@ -81,20 +96,39 @@ const PassengersInFlightReport = (props) => {
     <Box textAlign="center" mx="10px">
       <ReportHeader header="Passengers Travelling in a Flight" />
       <FilterComponent
-        handleDateChange={handleFilterChange}
+        routes={routes}
+        handleFlightChange={handleFilterChange}
         handleSortChange={handleSortChange}
         handleAgeSelect={handleAgeSelect}
       />
-      <PassengersInFlightReportContent
-        content={dataToShow}
-        tableCaption="Passengers Travelling in a Flight"
-      />
+      {filterValues.route ? (
+        <PassengersInFlightReportContent
+          content={dataToShow}
+          tableCaption="Passengers Travelling in a Flight"
+        />
+      ) : (
+        <Alert
+          status="info"
+          variant="subtle"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="center"
+          textAlign="center"
+          height="200px"
+        >
+          <AlertIcon boxSize="40px" mr={0} />
+          <AlertTitle mt={4} mb={1} fontSize="lg">
+            Select a flight to view info
+          </AlertTitle>
+        </Alert>
+      )}
     </Box>
   );
 };
 
 const FilterComponent = ({
-  handleDateChange,
+  routes,
+  handleFlightChange,
   handleSortChange,
   handleAgeSelect,
 }) => {
@@ -102,7 +136,7 @@ const FilterComponent = ({
   const [order, setOrder] = useState("asc");
   const handleChange = (event) => {
     var value = event.target.value;
-    handleDateChange({ [event.target.name]: value });
+    handleFlightChange({ route: value });
   };
   const handleClick = (ord) => {
     setOrder(ord);
@@ -118,28 +152,20 @@ const FilterComponent = ({
     setAge(val);
   };
   return (
-    <Box m={4} px={2}>
+    <Box my={4} px={2}>
       <Flex direction="row" ml={3}>
-        <Box flex="2" ml={3} h="100%">
+        <Box flex="4" ml={3} h="100%">
           <InputGroup>
-            <InputLeftAddon children="Start Date" />
-            <Input
-              type="date"
-              name="startDate"
-              placeholder="Select"
-              onChange={(event) => handleChange(event)}
-            />
-          </InputGroup>
-        </Box>
-        <Box flex="2" ml={3} h="100%">
-          <InputGroup>
-            <InputLeftAddon children="End Date" />
-            <Input
-              type="date"
-              name="endDate"
-              placeholder="Select"
-              onChange={(event) => handleChange(event)}
-            />
+            <InputLeftAddon children="Route" />
+            <Select placeholder={"Select Flight"} onChange={handleChange}>
+              {routes.map((rout) => {
+                return (
+                  <option
+                    value={rout.id}
+                  >{`${rout.id} ${rout.origin_code} -> ${rout.destination_code}`}</option>
+                );
+              })}
+            </Select>
           </InputGroup>
         </Box>
         <Box flex="3" ml={3} h="100%">
@@ -169,16 +195,16 @@ const FilterComponent = ({
             </Box>
           </Flex>
         </Box>
-        <Box flex="3" ml={3} h="100%">
-          <RadioGroup onChange={(val) => radioChange(val)} value={age}>
-            <Stack direction="row">
-              <Radio value="all">All</Radio>
-              <Radio value="below18">Below 18</Radio>
-              <Radio value="above18">Above 18</Radio>
-            </Stack>
-          </RadioGroup>
-        </Box>
       </Flex>
+      <Box ml={3} h="100%">
+        <RadioGroup onChange={(val) => radioChange(val)} value={age}>
+          <Stack direction="row">
+            <Radio value="all">All</Radio>
+            <Radio value="below18">Below 18</Radio>
+            <Radio value="above18">Above 18</Radio>
+          </Stack>
+        </RadioGroup>
+      </Box>
     </Box>
   );
 };

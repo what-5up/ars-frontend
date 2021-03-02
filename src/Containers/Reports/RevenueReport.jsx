@@ -73,7 +73,7 @@ const FilterComponent = ({
   handleModelChange,
   handleSortChange,
 }) => {
-  const [orderBy, setOrderBy] = useState("destination");
+  const [orderBy, setOrderBy] = useState("month");
   const [order, setOrder] = useState("asc");
   const handleChange = (event) => {
     var value = event.target.value;
@@ -106,7 +106,6 @@ const FilterComponent = ({
           <Flex direction="row" ml={3}>
             <Select
               placeholder="Sort By"
-              defaultValue="month"
               onChange={handleOrderChange}
             >
               <option value="month">Month</option>
@@ -176,6 +175,14 @@ const RevenueReportContent = ({ content, tableCaption }) => {
                   </Tr>
                 );
               })}
+              <Tr>
+                <Td>Total Revenue</Td>
+                <Td isNumeric>
+                  {row[1].reduce((total, rev) => {
+                    return total + rev.revenue;
+                  }, 0)}
+                </Td>
+              </Tr>
             </Tbody>
           </Table>
         </Box>
