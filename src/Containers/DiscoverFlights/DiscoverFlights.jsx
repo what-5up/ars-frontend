@@ -70,9 +70,6 @@ const DiscoverFlights = () => {
 					setTravellerClass={setTravellerClass}
 				/>
 			</Flex>
-			<Flex justifyContent="center" minWidth="80%">
-				<Booking/>
-			</Flex>
 			<Flex justifyContent="center" minWidth="80%" mx="auto" flexDirection="column">
 				{flights.length != 0 &&
 					flights.map((item, index) => {
