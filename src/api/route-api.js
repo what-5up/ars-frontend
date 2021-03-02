@@ -20,6 +20,13 @@ export const getRoutes = () => getRequest(URL);
 export const getRoute = (id) => getRequest(`${URL}/${id}`);
 
 /**
+ * Returns routes with unallocated prices
+ * 
+ * @return {Promise<object>} [ route_id ]
+ */
+export const getRoutesOfUnallocatedPrice = () => getRequest(`${URL}?unallocatedPrice=true`);
+
+/**
  * Returns all the route prices for the given flight no 
  * 
  * @param {number} id flight no
