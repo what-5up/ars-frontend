@@ -10,11 +10,13 @@ const Cost = () => {
 	let userID = useSelector((state) => state.auth.userID);
 
 	const location = useLocation();
+	let locationState = location.state;
 	const flight = location.state.flight;
 
 	const [reservedSeats, setReservedSeats] = useState([]);
 	const [totalPrice, setTotalPrice] = useState(0);
 	const [discount, setDiscount] = useState(0);
+
 	const addBooking = async (scenario, transactionKey = null) => {
 		let payload = {
 			scenario: scenario,
@@ -27,8 +29,9 @@ const Cost = () => {
 		}
 		await addBookingByUser(userID, payload);
 	};
-	useEffect(() => {
-		let tempReserved = location.state.passengers.map((passenger) => {
+
+	useEffect(async () => {
+		let tempReserved = locationState.passengers.map((passenger) => {
 			let obj = {};
 			obj['seat_id'] = passenger.seatID;
 			obj['passenger'] = passenger;
@@ -36,19 +39,18 @@ const Cost = () => {
 			return obj;
 		});
 
+		let reserved_seats = locationState.passengers.map((passenger) => {
+			return { seat_id: passenger.seatID };
+		});
+
+		let result = await getPricing(flight.id, { reserved_seats: reserved_seats, user_id: userID });
+		if (!result.hasOwnProperty('error')) {
+			setDiscount(result.data.price_after_discount);
+			setTotalPrice(result.data.total_price);
+		}
 		setReservedSeats(tempReserved);
-	}, []);
+	}, [reservedSeats, discount, totalPrice]);
 
-	useEffect(async () => {
-		let reserved_seats = location.state.passengers.map((passenger) => passenger.seatID);
-
-		let result = await getPricing(userID, { reserved_seats: reserved_seats, user_id: userID });
-		console.log(result);
-		console.log(result.data);
-		setDiscount(result.data.price_after_discount) 
-		setTotalPrice(result.data.total_price) 
-		
-	}, []);
 	return (
 		<Box
 			width="95%"
@@ -70,7 +72,7 @@ const Cost = () => {
 					reservedSeats={reservedSeats}
 					addBooking={addBooking}
 					totalCost={totalPrice}
-					priceAfterDiscount = {discount}
+					priceAfterDiscount={discount}
 				/>
 			</Flex>
 		</Box>

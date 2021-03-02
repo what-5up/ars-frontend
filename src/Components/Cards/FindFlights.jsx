@@ -81,11 +81,8 @@ const FindFlights = ({ setFlights, setPassengerCount, setTravellerClass }) => {
 
 	useEffect(async () => {
 		let classes = await getTravelerClasses();
-		if (classes === undefined) {
-			classes = {};
-			classes.data = [];
-		}
-		classes = classes.data.map((item) => {
+		classes = classes.data || [];
+		classes = classes.map((item) => {
 			return { label: item.class, value: item.id };
 		});
 		setClasses(classes);
@@ -93,38 +90,38 @@ const FindFlights = ({ setFlights, setPassengerCount, setTravellerClass }) => {
 
 	useEffect(async () => {
 		let routes = await getRoutes();
-		console.log(routes);
 
 		let tempDestinations = [];
 		let tempOrigins = [];
 
-		if (routes != undefined && routes.hasOwnProperty('data')) {
-			routes.data.forEach((item) => {
-				let index = tempOrigins.findIndex((entry) => item.origin_code == entry.value);
-				if (index < 0) {
-					tempOrigins.push({
-						value: item.origin_code,
-						label: item.origin,
-						customAbbreviation: item.origin_region,
-					});
-					tempDestinations.push([]);
-					tempDestinations[tempDestinations.length - 1].push({
-						id: item.id,
-						value: item.destination_code,
-						label: item.destination,
-						customAbbreviation: item.destination_region,
-					});
-				} else {
-					tempDestinations[index].push({
-						id: item.id,
-						value: item.destination_code,
-						label: item.destination,
-						customAbbreviation: item.destination_region,
-					});
-				}
-			});
-		}
+		routes = routes.data || [];
 
+		routes.forEach((item) => {
+			let index = tempOrigins.findIndex((entry) => item.origin_code == entry.value);
+			if (index < 0) {
+				tempOrigins.push({
+					value: item.origin_code,
+					label: item.origin,
+					customAbbreviation: item.origin_region,
+				});
+				tempDestinations.push([]);
+				tempDestinations[tempDestinations.length - 1].push({
+					id: item.id,
+					value: item.destination_code,
+					label: item.destination,
+					customAbbreviation: item.destination_region,
+				});
+			} else {
+				tempDestinations[index].push({
+					id: item.id,
+					value: item.destination_code,
+					label: item.destination,
+					customAbbreviation: item.destination_region,
+				});
+			}
+		});
+		console.log(JSON.stringify(tempOrigins));
+		console.log(JSON.stringify(tempDestinations));
 		setOrigins(tempOrigins);
 		// setDestinations(tempDestinations);
 		setDestinations(tempOrigins);
@@ -157,8 +154,8 @@ const FindFlights = ({ setFlights, setPassengerCount, setTravellerClass }) => {
 				setPassengerCount(values.passengers);
 				setTravellerClass(values.travelClass);
 				let flights = await getScheduledFlights(values);
-				console.log(flights);
-				setFlights(flights.data);
+				flights = flights.data || [];
+				setFlights(flights);
 			}}
 		>
 			{(props) => (
@@ -296,7 +293,8 @@ const FindFlights = ({ setFlights, setPassengerCount, setTravellerClass }) => {
 								<Box flex="2" ml={3} h="100%">
 									<FormControl isInvalid={props.errors.destination && props.touched.destination}>
 										<Select
-											options={destinations}
+											options={destinations.filter(item => item.value != props.values.origin)}
+											// options={destinations}
 											isSearchable={true}
 											components={{ DropdownIndicator }}
 											formatOptionLabel={formatOptionLabel}

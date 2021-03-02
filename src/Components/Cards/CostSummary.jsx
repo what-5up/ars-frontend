@@ -25,6 +25,8 @@ import { WatchLater } from '@material-ui/icons';
 import {} from '../../utils/helpers';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import {formatPrice} from '../../utils/helpers'
+
 
 const CostSummary = ({ flight, reservedSeats,addBooking, totalCost, priceAfterDiscount }) => {
 	let date = new Date(flight.departure);
@@ -56,7 +58,7 @@ const CostSummary = ({ flight, reservedSeats,addBooking, totalCost, priceAfterDi
 						</VStack>
 					</Box>
 				</Flex>
-				<Flex mb="3" justifyContent="space-between">
+				<Flex mb="3" mt="3" justifyContent="space-between">
 					<Box>
 						<Text fontSize="2xl">Passengers </Text>
 					</Box>
@@ -64,12 +66,12 @@ const CostSummary = ({ flight, reservedSeats,addBooking, totalCost, priceAfterDi
 						<Text fontSize="2xl">{reservedSeats.length}</Text>
 					</Box>
 				</Flex>
-				<Flex mb="3" justifyContent="space-between">
+				<Flex mb="3"justifyContent="space-between">
 					<Box>
 						<Text fontSize="2xl">Flight </Text>
 					</Box>
 					<Box>
-						<Text fontSize="2xl">{totalCost} </Text>
+						<Text fontSize="2xl">{formatPrice(totalCost)} </Text>
 					</Box>
 				</Flex>
 				<Flex mb="3" justifyContent="space-between">
@@ -77,7 +79,7 @@ const CostSummary = ({ flight, reservedSeats,addBooking, totalCost, priceAfterDi
 						<Text fontSize="2xl">Discount </Text>
 					</Box>
 					<Box>
-						<Text fontSize="2xl">Price </Text>
+						<Text fontSize="2xl">{formatPrice(totalCost - priceAfterDiscount)} </Text>
 					</Box>
 				</Flex>
 				<Flex mt="2">
@@ -85,10 +87,10 @@ const CostSummary = ({ flight, reservedSeats,addBooking, totalCost, priceAfterDi
 				</Flex>
 				<Flex justifyContent="space-between" mt="3" mb="3">
 					<Box>
-						<Text fontSize="2xl">{totalCost - priceAfterDiscount}</Text>
+						<Text fontSize="2xl">Total Cost</Text>
 					</Box>
 					<Box>
-						<Text fontSize="2xl">{priceAfterDiscount} </Text>
+						<Text fontSize="2xl">{formatPrice(priceAfterDiscount)} </Text>
 					</Box>
 				</Flex>
 				<Flex mb="3" justifyContent="center">

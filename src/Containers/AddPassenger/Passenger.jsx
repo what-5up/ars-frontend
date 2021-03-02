@@ -73,11 +73,7 @@ const Passenger = () => {
 	useEffect(async () => {
 		let prevPassengers = [];
 		prevPassengers = await getAddedPassengers(userID);
-		if (prevPassengers == undefined) {
-			prevPassengers = {};
-			prevPassengers.data = [];
-		}
-		prevPassengers = prevPassengers.data;
+		prevPassengers = prevPassengers.data ||[];
 		setAddedPassengers(prevPassengers);
 	}, []);
 

@@ -13,7 +13,7 @@ const AddPassenger = ({ initialValues, addPassenger, countries }) => {
 
 	useEffect(async () => {
 		let titles = await getTitles();
-		titles = titles.data;
+		titles = titles.data || [];
 		titles = titles.map((title) => {
 			return { value: title.id, label: title.title_name };
 		});

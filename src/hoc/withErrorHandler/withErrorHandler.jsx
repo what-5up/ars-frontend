@@ -11,21 +11,24 @@ import {
     AlertTitle,
     AlertDescription
 } from "@chakra-ui/react"
+import Loader from '../../Components/Cards/Loader';
 
 const withErrorHandler = (WrappedComponent) => {
     return class extends Component {
         state = {
             error: null,
             isOpen: false,
-            title: null
+            title: null,
+            loading:false,
         }
 
         componentWillMount() {
             this.reqInterceptor = axios.interceptors.request.use(req => {
-                this.setState({ error: null });
+                this.setState({ error: null, loading:true });
                 return req;
             });
             this.resInterceptor = axios.interceptors.response.use(res => res, error => {
+                this.setState({loading:false})
                 if (error.message === "Network Error")
                     this.setState({ error: "Unable to connect to the sever. Please try again later", isOpen: true, title: "Network Error" })
                 else { this.setState({ error: error.response.data.message, isOpen: true, title: error.response.statusText }); }
@@ -45,6 +48,8 @@ const withErrorHandler = (WrappedComponent) => {
         render() {
             return (
                 <div>
+                    {/* {this.state.loading && <Loader/>} */}
+                    
                     <Modal
                         isOpen={this.state.isOpen}
                         onClose={this.errorConfirmedHandler}
