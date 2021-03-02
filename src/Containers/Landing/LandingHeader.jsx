@@ -154,6 +154,9 @@ const Menu = ({ direction, isAuthenticated }) => {
     >
       <MenuItems to="/">Home</MenuItems>
       <MenuItems to="/discover">Discover </MenuItems>
+      {!isAuthenticated ? (
+        <MenuItems to="/bookings">Bookings </MenuItems>
+      ) : null}
       <MenuItems to="/contact-us">Contact Us </MenuItems>
       {!isAuthenticated ? <RegisterArea /> : null}
     </Stack>
