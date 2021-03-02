@@ -7,6 +7,10 @@ import {
   Box,
   Button,
   VStack,
+  Flex,
+  Stack, 
+  Heading,
+  Image
 } from "@chakra-ui/react";
 import { useHistory } from "react-router-dom";
 import { getRoutesOfUnallocatedPrice } from "../../api/route-api";
@@ -24,9 +28,17 @@ const FrontPage = () => {
     history.push("/prices", { route: id });
   };
   return (
-    <>
-      {notAllocated.length === 0 ? (
-        <Box p={4}>
+    <Stack
+        align="center"
+        justify={{ base: "center", md: "space-around", xl: "space-between" }}
+        direction={{ base: "column-reverse", md: "row" }}
+        wrap="no-wrap"
+        minH="70vh"
+        px={8}
+        mb={16}
+        spacing={10}
+      >
+        {notAllocated.length === 0 ? (
           <Alert
             status="success"
             variant="subtle"
@@ -34,21 +46,19 @@ const FrontPage = () => {
             alignItems="center"
             justifyContent="center"
             textAlign="center"
-            height="200px"
+            w={{ base: "80%", sm: "60%", md: "50%" }}
             borderRadius={10}
-            padding={4}
+            padding={10}
           >
             <AlertIcon boxSize="70px" />
             <AlertTitle mt={4} mb={1} fontSize="lg">
               Prices are allocated to all the tickets
             </AlertTitle>
-            <AlertDescription maxWidth="sm">
+            <AlertDescription >
               Visit 'Tickets' Page to see ticket prices
             </AlertDescription>
           </Alert>
-        </Box>
       ) : (
-        <Box p={4}>
           <Alert
             status="warning"
             variant="subtle"
@@ -56,8 +66,9 @@ const FrontPage = () => {
             alignItems="center"
             justifyContent="center"
             textAlign="center"
+            w={{ base: "80%", sm: "60%", md: "50%" }}
             borderRadius={10}
-            padding={4}
+            padding={10}
           >
             <AlertIcon boxSize="70px" />
             <AlertTitle mt={4} mb={1} fontSize="lg">
@@ -79,9 +90,16 @@ const FrontPage = () => {
               </VStack>
             </AlertDescription>
           </Alert>
-        </Box>
       )}
-    </>
+        <Box w={{ base: "80%", sm: "60%", md: "50%" }} mb={{ base: 12, md: 0 }}>
+          <Image
+            src="/images/pricing.jpg"
+            size="100%"
+            rounded="1rem"
+            shadow="2xl"
+          />
+        </Box>
+      </Stack>
   );
 };
 
