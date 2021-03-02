@@ -61,7 +61,7 @@ const FrontPage = () => {
           >
             <AlertIcon boxSize="70px" />
             <AlertTitle mt={4} mb={1} fontSize="lg">
-              You have to allocate prices to tickets of x route(s)
+              You have to allocate prices to {notAllocated.length} route{notAllocated.length > 1 ? 's' : ''}
             </AlertTitle>
             <AlertDescription maxWidth="sm">
               <VStack mt={4}>
