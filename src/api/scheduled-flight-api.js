@@ -40,6 +40,15 @@ export const getScheduledFlights = (params) => {
 }
 
 /**
+ * return detailed scheduled flights for CRC
+ * 
+ * @param {number} isDeleted 1 - to get deleted flights
+ * 
+ * @return {Promise<object>} [{ id, route, departure, arrival, delayedDeparture, assignedAircraftID }]
+ */
+export const getDetailedScheduledFlights = (isDeleted = 0) => getRequest(`${URL}/detailed?isDeleted=${isDeleted}`);
+
+/**
  * Add a scheduled flight
  * 
  * @param {object} data - body of the request
