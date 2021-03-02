@@ -29,16 +29,18 @@ const BookingsByPassengerTypeReport = (props) => {
   });
   useEffect(async () => {
     let response = await getBookingsByPassengerType(filterValues);
-    var newData = response.data.map((row) => {
-      return {
-        accountType: row.account_type
-          .split(/\s+/)
-          .map((w) => w[0].toUpperCase() + w.slice(1))
-          .join(" "),
-        count: row.number_of_bookings,
-      };
-    });
-    setData(newData);
+    if (response.data) {
+      var newData = response.data.map((row) => {
+        return {
+          accountType: row.account_type
+            .split(/\s+/)
+            .map((w) => w[0].toUpperCase() + w.slice(1))
+            .join(" "),
+          count: row.number_of_bookings,
+        };
+      });
+      setData(newData);
+    }
   }, [filterValues]);
   const handleFilterChange = (filterChange) => {
     setFilterValues({ ...filterValues, ...filterChange });

@@ -34,7 +34,7 @@ const PassengersForDestinationReport = (props) => {
       (!filterValues.startDate && !filterValues.endDate)
     ) {
       let response = await getPassengerCountByDest(filterValues);
-      if (response.data) {
+      if (response && response.data) {
         var newData = response.data.map((row) => {
           return {
             dest_code: row.dest_code,
