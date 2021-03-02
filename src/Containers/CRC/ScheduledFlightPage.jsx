@@ -98,7 +98,7 @@ const ScheduledFlightPage = () => {
     setDataToShow(newData);
   };
   const handleRouteSelect = (value) => {
-    if (value === '') {
+    if (value === "") {
       setDataToShow(fetchedData);
     } else {
       var newData = fetchedData.filter((row) => row.route == value);
@@ -137,6 +137,26 @@ const ScheduledFlightTable = ({
   handleDelete,
   handleAddDelay,
 }) => {
+  const [routes, setRoutes] = useState([]);
+  const [aircrafts, setAircrafts] = useState([]);
+  useEffect(async () => {
+    var routs = await getRoutes();
+    routs = routs.data || [];
+    setRoutes(routs);
+    var aircrfts = await getAircrafts();
+    aircrfts = aircrfts.data || [];
+    setAircrafts(aircrfts);
+  }, []);
+  const getRouteString = (id) => {
+    var rout = routes.find((x) => x.id === id);
+    return rout
+      ? `${rout.id} ${rout.origin_code} -> ${rout.destination_code}`
+      : id;
+  };
+  const getAircraftString = (id) => {
+    var aircraft = aircrafts.find((x) => x.id === id);
+    return aircraft?`ID: ${aircraft.id}, Model: ${aircraft.model_name}`:id;
+  };
   return (
     <>
       <UpdateModal values={{}} handleUpdate={handleNew} forNew={true} />
@@ -159,8 +179,8 @@ const ScheduledFlightTable = ({
             return (
               <Tr key={row.id}>
                 <Td>{row.id}</Td>
-                <Td>{row.route}</Td>
-                <Td>{row.assignedAircraftId}</Td>
+                <Td>{getRouteString(row.route)}</Td>
+                <Td>{getAircraftString(row.assignedAircraftId)}</Td>
                 <Td>{getTimeString(row.departure)}</Td>
                 <Td>{row.arrival ? getTimeString(row.arrival) : null}</Td>
                 <Td>
@@ -264,7 +284,6 @@ const UpdateModal = ({ values, handleUpdate, forNew }) => {
     };
     if (forNew) {
       var response = await addScheduledFlight(dataToSend);
-      console.log(response);
       if (response.message === "Added successfully") {
         toast({
           title: "New Scheduled Flight Added.",
