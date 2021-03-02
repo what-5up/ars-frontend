@@ -1,4 +1,5 @@
 import { login, addGuest } from '../../api';
+import axios from '../../api/axios';
 import jwt_decode from "jwt-decode";
 import { DesignationEnum } from '../../utils/constants';
 
@@ -11,14 +12,13 @@ export const authStart = () => {
 };
 
 export const authSuccess = (token, userID, accType, userType) => {
-    console.log(accType);
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     return {
         type: actionTypes.AUTH_SUCCESS,
         token: token,
         userID: userID,
         accType: accType,
         userType: userType
-
     };
 };
 
@@ -35,6 +35,8 @@ export const logout = () => {
     localStorage.removeItem('userID');
     localStorage.removeItem('accType');
     localStorage.removeItem('userType');
+    delete axios.defaults.headers.common['Authorization'];
+    
     return {
         type: actionTypes.AUTH_LOGOUT
     };
