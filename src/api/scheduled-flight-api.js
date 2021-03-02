@@ -10,6 +10,13 @@ const URL = "scheduled-flights";
 export const getScheduledFlight = (id) => getRequest(`${URL}/${id}`);
 
 /**
+ * Return the pricing of reserved seat of scheduled flight
+ * 
+ * @param {number} id - scheduled flight id
+ */
+export const getPricing = (id,data) => postRequest(`${URL}/${id}/pricing`,data);
+
+/**
  * Return an array of scheduled flights
  * 
  * @param {object} params - query parameters to filter the records

@@ -26,7 +26,7 @@ import {} from '../../utils/helpers';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 
-const CostSummary = ({ flight, reservedSeats,addBooking, totalCost }) => {
+const CostSummary = ({ flight, reservedSeats,addBooking, totalCost, priceAfterDiscount }) => {
 	let date = new Date(flight.departure);
 	let time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 	let day = date.toLocaleDateString();
@@ -85,10 +85,10 @@ const CostSummary = ({ flight, reservedSeats,addBooking, totalCost }) => {
 				</Flex>
 				<Flex justifyContent="space-between" mt="3" mb="3">
 					<Box>
-						<Text fontSize="2xl">Total </Text>
+						<Text fontSize="2xl">{totalCost - priceAfterDiscount}</Text>
 					</Box>
 					<Box>
-						<Text fontSize="2xl">Price </Text>
+						<Text fontSize="2xl">{priceAfterDiscount} </Text>
 					</Box>
 				</Flex>
 				<Flex mb="3" justifyContent="center">
