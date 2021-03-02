@@ -57,21 +57,10 @@ const ScheduledFlightPage = () => {
     setFetchedData(newData);
   };
   const handleNew = (newValues) => {
-    // TODO: send data to backend
-    // format is
-    // {
-    //   id: ,
-    //   route: ,
-    //   departure: ,
-    //   assignedAircraftId: ,
-    //   delayedDeparture: ,
-    // }
-    // TODO: need scheduled id from backend
     var newData = fetchedData.concat(newValues);
     setFetchedData(newData);
   };
   const handleUpdate = (newValues) => {
-    //   TODO: send data to backend
     var newData = fetchedData.map((row) => {
       return newValues.id === row.id
         ? {
