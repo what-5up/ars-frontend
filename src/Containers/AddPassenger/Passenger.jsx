@@ -37,10 +37,11 @@ const Passenger = () => {
 	const history = useHistory();
 
 	const handleClick = async () => {
+		console.log(locationParams);
 		history.push('/seatmap', { passengers: passengers, flightID: flight.id, ...locationParams });
 	};
 
-	const addOrUpdatePassengers = (obj) => {
+	const addOrUpdatePassengers = (obj, scenario="new") => {
 		let newPassengers = passengers;
 		let index = passengers.findIndex((item) => item.disabled == true);
 		if (index > 0) {

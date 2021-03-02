@@ -25,13 +25,15 @@ import { WatchLater } from '@material-ui/icons';
 import {} from '../../utils/helpers';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import {formatPrice} from '../../utils/helpers'
+import {formatPrice} from '../../utils/helpers';
+import { useHistory } from 'react-router-dom';
 
 
 const CostSummary = ({ flight, reservedSeats,addBooking, totalCost, priceAfterDiscount }) => {
 	let date = new Date(flight.departure);
 	let time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 	let day = date.toLocaleDateString();
+	let history = useHistory();
 
 	const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -104,7 +106,7 @@ const CostSummary = ({ flight, reservedSeats,addBooking, totalCost, priceAfterDi
 					</Button>
 				</Flex>
 				<Flex mb="3" justifyContent="center">
-					<Button colorScheme="teal" width="60%">
+					<Button colorScheme="teal" width="60%" onClick={() => {history.push('/')}}>
 						Cancel
 					</Button>
 				</Flex>

@@ -50,7 +50,7 @@ const Content = () => {
 						<Redirect to={{ pathname: '/' }} />
 					) : (
 						<Box style={{ width: '100vw' }}>
-							<SeatMap  {...location.state} colorMode={colorMode}  price={75000} class="Economy"/>
+							<SeatMap  {...location.state} colorMode={colorMode}  price={75000} />
 						</Box>
 					)}
 					</Box>

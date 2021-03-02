@@ -120,8 +120,7 @@ const FindFlights = ({ setFlights, setPassengerCount, setTravellerClass }) => {
 				});
 			}
 		});
-		console.log(JSON.stringify(tempOrigins));
-		console.log(JSON.stringify(tempDestinations));
+
 		setOrigins(tempOrigins);
 		setDestinations(tempDestinations);
 	}, []);
@@ -150,8 +149,11 @@ const FindFlights = ({ setFlights, setPassengerCount, setTravellerClass }) => {
 				passengers: Yup.number().default(1).min(1, 'minimum one required').required('Required'),
 			})}
 			onSubmit={async (values) => {
+				let choosenClass = classes.find(item => item.value === values.travelClass)
 				setPassengerCount(values.passengers);
-				setTravellerClass(values.travelClass);
+				console.log(choosenClass);
+				
+				setTravellerClass(choosenClass.label);
 				let flights = await getScheduledFlights(values);
 				flights = flights.data || [];
 				setFlights(flights);

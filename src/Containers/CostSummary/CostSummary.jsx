@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Flex, Box, Heading, Divider } from '@chakra-ui/react';
-import { useLocation } from 'react-router-dom';
+import { Flex, Box, Heading, Divider, useToast } from '@chakra-ui/react';
+import { useLocation, useHistory } from 'react-router-dom';
 import CostSummary from '../../Components/Cards/CostSummary';
 import { useSelector } from 'react-redux';
 import { addBookingByUser } from '../../api/user-api';
@@ -12,10 +12,12 @@ const Cost = () => {
 	const location = useLocation();
 	let locationState = location.state;
 	const flight = location.state.flight;
+	const history = useHistory();
 
 	const [reservedSeats, setReservedSeats] = useState([]);
 	const [totalPrice, setTotalPrice] = useState(0);
 	const [discount, setDiscount] = useState(0);
+	const toast = useToast();
 
 	const addBooking = async (scenario, transactionKey = null) => {
 		let payload = {
@@ -27,7 +29,25 @@ const Cost = () => {
 		if (transactionKey != null) {
 			payload.transactionKey = transactionKey;
 		}
-		await addBookingByUser(userID, payload);
+		let result = await addBookingByUser(userID, payload);
+		if (!result.hasOwnProperty('error')) {
+			history.push('/');
+			toast({
+				title: 'Booking Placed.',
+				description: result.message,
+				status: 'success',
+				duration: 2000,
+				isClosable: false,
+			});
+		} else {
+			toast({
+				title: 'An error occurred.',
+				description: result.message,
+				status: 'error',
+				duration: 9000,
+				isClosable: true,
+			});
+		}
 	};
 
 	useEffect(async () => {

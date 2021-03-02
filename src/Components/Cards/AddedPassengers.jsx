@@ -57,7 +57,7 @@ const AddedPassengers = ({ passengers, id, addPassenger }) => {
 							return (
 								<Tr>
 									<Td cursor="pointer">
-										<AddCircleOutlineIcon onClick= {() => addPassenger({...item,id:id, existing:true, currentID:item.id}) }/>
+										<AddCircleOutlineIcon onClick= {() => addPassenger({...item,id:id, existing:true, currentID:item.id},'added') }/>
 									</Td>
 									<Td>{item.first_name}</Td>
 									<Td>{item.last_name}</Td>
