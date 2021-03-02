@@ -6,57 +6,73 @@ import SearchComponent from '../../Components/Cards/SearchComponent';
 import FlightCard from '../../Components/Cards/FlightCard';
 import GuestUser from '../../Components/Cards/GuestUser';
 import { useHistory } from 'react-router-dom';
-import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
-
+import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 const DiscoverFlights = () => {
-	
+
 	let isAuthenticated = useSelector((state) => state.auth.token !== null);
+	
 	let [travellerClass, setTravellerClass] = useState('');
 	let [flights, setFlights] = useState([]);
 	let [passengerCount, setPassengerCount] = useState(0);
-	
+
+	const {onClose,isOpen, onOpen} = useDisclosure({id:'opensas'});
+
 	let history = useHistory();
-	const goToPassenger = (state = {},id) => {
-		let flight = flights.find(item => item.id == id)
-		history.push('/passenger', { ...state, flight: flight, travellerClass:travellerClass, count:passengerCount, class:travellerClass });
+
+	const goToPassenger = (state = {}, id) => {
+		let flight = flights.find((item) => item.id == id);
+		history.push('/passenger', {
+			isGuest: false,
+			...state,
+			flight: flight,
+			travellerClass: travellerClass,
+			count: passengerCount,
+			class: travellerClass,
+		});
 	};
+
 	const handleClick = (id) => {
 		console.log(isAuthenticated);
 		if (travellerClass != '') {
 			if (isAuthenticated) {
-				goToPassenger({},id);
+				goToPassenger({}, id);
 			} else {
-				onOpen();
+				onOpen()
 			}
-		} 
+		}
 	};
-	const { isOpen, onOpen, onClose } = useDisclosure();
 
 	return (
 		<Flex mt={5} flexDirection="column" minWidth="100vw">
 			<Flex justifyContent="center" minWidth="80%">
-				<FindFlights setFlights={setFlights} setPassengerCount={setPassengerCount} setTravellerClass={setTravellerClass}/>
+				<FindFlights
+					setFlights={setFlights}
+					setPassengerCount={setPassengerCount}
+					setTravellerClass={setTravellerClass}
+				/>
 			</Flex>
 			<Flex justifyContent="center" minWidth="80%">
 				<SearchComponent />
 			</Flex>
 			<Flex justifyContent="center" minWidth="80%" mx="auto" flexDirection="column">
-				{flights.length != 0 && flights.map((item, index) => {
-					return (
-						<FlightCard
-							key={index}
-							{...item}
-							setFlights = {setFlights}
-							bookFlight={handleClick}
-							setTravellerClass={setTravellerClass}
-						/>
-					);
-				})}
+				{flights.length != 0 &&
+					flights.map((item, index) => {
+						return (
+							<FlightCard
+								key={index}
+								{...item}
+								setFlights={setFlights}
+								bookFlight={handleClick}
+								setTravellerClass={setTravellerClass}
+							/>
+						);
+					})}
 			</Flex>
 			<Modal
+				id ="opensas"
+				isOpen = {isOpen}
+				onClose = {onClose}
 				closeOnOverlayClick={false}
-				isOpen={isOpen}
-				onClose={onClose}
 				size="4xl"
 				motionPreset="slideInBottom"
 				isCentered
@@ -66,7 +82,7 @@ const DiscoverFlights = () => {
 				<ModalContent>
 					<ModalCloseButton />
 					<ModalBody>
-						<GuestUser routeForward={goToPassenger} closeModal={onClose} />
+						<GuestUser routeForward={goToPassenger} closeGuest={onClose} />
 					</ModalBody>
 				</ModalContent>
 			</Modal>
@@ -74,6 +90,4 @@ const DiscoverFlights = () => {
 	);
 };
 
-
-
-export default connect(null, null)(withErrorHandler(DiscoverFlights));
+export default withErrorHandler(DiscoverFlights);

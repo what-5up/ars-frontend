@@ -24,24 +24,19 @@ import { getTitles } from '../../api/title-api';
 import { ArrowForwardIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import LoginArea from '../Forms/LoginArea';
 import { connect, useSelector, useDispatch } from 'react-redux';
-import {gender} from '../../utils/constants';
+import { gender } from '../../utils/constants';
 import * as actions from '../../store/actions/index';
 
-
-const GuestUser = ({ routeForward, closeModal }) => {
+const GuestUser = ({ routeForward, closeGuest }) => {
 	const [title, setTitle] = useState([]);
-	const signup = useDisclosure();
 	const dispatch = useDispatch();
-	const userID = useSelector((state) => state.auth.userID);
-	const onAuth = useCallback(
-		(values) => dispatch(actions.guestAuth(values)),
-		[dispatch]
-	  )
-	
+	const onAuth = useCallback((values, routeForward) => dispatch(actions.guestAuth(values,routeForward)), [dispatch]);
 
 	useEffect(async () => {
 		let titles = await getTitles();
-		titles = titles.data;
+
+		titles = titles.data || [];
+
 		titles = titles.map((title) => {
 			return { value: title.id, label: title.title_name };
 		});
@@ -168,8 +163,7 @@ const GuestUser = ({ routeForward, closeModal }) => {
 						<Flex mb={3} style={{ justifyContent: 'center' }}>
 							<Button
 								onClick={() => {
-									closeModal();
-									signup.onOpen();
+									document.getElementById('signin').style.display = 'block';
 								}}
 								colorScheme="teal"
 								rightIcon={<ArrowForwardIcon />}
@@ -179,18 +173,8 @@ const GuestUser = ({ routeForward, closeModal }) => {
 							</Button>
 						</Flex>
 					</Flex>
-					<Modal
-						closeOnOverlayClick={false}
-						isOpen={signup.isOpen}
-						onClose={() => {
-							console.log('Here');
-							signup.onClose();
-						}}
-						size="lg"
-						motionPreset="slideInBottom"
-						isCentered
-						closeOnEsc
-					>
+
+					<Box id="signin" style={{ display: 'none' }} p={0}>
 						<ModalOverlay />
 						<ModalContent>
 							<ModalCloseButton />
@@ -198,10 +182,10 @@ const GuestUser = ({ routeForward, closeModal }) => {
 								<LoginArea onLogin={() => console.log('Logged in')} />
 							</ModalBody>
 						</ModalContent>
-					</Modal>
+					</Box>
 				</Box>
 			)}
 		</Formik>
 	);
 };
-export default connect(null, null)(GuestUser);;
+export default connect(null, null)(GuestUser);

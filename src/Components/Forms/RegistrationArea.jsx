@@ -50,7 +50,7 @@ const RegistrationForm = () => {
 	const [titleList, setTitleList] = useState([]);
 	useEffect(async () => {
 		let titles = await getTitles();
-		titles = titles.data;
+		titles = titles.data || [];
 		titles = titles.map((title) => {
 			return { value: title.id, label: title.title_name };
 		});
@@ -138,40 +138,38 @@ const RegistrationForm = () => {
 									<FormErrorMessage>{props.errors.lastName}</FormErrorMessage>
 								</FormControl>
 							</Grid>
-								<Grid item xs={12} sm={8}>
-									<FormControl isInvalid={props.errors.email && props.touched.email}>
-										<Input
-											required
-											id="email"
-											label="Email Address"
-											placeholder="Email Address"
-											name="email"
-											autoComplete="off"
-											{...props.getFieldProps('email')}
-										/>
-										<FormErrorMessage>{props.errors.email}</FormErrorMessage>
-									</FormControl>
-								</Grid>
-								<Grid item xs={12} sm={4}>
-									<FormControl isInvalid={props.errors.gender && props.touched.gender}>
-										<Select
-											id="gender"
-											name="gender"
-											options={gender}
-											placeholder="gender"
-											value={
-												gender
-													? gender.find((option) => option.value === props.values.gender)
-													: ''
-											}
-											onChange={(option) => props.setFieldValue('gender', option.value)}
-											onBlur={() => props.setFieldTouched('gender', true)}
-											error={props.errors.gender}
-											touched={props.touched.gender}
-										/>
-										<FormErrorMessage>{props.errors.gender}</FormErrorMessage>
-									</FormControl>
-								</Grid>
+							<Grid item xs={12} sm={8}>
+								<FormControl isInvalid={props.errors.email && props.touched.email}>
+									<Input
+										required
+										id="email"
+										label="Email Address"
+										placeholder="Email Address"
+										name="email"
+										autoComplete="off"
+										{...props.getFieldProps('email')}
+									/>
+									<FormErrorMessage>{props.errors.email}</FormErrorMessage>
+								</FormControl>
+							</Grid>
+							<Grid item xs={12} sm={4}>
+								<FormControl isInvalid={props.errors.gender && props.touched.gender}>
+									<Select
+										id="gender"
+										name="gender"
+										options={gender}
+										placeholder="gender"
+										value={
+											gender ? gender.find((option) => option.value === props.values.gender) : ''
+										}
+										onChange={(option) => props.setFieldValue('gender', option.value)}
+										onBlur={() => props.setFieldTouched('gender', true)}
+										error={props.errors.gender}
+										touched={props.touched.gender}
+									/>
+									<FormErrorMessage>{props.errors.gender}</FormErrorMessage>
+								</FormControl>
+							</Grid>
 							<Grid item xs={12}>
 								<FormControl isInvalid={props.errors.password && props.touched.password}>
 									<Input

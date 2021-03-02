@@ -81,11 +81,8 @@ const FindFlights = ({ setFlights, setPassengerCount, setTravellerClass }) => {
 
 	useEffect(async () => {
 		let classes = await getTravelerClasses();
-		if (classes === undefined) {
-			classes = {};
-			classes.data = [];
-		}
-		classes = classes.data.map((item) => {
+		classes = classes.data || [];
+		classes = classes.map((item) => {
 			return { label: item.class, value: item.id };
 		});
 		setClasses(classes);
@@ -93,41 +90,40 @@ const FindFlights = ({ setFlights, setPassengerCount, setTravellerClass }) => {
 
 	useEffect(async () => {
 		let routes = await getRoutes();
-		console.log(routes);
 
 		let tempDestinations = [];
 		let tempOrigins = [];
 
-		if (routes != undefined && routes.hasOwnProperty('data')) {
-			routes.data.forEach((item) => {
-				let index = tempOrigins.findIndex((entry) => item.origin_code == entry.value);
-				if (index < 0) {
-					tempOrigins.push({
-						value: item.origin_code,
-						label: item.origin,
-						customAbbreviation: item.origin_region,
-					});
-					tempDestinations.push([]);
-					tempDestinations[tempDestinations.length - 1].push({
-						id: item.id,
-						value: item.destination_code,
-						label: item.destination,
-						customAbbreviation: item.destination_region,
-					});
-				} else {
-					tempDestinations[index].push({
-						id: item.id,
-						value: item.destination_code,
-						label: item.destination,
-						customAbbreviation: item.destination_region,
-					});
-				}
-			});
-		}
+		routes = routes.data || [];
 
+		routes.forEach((item) => {
+			let index = tempOrigins.findIndex((entry) => item.origin_code == entry.value);
+			if (index < 0) {
+				tempOrigins.push({
+					value: item.origin_code,
+					label: item.origin,
+					customAbbreviation: item.origin_region,
+				});
+				tempDestinations.push([]);
+				tempDestinations[tempDestinations.length - 1].push({
+					id: item.id,
+					value: item.destination_code,
+					label: item.destination,
+					customAbbreviation: item.destination_region,
+				});
+			} else {
+				tempDestinations[index].push({
+					id: item.id,
+					value: item.destination_code,
+					label: item.destination,
+					customAbbreviation: item.destination_region,
+				});
+			}
+		});
+		console.log(JSON.stringify(tempOrigins));
+		console.log(JSON.stringify(tempDestinations));
 		setOrigins(tempOrigins);
-		// setDestinations(tempDestinations);
-		setDestinations(tempOrigins);
+		setDestinations(tempDestinations);
 	}, []);
 	let [showDropdown, setShowDropdown] = useState(false);
 	let convertedAttr = convertArrToObj(types);
@@ -157,8 +153,8 @@ const FindFlights = ({ setFlights, setPassengerCount, setTravellerClass }) => {
 				setPassengerCount(values.passengers);
 				setTravellerClass(values.travelClass);
 				let flights = await getScheduledFlights(values);
-				console.log(flights);
-				setFlights(flights.data);
+				flights = flights.data || [];
+				setFlights(flights);
 			}}
 		>
 			{(props) => (
@@ -285,6 +281,7 @@ const FindFlights = ({ setFlights, setPassengerCount, setTravellerClass }) => {
 											}
 											onChange={(option) => {
 												props.setFieldValue('origin', option.value);
+												props.setFieldValue('destination', '');
 											}}
 											onBlur={() => props.setFieldTouched('origin', true)}
 											error={props.errors.origin}
@@ -296,19 +293,31 @@ const FindFlights = ({ setFlights, setPassengerCount, setTravellerClass }) => {
 								<Box flex="2" ml={3} h="100%">
 									<FormControl isInvalid={props.errors.destination && props.touched.destination}>
 										<Select
-											options={destinations}
+											options={
+												props.values.origin === ''
+													? []
+													: destinations[
+															origins.findIndex(
+																(entry) => props.values.origin === entry.value
+															)
+													  ]
+											}
+											placeholder="To"
+											value={
+												destinations && props.values.destination
+													? destinations.find(
+															(option) => option.value === props.values.destination
+													  ) && null
+													: ''
+											}
+											onChange={(option) => {
+												props.setFieldValue('destination', option.value);
+											}}
 											isSearchable={true}
 											components={{ DropdownIndicator }}
 											formatOptionLabel={formatOptionLabel}
 											classNamePrefix="vyrill"
 											styles={customStyles}
-											placeholder="To"
-											// value={
-											// 	origins
-											// 		? origins.find((option) => option.value === props.values.destination) && null
-											// 		: ''
-											// }
-											onChange={(option) => props.setFieldValue('destination', option.value)}
 											onBlur={() => props.setFieldTouched('destination', true)}
 											error={props.errors.destination}
 											touched={props.touched.destination}
