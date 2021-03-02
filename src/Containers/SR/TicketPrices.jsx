@@ -9,48 +9,25 @@ import {
   Td,
   TableCaption,
   Box,
-  Button,
-  Text,
-  useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalCloseButton,
-  FormControl,
   InputGroup,
-  Input,
   InputLeftAddon,
   Select,
-  FormLabel,
-  FormErrorMessage,
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogContent,
-  AlertDialogOverlay,
-  AlertDialogCloseButton,
-  useToast,
+  Alert,
+  AlertIcon,
+  AlertTitle,
 } from "@chakra-ui/react";
 import { useLocation } from "react-router-dom";
-import AddIcon from "@material-ui/icons/Add";
-import CreateIcon from "@material-ui/icons/Create";
-import DeleteIcon from "@material-ui/icons/Delete";
-import { Formik } from "formik";
-import * as Yup from "yup";
-import {
-  getRoutes,
-  getRoutePrice,
-  deleteRoutePrice,
-  updateRoutePrice,
-  addRoutePrice,
-} from "../../api/route-api";
+import { getRoutes, getRoutePrice } from "../../api/route-api";
+import { getTravelerClasses } from "../../api/traveller-class-api";
+import UpdateModal from "../../Components/SR/UpdateModal";
+import DeleteModal from "../../Components/SR/DeleteModal";
 
 const TicketPrices = () => {
   const [fetchedData, setFetchedData] = useState([]);
+  const [used, setUsed] = useState([])
   const [routes, setRoutes] = useState([]);
+  const [availableClasses, setAvailableClasses] = useState([]);
+  const [travellerClasses, setTravellerClasses] = useState([]);
   const location = useLocation();
   const locationParams = location.state || { route: null };
   const [selectedRoute, setSelectedRoute] = useState(locationParams.route);
@@ -58,8 +35,15 @@ const TicketPrices = () => {
     var routs = await getRoutes();
     routs = routs.data || [];
     setRoutes(routs);
-    var response = await getRoutePrice(selectedRoute);
-    var data = response.data || [];
+    var classes = await getTravelerClasses();
+    classes = classes.data || [];
+    setTravellerClasses(classes);
+    var response;
+    var data = [];
+    if (selectedRoute) {
+      response = await getRoutePrice(selectedRoute);
+      data = response.data;
+    }
     data = data.map((row) => {
       return {
         id: row.route_id,
@@ -67,6 +51,17 @@ const TicketPrices = () => {
         price: row.amount,
       };
     });
+    var usednew = data.map((row)=>{
+      return {
+        id:row.travellerClass,
+        class:classes.find((x) => x.id == row.travellerClass)
+        .class
+      }
+    });
+    setUsed(usednew);
+    let difference = classes.filter((x) => usednew.includes(x));
+    console.log(difference,usednew,classes)
+    setAvailableClasses(classes);
     setFetchedData(data);
   }, [selectedRoute]);
   const handleUpdateSuccess = (newValues) => {
@@ -93,7 +88,7 @@ const TicketPrices = () => {
   return (
     <Box m={4} px={4}>
       <Heading>Prices</Heading>
-      <InputGroup>
+      <InputGroup py={8}>
         <InputLeftAddon children="Route" />
         <Select
           defaultValue={selectedRoute}
@@ -110,27 +105,57 @@ const TicketPrices = () => {
           })}
         </Select>
       </InputGroup>
-      <PricesTable
-        content={fetchedData}
-        tableCaption={""}
-        handleUpdate={handleUpdateSuccess}
-        handleDelete={handleDeleteSuccess}
-        handleAdd={handleAddSuccess}
-      />
+      {selectedRoute ? (
+        <PricesTable
+          routeId={selectedRoute}
+          content={fetchedData}
+          tableCaption={""}
+          handleUpdate={handleUpdateSuccess}
+          handleDelete={handleDeleteSuccess}
+          handleAdd={handleAddSuccess}
+          travellerClasses={travellerClasses}
+          availableClasses={availableClasses}
+        />
+      ) : (
+        <Alert
+          status="info"
+          variant="subtle"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="center"
+          textAlign="center"
+          height="200px"
+        >
+          <AlertIcon boxSize="40px" mr={0} />
+          <AlertTitle mt={4} mb={1} fontSize="lg">
+            Select a flight to view info
+          </AlertTitle>
+        </Alert>
+      )}
     </Box>
   );
 };
 
 const PricesTable = ({
+  routeId,
   content,
   tableCaption,
   handleUpdate,
   handleDelete,
   handleAdd,
+  travellerClasses,
+  availableClasses,
 }) => {
   return (
     <>
-      <UpdateModal values={{}} handleUpdate={handleAdd} forNew={true} />
+      <UpdateModal
+        values={{ routeId: routeId }}
+        handleUpdate={handleAdd}
+        forNew={true}
+        travellerClasses={travellerClasses}
+        availableClasses={availableClasses}
+        route={routeId}
+      />
       <Table mt={5} variant="striped" colorScheme="gray">
         <TableCaption>{tableCaption}</TableCaption>
         <Thead>
@@ -145,18 +170,26 @@ const PricesTable = ({
           {content.map((row) => {
             return (
               <Tr key={row.travellerClass}>
-                <Td>{row.travellerClass}</Td>
+                <Td>
+                  {
+                    travellerClasses.find((x) => x.id == row.travellerClass)
+                      .class
+                  }
+                </Td>
                 <Td isNumeric>{row.price}</Td>
                 <Td>
                   <UpdateModal
                     values={row}
                     handleUpdate={handleUpdate}
                     forNew={false}
+                    travellerClasses={travellerClasses}
+                    availableClasses={availableClasses}
+                    route={routeId}
                   />
                 </Td>
                 <Td>
                   <DeleteModal
-                    routeId={row.id}
+                    routeId={routeId}
                     classId={row.travellerClass}
                     handleDelete={handleDelete}
                   />
@@ -167,215 +200,6 @@ const PricesTable = ({
         </Tbody>
       </Table>
     </>
-  );
-};
-const UpdateModal = ({ values, handleUpdate, forNew }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const toast = useToast();
-  const handleUpdatePrice = async (newValues) => {
-    var response = await updateRoutePrice(
-      newValues.routeId,
-      newValues.travellerClass,
-      newValues.price
-    );
-    if (response.message === "Updated successfully") {
-      handleUpdate(newValues);
-      toast({
-        title: "Price Updated.",
-        description: response.message,
-        status: "success",
-        duration: 9000,
-        isClosable: true,
-      });
-    } else {
-      toast({
-        title: "An error occurred.",
-        description: response.message,
-        status: "error",
-        duration: 9000,
-        isClosable: true,
-      });
-    }
-  };
-  const handlePriceAdd = async (newValues) => {
-    var response = await addRoutePrice(newValues.routeId, {
-      travellerClass: newValues.travellerClass,
-      amount: newValues.price,
-    });
-    if (response.message === "Updated successfully") {
-      handleUpdate(newValues);
-      toast({
-        title: "Price Updated.",
-        description: response.message,
-        status: "success",
-        duration: 9000,
-        isClosable: true,
-      });
-    } else {
-      toast({
-        title: "An error occurred.",
-        description: response.message,
-        status: "error",
-        duration: 9000,
-        isClosable: true,
-      });
-    }
-  };
-  return (
-    <div>
-      {forNew ? (
-        <Button colorScheme="teal" onClick={onOpen} m={4}>
-          <AddIcon />
-          <Text mx={2}>Add New Price</Text>
-        </Button>
-      ) : (
-        <Button bg="transparent" _hover={{ bg: "trasparent" }} onClick={onOpen}>
-          <CreateIcon />
-          <Text mx={2}>Update</Text>
-        </Button>
-      )}
-      <Modal isOpen={isOpen} onClose={onClose} isCentered>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>{forNew ? "New Price" : "Update Price"}</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Formik
-              initialValues={{
-                routeId: values.id,
-                travellerClass: values.travellerClass,
-                price: values.price,
-              }}
-              validationSchema={Yup.object({
-                travellerClass: Yup.number().required("Required"),
-                price: Yup.number().required("Required"),
-              })}
-              onSubmit={(newValues) => {
-                if (forNew) {
-                  handlePriceAdd(newValues);
-                } else {
-                  handleUpdatePrice(newValues);
-                }
-                onClose();
-              }}
-            >
-              {(props) => (
-                <Box>
-                  <FormControl
-                    isInvalid={
-                      props.errors.travellerClass &&
-                      props.touched.travellerClass
-                    }
-                  >
-                    <FormLabel>Traveller Class:</FormLabel>
-                    {forNew ? null : (
-                      <Input
-                        type="text"
-                        name="travellerClass"
-                        value={props.initialValues.travellerClass}
-                        isDisabled={true}
-                      />
-                    )}
-                    <FormErrorMessage>
-                      {props.errors.travellerClass}
-                    </FormErrorMessage>
-                  </FormControl>
-                  <FormControl
-                    isInvalid={props.errors.price && props.touched.price}
-                  >
-                    <FormLabel>Discount:</FormLabel>
-                    <InputGroup>
-                      <Input
-                        type="number"
-                        placeholder="Enter Price"
-                        name="price"
-                        value={props.initialValues.price}
-                        {...props.getFieldProps("price")}
-                      />
-                    </InputGroup>
-                    <FormErrorMessage>{props.errors.price}</FormErrorMessage>
-                  </FormControl>
-                  <Box my={4}>
-                    <Button colorScheme="red" onClick={onClose}>
-                      <Text mx={2}>Cancel</Text>
-                    </Button>
-                    <Button
-                      colorScheme="teal"
-                      onClick={props.submitForm}
-                      mx={4}
-                    >
-                      <Text mx={2}>Save</Text>
-                    </Button>
-                  </Box>
-                </Box>
-              )}
-            </Formik>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-    </div>
-  );
-};
-
-const DeleteModal = ({ routeId, classId, handleDelete }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const cancelRef = React.useRef();
-  const toast = useToast();
-  const handleYes = async () => {
-    var response = await deleteRoutePrice(routeId, classId);
-    if (response.message === "Route price deleted successfully") {
-      handleDelete(classId);
-      onClose();
-      toast({
-        title: "Price Deleted.",
-        description: response.message,
-        status: "success",
-        duration: 9000,
-        isClosable: true,
-      });
-    } else {
-      toast({
-        title: "An error occurred.",
-        description: "Unable to delete route price.",
-        status: "error",
-        duration: 9000,
-        isClosable: true,
-      });
-      onClose();
-    }
-  };
-  return (
-    <div>
-      <Button colorScheme="red" onClick={onOpen}>
-        <DeleteIcon />
-        <Text mx={2}>Delete</Text>
-      </Button>
-      <AlertDialog
-        motionPreset="slideInBottom"
-        leastDestructiveRef={cancelRef}
-        onClose={onClose}
-        isOpen={isOpen}
-        isCentered
-      >
-        <AlertDialogOverlay />
-
-        <AlertDialogContent>
-          <AlertDialogHeader>Discard Price?</AlertDialogHeader>
-          <AlertDialogCloseButton />
-          <AlertDialogBody>
-            Are you sure you want to discard this price?
-          </AlertDialogBody>
-          <AlertDialogFooter>
-            <Button ref={cancelRef} onClick={onClose}>
-              No
-            </Button>
-            <Button colorScheme="red" ml={3} onClick={handleYes}>
-              Yes
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
   );
 };
 

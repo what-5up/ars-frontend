@@ -30,6 +30,7 @@ import {
   Input,
   FormLabel,
   FormErrorMessage,
+  useToast,
 } from "@chakra-ui/react";
 import AddIcon from "@material-ui/icons/Add";
 import CreateIcon from "@material-ui/icons/Create";
@@ -45,6 +46,7 @@ import {
 
 const AccountTypesPage = () => {
   const [fetchedData, setFetchedData] = useState([]);
+  const toast = useToast();
   useEffect(async () => {
     var results = await getAccountTypes();
     var recievedData = results.data || [];
@@ -59,9 +61,26 @@ const AccountTypesPage = () => {
     setFetchedData(data);
   }, []);
   const handleDelete = async (id) => {
-    await deleteAccountType(id);
-    var newData = fetchedData.filter((type) => type.typeId !== id);
-    setFetchedData(newData);
+    var response = await deleteAccountType(id);
+    if (response.message === "Account type deleted successfully") {
+      var newData = fetchedData.filter((type) => type.typeId !== id);
+      setFetchedData(newData);
+      toast({
+        title: "Account Type Deleted.",
+        description: response.message,
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: "An error occurred.",
+        description: response.message,
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+    }
   };
   const handleNew = async (newValues) => {
     var dataToSend = {
@@ -69,10 +88,29 @@ const AccountTypesPage = () => {
       discount: newValues.discount,
       criteria: newValues.bookingsCriteria,
     };
-    var result = await addAccountType(dataToSend);
-    console.log(result.data.id);
-    var newData = fetchedData.concat({ ...newValues, typeId: result.data.id });
-    setFetchedData(newData);
+    var response = await addAccountType(dataToSend);
+    if (response.message === "Account type added successfully") {
+      var newData = fetchedData.concat({
+        ...newValues,
+        typeId: response.data.id,
+      });
+      setFetchedData(newData);
+      toast({
+        title: "Account Type Deleted.",
+        description: response.message,
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: "An error occurred.",
+        description: response.message,
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+    }
   };
   const handleUpdate = async (newValues) => {
     var dataToSend = {
@@ -80,11 +118,28 @@ const AccountTypesPage = () => {
       discount: newValues.discount,
       criteria: newValues.bookingsCriteria,
     };
-    await updateAccountType(newValues.typeId, dataToSend);
-    var newData = fetchedData.map((type) => {
-      return newValues.typeId === type.typeId ? newValues : type;
-    });
-    setFetchedData(newData);
+    var response = await updateAccountType(newValues.typeId, dataToSend);
+    if (response.message === "Updated successfully") {
+      var newData = fetchedData.map((type) => {
+        return newValues.typeId === type.typeId ? newValues : type;
+      });
+      setFetchedData(newData);
+      toast({
+        title: "Account Type Updated.",
+        description: response.message,
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: "An error occurred.",
+        description: response.message,
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+    }
   };
   return (
     <Box m={4} px={4}>
