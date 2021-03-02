@@ -28,9 +28,9 @@ import {
   FormControl,
   InputGroup,
   Input,
-  FormLabel,
   InputLeftAddon,
   Select,
+  useToast,
 } from "@chakra-ui/react";
 import CreateIcon from "@material-ui/icons/Create";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -38,53 +38,21 @@ import ScheduleIcon from "@material-ui/icons/Schedule";
 import AddIcon from "@material-ui/icons/Add";
 import { getRoutes } from "../../api/route-api";
 import { getAircrafts } from "../../api/aircraft-api";
+import {
+  getDetailedScheduledFlights,
+  deleteScheduledFlight,
+  updateScheduledFlight,
+  addScheduledFlight,
+} from "../../api/scheduled-flight-api";
 
 const ScheduledFlightPage = () => {
   const [fetchedData, setFetchedData] = useState([]);
-  useEffect(() => {
-    // TODO: fetch account types
-    // format is
-    // {
-    //   id: ,
-    //   route: ,
-    //   departure: ,
-    //   assignedAircraftID: ,
-    //   delayedDeparture: ,
-    // }
-    var dummy = [
-      {
-        id: 1,
-        route: 12,
-        departure: "new Date()",
-        assignedAircraftID: 1,
-        delayedDeparture: "new Date()",
-      },
-      {
-        id: 2,
-        route: 5,
-        departure: "new Date()",
-        assignedAircraftID: 7,
-        delayedDeparture: "new Date()",
-      },
-      {
-        id: 3,
-        route: 5,
-        departure: "new Date()",
-        assignedAircraftID: 5,
-        delayedDeparture: "new Date()",
-      },
-      {
-        id: 4,
-        route: 3,
-        departure: "new Date()",
-        assignedAircraftID: 9,
-        delayedDeparture: "new Date()",
-      },
-    ];
-    setFetchedData(dummy);
+  useEffect(async () => {
+    var response = await getDetailedScheduledFlights();
+    var data = response.data || [];
+    setFetchedData(data);
   }, []);
   const handleDelete = (id) => {
-    //   TODO: send delete to backend
     var newData = fetchedData.filter((row) => row.id !== id);
     setFetchedData(newData);
   };
@@ -95,7 +63,7 @@ const ScheduledFlightPage = () => {
     //   id: ,
     //   route: ,
     //   departure: ,
-    //   assignedAircraftID: ,
+    //   assignedAircraftId: ,
     //   delayedDeparture: ,
     // }
     // TODO: need scheduled id from backend
@@ -104,21 +72,14 @@ const ScheduledFlightPage = () => {
   };
   const handleUpdate = (newValues) => {
     //   TODO: send data to backend
-    // format is
-    // {
-    //   id: ,
-    //   route: ,
-    //   departure: ,
-    //   assignedAircraftID: ,
-    //   delayedDeparture: ,
-    // }
     var newData = fetchedData.map((row) => {
       return newValues.id === row.id
         ? {
             id: row.id,
             route: newValues.route,
             departure: newValues.departure,
-            assignedAircraftID: newValues.assignedAircraftID,
+            arrival: newValues.arrival,
+            assignedAircraftId: newValues.assignedAircraftId,
             delayedDeparture: row.delayedDeparture,
           }
         : row;
@@ -126,22 +87,14 @@ const ScheduledFlightPage = () => {
     setFetchedData(newData);
   };
   const handleAddDelay = (newValues) => {
-    //   TODO: send data to backend
-    // format is
-    // {
-    //   id: ,
-    //   route: ,
-    //   departure: ,
-    //   assignedAircraftID: ,
-    //   delayedDeparture: ,
-    // }
     var newData = fetchedData.map((row) => {
       return newValues.id === row.id
         ? {
             id: row.id,
             route: row.route,
             departure: row.departure,
-            assignedAircraftID: row.assignedAircraftID,
+            arrival: row.arrival,
+            assignedAircraftId: row.assignedAircraftId,
             delayedDeparture: newValues.delayedDeparture,
           }
         : row;
@@ -162,7 +115,15 @@ const ScheduledFlightPage = () => {
     </Box>
   );
 };
-
+const getTimeString = (d) => {
+  let date = new Date(d);
+  let time = date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  let day = date.toLocaleDateString();
+  return `${day} ${time}`;
+};
 const ScheduledFlightTable = ({
   content,
   tableCaption,
@@ -182,6 +143,7 @@ const ScheduledFlightTable = ({
             <Th>Route ID</Th>
             <Th>Assigned AircraftID</Th>
             <Th>Departure</Th>
+            <Th>Arrival</Th>
             <Th>Delayed Departure</Th>
             <Th></Th>
             <Th></Th>
@@ -193,11 +155,20 @@ const ScheduledFlightTable = ({
               <Tr key={row.id}>
                 <Td>{row.id}</Td>
                 <Td>{row.route}</Td>
-                <Td>{row.assignedAircraftID}</Td>
-                <Td>{row.departure}</Td>
-                <Td>{row.delayedDeparture}</Td>
+                <Td>{row.assignedAircraftId}</Td>
+                <Td>{getTimeString(row.departure)}</Td>
+                <Td>{row.arrival ? getTimeString(row.arrival) : null}</Td>
                 <Td>
-                  <AddDelayModel values={row} handleUpdate={handleAddDelay} />
+                  {row.delayedDeparture
+                    ? getTimeString(row.delayedDeparture)
+                    : null}
+                </Td>
+                <Td>
+                  <AddDelayModel
+                    id={row.id}
+                    values={row}
+                    handleUpdate={handleAddDelay}
+                  />
                 </Td>
                 <Td>
                   <UpdateModal values={row} handleUpdate={handleUpdate} />
@@ -214,11 +185,26 @@ const ScheduledFlightTable = ({
   );
 };
 const UpdateModal = ({ values, handleUpdate, forNew }) => {
+  const toast = useToast();
   const [routes, setRoutes] = useState([]);
   const [aircrafts, setAircrafts] = useState([]);
+  let departureDate = new Date(values.departure);
+  let departureTime = departureDate.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  let departureDay = departureDate.toLocaleDateString();
+  let arrivalDt = new Date(values.arrival);
+  let arrivalD = arrivalDt.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  let arrivalT = arrivalDt.toLocaleDateString();
   const [formValues, setFormValues] = useState(values);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedTime, setSelectedTime] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(departureDay);
+  const [selectedTime, setSelectedTime] = useState(departureTime);
+  const [arrivalDate, setArrivalDate] = useState(arrivalD);
+  const [arrivalTime, setArrivalTime] = useState(arrivalT);
   const { isOpen, onOpen, onClose } = useDisclosure();
   useEffect(async () => {
     var routs = await getRoutes();
@@ -228,25 +214,91 @@ const UpdateModal = ({ values, handleUpdate, forNew }) => {
     aircrfts = aircrfts.data || [];
     setAircrafts(aircrfts);
   }, []);
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    handleUpdate(formValues);
-    onClose();
+    var dataToSend = {
+      route: formValues.route,
+      departure: formValues.departure,
+      arrival: formValues.arrival,
+      assignedAircraftId: formValues.assignedAircraftId,
+    };
+    if (forNew) {
+      var response = await addScheduledFlight(dataToSend);
+      console.log(response);
+      if (response.message === "Added successfully") {
+        toast({
+          title: "New Scheduled Flight Added.",
+          description: response.message,
+          status: "success",
+          duration: 9000,
+          isClosable: true,
+        });
+        var newData = {
+          ...dataToSend,
+          id: response.data.id,
+        };
+        handleUpdate(newData);
+        onClose();
+      } else {
+        toast({
+          title: "An error occurred.",
+          description: response.message,
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+      }
+    } else {
+      var response = await updateScheduledFlight(formValues.id, dataToSend);
+      if (response.message === "Updated successfully") {
+        handleUpdate(formValues);
+        onClose();
+        toast({
+          title: "Schedule Updated.",
+          description: response.message,
+          status: "success",
+          duration: 9000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: "An error occurred.",
+          description: `Unable to delete schedule ${formValues.id}.`,
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+      }
+    }
   };
   const handleChange = (event) => {
     var value = event.target.value;
     if (event.target.name === "departureDate") setSelectedDate(value);
     if (event.target.name === "departureTime") setSelectedTime(value);
+    if (event.target.name === "arrivalDate") setArrivalDate(value);
+    if (event.target.name === "arrivalTime") setArrivalTime(value);
     if (
       (selectedDate && event.target.name === "departureTime") ||
       (selectedTime && event.target.name === "departureDate")
-    )
+    ) {
       setFormValues({
         ...formValues,
         departure: `${
           event.target.name === "departureTime" ? selectedDate : value
         } ${event.target.name === "departureDate" ? selectedTime : value}:00`,
       });
+    }
+    if (
+      (arrivalDate && event.target.name === "arrivalTime") ||
+      (arrivalTime && event.target.name === "arrivalDate")
+    ) {
+      setFormValues({
+        ...formValues,
+        arrival: `${
+          event.target.name === "arrivalTime" ? arrivalDate : value
+        } ${event.target.name === "arrivalDate" ? arrivalTime : value}:00`,
+      });
+    }
   };
   const handleRouteSelect = (event) => {
     var value = event.target.value;
@@ -254,7 +306,7 @@ const UpdateModal = ({ values, handleUpdate, forNew }) => {
   };
   const handleAircraftSelect = (event) => {
     var value = event.target.value;
-    setFormValues({ ...formValues, assignedAircraftID: value });
+    setFormValues({ ...formValues, assignedAircraftId: value });
   };
   return (
     <div>
@@ -300,7 +352,7 @@ const UpdateModal = ({ values, handleUpdate, forNew }) => {
                 <InputGroup>
                   <InputLeftAddon children="Aircraft" />
                   <Select
-                    defaultValue={formValues.assignedAircraftID}
+                    defaultValue={formValues.assignedAircraftId}
                     placeholder={forNew ? "Select Aircraft" : ""}
                     onChange={handleAircraftSelect}
                   >
@@ -321,7 +373,7 @@ const UpdateModal = ({ values, handleUpdate, forNew }) => {
                     type="date"
                     name="departureDate"
                     placeholder="Select"
-                    // value={formValues.departure}
+                    value={selectedDate}
                     onChange={(event) => handleChange(event)}
                   />
                 </InputGroup>
@@ -333,6 +385,31 @@ const UpdateModal = ({ values, handleUpdate, forNew }) => {
                     type="time"
                     name="departureTime"
                     placeholder="Select"
+                    value={selectedTime}
+                    onChange={(event) => handleChange(event)}
+                  />
+                </InputGroup>
+              </FormControl>
+              <FormControl mt={4}>
+                <InputGroup>
+                  <InputLeftAddon children="Arrival date" />
+                  <Input
+                    type="date"
+                    name="arrivalDate"
+                    placeholder="Select"
+                    value={arrivalDate}
+                    onChange={(event) => handleChange(event)}
+                  />
+                </InputGroup>
+              </FormControl>
+              <FormControl mt={4}>
+                <InputGroup>
+                  <InputLeftAddon children="Arrival time" />
+                  <Input
+                    type="time"
+                    name="arrivalTime"
+                    placeholder="Select"
+                    value={arrivalTime}
                     onChange={(event) => handleChange(event)}
                   />
                 </InputGroup>
@@ -352,15 +429,36 @@ const UpdateModal = ({ values, handleUpdate, forNew }) => {
     </div>
   );
 };
-const AddDelayModel = ({ values, handleUpdate }) => {
+const AddDelayModel = ({ id, values, handleUpdate }) => {
+  const toast = useToast();
   const [formValues, setFormValues] = useState(values);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    handleUpdate(formValues);
-    onClose();
+    var response = await updateScheduledFlight(id, {
+      delayedDeparture: formValues.delayedDeparture,
+    });
+    if (response.message === "Updated successfully") {
+      handleUpdate(formValues);
+      onClose();
+      toast({
+        title: "Schedule Updated.",
+        description: response.message,
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: "An error occurred.",
+        description: `Unable to delete schedule ${id}.`,
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+    }
   };
   const handleChange = (event) => {
     var value = event.target.value;
@@ -385,12 +483,22 @@ const AddDelayModel = ({ values, handleUpdate }) => {
         <ScheduleIcon />
         <Text mx={2}>Mark Delayed</Text>
       </Button>
+
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Mark Delayed</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            <Text mx={2}>{values.route}</Text>
+            <Text mx={2}>{`Scheduled Departure : ${new Date(
+              values.departure
+            ).toLocaleDateString()} ${new Date(
+              values.departure
+            ).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}`}</Text>
             <form onSubmit={handleSubmit}>
               <FormControl mt={4}>
                 <InputGroup>
@@ -399,7 +507,7 @@ const AddDelayModel = ({ values, handleUpdate }) => {
                     type="date"
                     name="delayedDepartureDate"
                     placeholder="Select"
-                    // value={formValues.departure}
+                    value={selectedDate}
                     onChange={(event) => handleChange(event)}
                   />
                 </InputGroup>
@@ -411,6 +519,7 @@ const AddDelayModel = ({ values, handleUpdate }) => {
                     type="time"
                     name="delayedDepartureTime"
                     placeholder="Select"
+                    value={selectedTime}
                     onChange={(event) => handleChange(event)}
                   />
                 </InputGroup>
@@ -433,8 +542,29 @@ const AddDelayModel = ({ values, handleUpdate }) => {
 const DeleteModal = ({ id, handleDelete }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef();
-  const handleYes = () => {
-    handleDelete(id);
+  const toast = useToast();
+  const handleYes = async () => {
+    var response = await deleteScheduledFlight(id);
+    if (response.message === "Scheduled flight deleted successfully") {
+      handleDelete(id);
+      onClose();
+      toast({
+        title: "Schedule Deleted.",
+        description: response.message,
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: "An error occurred.",
+        description: `Unable to delete schedule ${id}.`,
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+      onClose();
+    }
   };
   return (
     <div>
