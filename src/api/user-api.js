@@ -121,4 +121,4 @@ export const addBookingByUser = (id, data) => postRequest(`${URL}/${id}/${BOOKIN
  * 
  * @returns {Promise<object>}
  */
-export const updateBooking = (userID, bookingID, state) => putRequest(`${URL}/${userID}/${BOOKING_URL}/${bookingID}`, {state: state} );
+export const updateBooking = (userID, bookingID, data) => putRequest(`${URL}/${userID}/${BOOKING_URL}/${bookingID}`, data );

@@ -18,27 +18,18 @@ import {
 	AlertDialogHeader,
 	AlertDialogContent,
 	AlertDialogOverlay,
-  Modal,
-	ModalOverlay,
-	ModalCloseButton,
-	ModalBody,
-	ModalContent,
-	FormControl,
-	FormLabel,
-	FormErrorMessage,
-	ModalHeader,
-	Input,
 } from '@chakra-ui/react';
-import Fab from '@material-ui/core/Fab';
-import PaymentIcon from '@material-ui/icons/Payment';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import { formatPrice, getDateTime } from '../../utils/helpers';
-import { Formik } from 'formik';
-import * as Yup from 'yup';
+import PaymentCard from './PaymentCard';
+import Fab from '@material-ui/core/Fab';
 
-const BookingCard = ({ id, departure, arrival, origin_code, destination_code, final_amount, state, cancelBooking }) => {
+
+const BookingCard = ({ id, departure, arrival, origin_code, destination_code, final_amount, state, cancelBooking, addPayment }) => {
 	departure = getDateTime(departure);
 	arrival = getDateTime(arrival);
+
+  console.log(final_amount);
 	return (
 		<Flex boxShadow="xl" borderRadius="10px" m="10px" mt="5" p="8px" justifyContent="center">
 			<Grid h="200px" w="80vw" templateRows="repeat(3, 1fr)" templateColumns="repeat(20, 1fr)" gap={2} mx="auto">
@@ -68,8 +59,8 @@ const BookingCard = ({ id, departure, arrival, origin_code, destination_code, fi
 				<GridItem rowSpan={2} colSpan={5}>
 					<Center pt={4}>
 						<VStack spacing={-0.5}>
-							<Badge ml="1" fontSize="0.8em" colorScheme={state === 'complete' ? 'red' : 'green'}>
-								{state === 'complete' ? 'Paid' : 'Not Paid'}
+							<Badge ml="1" fontSize="0.8em" colorScheme={state != 'completed' ? 'red' : 'green'}>
+								{state != 'completed' ? 'Not Paid' : 'Paid'}
 							</Badge>
 							<Heading pt={0}>{formatPrice(final_amount)}</Heading>
 							<Text color="gray.500">3 Passengers</Text>
@@ -80,13 +71,8 @@ const BookingCard = ({ id, departure, arrival, origin_code, destination_code, fi
 				<GridItem rowSpan={1} colSpan={20}>
 					<Center mt={3}>
 						<HStack spacing={8}>
-							<CancelBooking cancelBooking={() => cancelBooking(id)} />
-							<Button bg="transparent" _hover={{ bg: 'trasparent' }} >
-								<Fab color="primary" variant="extended" size="large">
-									<PaymentIcon />
-									<Text mx={2}>Pay For Booking</Text>
-								</Fab>
-							</Button>
+							{ state === "booked" && <CancelBooking cancelBooking={() => cancelBooking(id)} />}
+              { state === "booked" && <PaymentCard addPayment = {(transactionKey) => {addPayment(id,transactionKey)}}/>}
 						</HStack>
 					</Center>
 				</GridItem>
@@ -145,66 +131,5 @@ const CancelBooking = ({ cancelBooking }) => {
 		</>
 	);
 };
-
-// const PaymentCard = () => {
-// 	const { isOpen, onOpen, onClose } = useDisclosure();
-
-// 	return (
-// 		<Modal
-// 			isCentered
-// 			closeOnOverlayClick={false}
-// 			isOpen={isOpen}
-// 			onClose={onClose}
-// 			size="md"
-// 			motionPreset="slideInBottom"
-// 			isCentered
-// 			closeOnEsc
-// 		>
-// 			<ModalOverlay />
-// 			<ModalContent>
-// 				<ModalHeader>Payment</ModalHeader>
-// 				<ModalCloseButton />
-// 				<ModalBody>
-// 					<Formik
-// 						initialValues={{
-// 							transactionKey: 0,
-// 						}}
-// 						validationSchema={Yup.object({
-// 							transactionKey: Yup.number().required('Required'),
-// 						})}
-// 						onSubmit={async (values) => {
-// 							console.log(values);
-// 							await addBooking('complete_payment', values.transactionKey);
-// 							onClose();
-// 						}}
-// 					>
-// 						{(props) => (
-// 							<Box>
-// 								<FormControl isInvalid={props.errors.transactionKey && props.touched.transactionKey}>
-// 									<FormLabel>Transaction Key:</FormLabel>
-// 									<Input
-// 										type="number"
-// 										name="transactionKey"
-// 										value={props.initialValues.transactionKey}
-// 										{...props.getFieldProps('transactionKey')}
-// 									/>
-// 									<FormErrorMessage>{props.errors.transactionKey}</FormErrorMessage>
-// 								</FormControl>
-// 								<Box my={4}>
-// 									<Button colorScheme="red" onClick={onClose}>
-// 										<Text mx={2}>Cancel</Text>
-// 									</Button>
-// 									<Button colorScheme="teal" onClick={props.submitForm} mx={4}>
-// 										<Text mx={2}>Confirm Booking</Text>
-// 									</Button>
-// 								</Box>
-// 							</Box>
-// 						)}
-// 					</Formik>
-// 				</ModalBody>
-// 			</ModalContent>
-// 		</Modal>
-// 	);
-// };
 
 export default BookingCard;

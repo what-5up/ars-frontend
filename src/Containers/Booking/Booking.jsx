@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Flex, Box, Heading, Divider, useToast } from '@chakra-ui/react';
 import { useLocation, useHistory } from 'react-router-dom';
 import BookingCard from '../../Components/Cards/BookingCard';
-import { getBookingsByUser, deleteBooking } from '../../api/user-api';
+import { getBookingsByUser, deleteBooking, updateBooking } from '../../api/user-api';
 import { getPricing } from '../../api/scheduled-flight-api';
 import { useSelector } from 'react-redux';
 
@@ -36,6 +36,35 @@ const Booking = () => {
 		}
         
 	};
+    
+	const payBooking = async (bookingId,transactionKey) => {
+		let result = await updateBooking(userID, bookingId,{scenario:"complete_payment", transactionKey:transactionKey});
+		if (result.hasOwnProperty('error')) {
+			toast({
+				title: 'An error occurred.',
+				description: result.message,
+				status: 'error',
+				duration: 9000,
+				isClosable: true,
+			});
+		} else {
+			toast({
+				title: 'Payment successfull',
+				description: result.message,
+				status: 'success',
+				duration: 9000,
+				isClosable: true,
+			});
+            let index = bookedFlights.findIndex(item => item.id == bookingId) 
+            console.log(index);
+            let updatedBooking = bookedFlights
+            updatedBooking[index] = {...updatedBooking[index],state:"completed"}
+            console.log(updatedBooking);
+            setBookedFlights([...updatedBooking])
+		}
+        
+	};
+
 	useEffect(async () => {
 		let bookings = await getBookingsByUser(userID);
 		bookings = bookings.data || [];
@@ -68,7 +97,7 @@ const Booking = () => {
 				{bookedFlights.map((item) => {
 					return (
 						<Flex justifyContent="center">
-							<BookingCard {...item} cancelBooking={cancelBooking} />
+							<BookingCard {...item} cancelBooking={cancelBooking} addPayment={payBooking}/>
 						</Flex>
 					);
 				})}
