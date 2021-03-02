@@ -32,6 +32,7 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
   AlertDialogCloseButton,
+  useToast,
 } from "@chakra-ui/react";
 import { useLocation } from "react-router-dom";
 import AddIcon from "@material-ui/icons/Add";
@@ -39,7 +40,13 @@ import CreateIcon from "@material-ui/icons/Create";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { getRoutes } from "../../api/route-api";
+import {
+  getRoutes,
+  getRoutePrice,
+  deleteRoutePrice,
+  updateRoutePrice,
+  addRoutePrice,
+} from "../../api/route-api";
 
 const TicketPrices = () => {
   const [fetchedData, setFetchedData] = useState([]);
@@ -51,40 +58,36 @@ const TicketPrices = () => {
     var routs = await getRoutes();
     routs = routs.data || [];
     setRoutes(routs);
-    // TODO: fetch prices
-    var dummy = [
-      {
-        id: 1,
-        travellerClass: "A",
-        price: 5000,
-      },
-      {
-        id: 2,
-        travellerClass: "B",
-        price: 10000,
-      },
-      {
-        id: 3,
-        travellerClass: "C",
-        price: 12000,
-      },
-    ];
-    setFetchedData(dummy);
-  }, []);
-  const handleUpdate = (newValues) => {
-    //   TODO: send data to backend
-    var newData = fetchedData.map((priceData) => {
-      return newValues.id === priceData.id ? newValues : priceData;
+    var response = await getRoutePrice(selectedRoute);
+    var data = response.data || [];
+    data = data.map((row) => {
+      return {
+        id: row.route_id,
+        travellerClass: row.traveler_class,
+        price: row.amount,
+      };
     });
+    setFetchedData(data);
+  }, [selectedRoute]);
+  const handleUpdateSuccess = (newValues) => {
+    var newData = fetchedData.map((priceData) => {
+      return newValues.travellerClass === priceData.travellerClass
+        ? newValues
+        : priceData;
+    });
+    setFetchedData(newData);
+  };
+  const handleAddSuccess = (newValues) => {
+    var newData = fetchedData.concat(newValues);
     setFetchedData(newData);
   };
   const handleRouteSelect = (event) => {
     var value = event.target.value;
     setSelectedRoute(value);
+    setFetchedData([]);
   };
-  const handleDelete = async (id) => {
-    // TODO: send delete request to backend
-    var newData = fetchedData.filter((row) => row.id !== id);
+  const handleDeleteSuccess = async (id) => {
+    var newData = fetchedData.filter((row) => row.travellerClass !== id);
     setFetchedData(newData);
   };
   return (
@@ -110,17 +113,24 @@ const TicketPrices = () => {
       <PricesTable
         content={fetchedData}
         tableCaption={""}
-        handleUpdate={handleUpdate}
-        handleDelete={handleDelete}
+        handleUpdate={handleUpdateSuccess}
+        handleDelete={handleDeleteSuccess}
+        handleAdd={handleAddSuccess}
       />
     </Box>
   );
 };
 
-const PricesTable = ({ content, tableCaption, handleUpdate, handleDelete }) => {
+const PricesTable = ({
+  content,
+  tableCaption,
+  handleUpdate,
+  handleDelete,
+  handleAdd,
+}) => {
   return (
     <>
-      <UpdateModal values={{}} handleUpdate={handleUpdate} forNew={true} />
+      <UpdateModal values={{}} handleUpdate={handleAdd} forNew={true} />
       <Table mt={5} variant="striped" colorScheme="gray">
         <TableCaption>{tableCaption}</TableCaption>
         <Thead>
@@ -134,7 +144,7 @@ const PricesTable = ({ content, tableCaption, handleUpdate, handleDelete }) => {
         <Tbody>
           {content.map((row) => {
             return (
-              <Tr key={row.id}>
+              <Tr key={row.travellerClass}>
                 <Td>{row.travellerClass}</Td>
                 <Td isNumeric>{row.price}</Td>
                 <Td>
@@ -145,7 +155,11 @@ const PricesTable = ({ content, tableCaption, handleUpdate, handleDelete }) => {
                   />
                 </Td>
                 <Td>
-                  <DeleteModal typeId={row.id} handleDelete={handleDelete} />
+                  <DeleteModal
+                    routeId={row.id}
+                    classId={row.travellerClass}
+                    handleDelete={handleDelete}
+                  />
                 </Td>
               </Tr>
             );
@@ -157,6 +171,56 @@ const PricesTable = ({ content, tableCaption, handleUpdate, handleDelete }) => {
 };
 const UpdateModal = ({ values, handleUpdate, forNew }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
+  const handleUpdatePrice = async (newValues) => {
+    var response = await updateRoutePrice(
+      newValues.routeId,
+      newValues.travellerClass,
+      newValues.price
+    );
+    if (response.message === "Updated successfully") {
+      handleUpdate(newValues);
+      toast({
+        title: "Price Updated.",
+        description: response.message,
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: "An error occurred.",
+        description: response.message,
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+    }
+  };
+  const handlePriceAdd = async (newValues) => {
+    var response = await addRoutePrice(newValues.routeId, {
+      travellerClass: newValues.travellerClass,
+      amount: newValues.price,
+    });
+    if (response.message === "Updated successfully") {
+      handleUpdate(newValues);
+      toast({
+        title: "Price Updated.",
+        description: response.message,
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: "An error occurred.",
+        description: response.message,
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+    }
+  };
   return (
     <div>
       {forNew ? (
@@ -178,19 +242,21 @@ const UpdateModal = ({ values, handleUpdate, forNew }) => {
           <ModalBody>
             <Formik
               initialValues={{
+                routeId: values.id,
                 travellerClass: values.travellerClass,
                 price: values.price,
               }}
               validationSchema={Yup.object({
-                travellerClass: Yup.string().required("Required"),
+                travellerClass: Yup.number().required("Required"),
                 price: Yup.number().required("Required"),
               })}
               onSubmit={(newValues) => {
-                console.log(newValues);
-                console.log("Onvy");
-                handleUpdate(newValues);
+                if (forNew) {
+                  handlePriceAdd(newValues);
+                } else {
+                  handleUpdatePrice(newValues);
+                }
                 onClose();
-                console.log("after");
               }}
             >
               {(props) => (
@@ -201,13 +267,15 @@ const UpdateModal = ({ values, handleUpdate, forNew }) => {
                       props.touched.travellerClass
                     }
                   >
-                    <FormLabel>Account Type:</FormLabel>
-                    <Input
-                      type="text"
-                      name="travellerClass"
-                      value={props.initialValues.travellerClass}
-                      isDisabled={true}
-                    />
+                    <FormLabel>Traveller Class:</FormLabel>
+                    {forNew ? null : (
+                      <Input
+                        type="text"
+                        name="travellerClass"
+                        value={props.initialValues.travellerClass}
+                        isDisabled={true}
+                      />
+                    )}
                     <FormErrorMessage>
                       {props.errors.travellerClass}
                     </FormErrorMessage>
@@ -249,11 +317,32 @@ const UpdateModal = ({ values, handleUpdate, forNew }) => {
   );
 };
 
-const DeleteModal = ({ typeId, handleDelete }) => {
+const DeleteModal = ({ routeId, classId, handleDelete }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef();
-  const handleYes = () => {
-    handleDelete(typeId);
+  const toast = useToast();
+  const handleYes = async () => {
+    var response = await deleteRoutePrice(routeId, classId);
+    if (response.message === "Route price deleted successfully") {
+      handleDelete(classId);
+      onClose();
+      toast({
+        title: "Price Deleted.",
+        description: response.message,
+        status: "success",
+        duration: 9000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: "An error occurred.",
+        description: "Unable to delete route price.",
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+      onClose();
+    }
   };
   return (
     <div>
@@ -289,5 +378,16 @@ const DeleteModal = ({ typeId, handleDelete }) => {
     </div>
   );
 };
+
+// const showToast = ({ title, message, status }) => {
+//   const toast = useToast();
+//   toast({
+//     title: title,
+//     description: message,
+//     status: status,
+//     duration: 9000,
+//     isClosable: true,
+//   });
+// };
 
 export default TicketPrices;
