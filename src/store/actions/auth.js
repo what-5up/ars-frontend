@@ -112,7 +112,7 @@ export const guestAuth = (values, routeForward) => {
 				localStorage.setItem('accType', accType);
 				localStorage.setItem('userType', userType);
 			
-				routeForward({id: userID});
+				routeForward({id: userID, isGuest: true});
 				dispatch(authSuccess(token, userID, accType, userType))
                 dispatch(checkAuthTimeout(expiresIn));
             }

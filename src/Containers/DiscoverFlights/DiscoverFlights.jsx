@@ -13,7 +13,6 @@ const DiscoverFlights = () => {
 	
 	let [travellerClass, setTravellerClass] = useState('');
 	let [flights, setFlights] = useState([]);
-	const [isGuestOpen, setIsGuestOpen] = useState(false)
 	let [passengerCount, setPassengerCount] = useState(0);
 
 	const {onClose,isOpen, onOpen} = useDisclosure({id:'opensas'});
@@ -23,6 +22,7 @@ const DiscoverFlights = () => {
 	const goToPassenger = (state = {}, id) => {
 		let flight = flights.find((item) => item.id == id);
 		history.push('/passenger', {
+			isGuest: false,
 			...state,
 			flight: flight,
 			travellerClass: travellerClass,

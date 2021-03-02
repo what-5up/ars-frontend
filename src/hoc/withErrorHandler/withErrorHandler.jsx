@@ -30,13 +30,14 @@ const withErrorHandler = (WrappedComponent) => {
             this.resInterceptor = axios.interceptors.response.use(res => res, error => {
                 this.setState({loading:false})
                 if (error.message === "Network Error")
-                    this.setState({ error: "Unable to connect to the sever. Please try again later", isOpen: true, title: "Network Error" })
+                    this.setState({ error: "Unable to connect to the sever. Please try again later", isOpen: true, title: "Network Error", loading:true })
                 else { this.setState({ error: error.response.data.message, isOpen: true, title: error.response.statusText }); }
                 return Promise.reject(error);
             });
         }
 
         componentWillUnmount() {
+            this.setState({loading:false})
             axios.interceptors.request.eject(this.reqInterceptor);
             axios.interceptors.response.eject(this.resInterceptor);
         }
@@ -46,9 +47,10 @@ const withErrorHandler = (WrappedComponent) => {
         }
 
         render() {
+            console.log(this.state.loading);
             return (
                 <div>
-                    {/* {this.state.loading && <Loader/>} */}
+                    {!this.state.loading && <Loader/>}
                     
                     <Modal
                         isOpen={this.state.isOpen}

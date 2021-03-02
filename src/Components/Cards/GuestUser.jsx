@@ -30,7 +30,7 @@ import * as actions from '../../store/actions/index';
 const GuestUser = ({ routeForward, closeGuest }) => {
 	const [title, setTitle] = useState([]);
 	const dispatch = useDispatch();
-	const onAuth = useCallback((values) => dispatch(actions.guestAuth(values)), [dispatch]);
+	const onAuth = useCallback((values, routeForward) => dispatch(actions.guestAuth(values,routeForward)), [dispatch]);
 
 	useEffect(async () => {
 		let titles = await getTitles();
@@ -163,7 +163,7 @@ const GuestUser = ({ routeForward, closeGuest }) => {
 						<Flex mb={3} style={{ justifyContent: 'center' }}>
 							<Button
 								onClick={() => {
-									document.getElementById('openras').style.display = 'block';
+									document.getElementById('signin').style.display = 'block';
 								}}
 								colorScheme="teal"
 								rightIcon={<ArrowForwardIcon />}
@@ -173,8 +173,8 @@ const GuestUser = ({ routeForward, closeGuest }) => {
 							</Button>
 						</Flex>
 					</Flex>
-					
-					<Box id="openras" style={{ display: 'none' }} p={0}>
+
+					<Box id="signin" style={{ display: 'none' }} p={0}>
 						<ModalOverlay />
 						<ModalContent>
 							<ModalCloseButton />

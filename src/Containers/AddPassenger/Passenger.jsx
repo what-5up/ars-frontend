@@ -19,7 +19,7 @@ import PassengerFlight from '../../Components/Cards/PassengerFlight';
 import AddedPassengers from '../../Components/Cards/AddedPassengers';
 import { getAddedPassengers } from '../../api/user-api';
 import { useSelector } from 'react-redux';
-import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
+import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 
 const API_URL = 'https://restcountries.eu/rest/v2/all';
 
@@ -73,7 +73,7 @@ const Passenger = () => {
 	useEffect(async () => {
 		let prevPassengers = [];
 		prevPassengers = await getAddedPassengers(userID);
-		prevPassengers = prevPassengers.data ||[];
+		prevPassengers = prevPassengers.data || [];
 		setAddedPassengers(prevPassengers);
 	}, []);
 
@@ -86,10 +86,12 @@ const Passenger = () => {
 			});
 			return data;
 		}
-		fetchCountries().then((result) => {
-			console.log(result);
-			setCountries(result);
-		}).catch(err => console.log(err))
+		fetchCountries()
+			.then((result) => {
+				console.log(result);
+				setCountries(result);
+			})
+			.catch((err) => console.log(err));
 	}, []);
 
 	return (
@@ -141,11 +143,13 @@ const Passenger = () => {
 						<PassengerFlight {...flight} />
 					</Flex>
 					<Flex w="100%" justifyContent="center" mt="3">
-						<AddedPassengers
-							passengers={addedPassengers}
-							id={currentIndex}
-							addPassenger={addOrUpdatePassengers}
-						/>
+						{!location.state.isGuest && (
+							<AddedPassengers
+								passengers={addedPassengers}
+								id={currentIndex}
+								addPassenger={addOrUpdatePassengers}
+							/>
+						)}
 					</Flex>
 				</Flex>
 			</Flex>
