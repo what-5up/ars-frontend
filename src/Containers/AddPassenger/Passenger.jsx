@@ -19,6 +19,7 @@ import PassengerFlight from '../../Components/Cards/PassengerFlight';
 import AddedPassengers from '../../Components/Cards/AddedPassengers';
 import { getAddedPassengers } from '../../api/user-api';
 import { useSelector } from 'react-redux';
+import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
 
 const API_URL = 'https://restcountries.eu/rest/v2/all';
 
@@ -60,7 +61,7 @@ const Passenger = () => {
 			tempArr.push({
 				id: i,
 				disabled: true,
-				existing:false
+				existing: false,
 			});
 			if (i == 0) {
 				tempArr[0]['disabled'] = false;
@@ -72,11 +73,15 @@ const Passenger = () => {
 	useEffect(async () => {
 		let prevPassengers = [];
 		prevPassengers = await getAddedPassengers(userID);
+		if (prevPassengers == undefined) {
+			prevPassengers = {};
+			prevPassengers.data = [];
+		}
 		prevPassengers = prevPassengers.data;
 		setAddedPassengers(prevPassengers);
 	}, []);
 
-	useEffect(() => {
+	useEffect(async () => {
 		async function fetchCountries() {
 			let respone = await fetch(API_URL);
 			let data = await respone.json();
@@ -85,7 +90,10 @@ const Passenger = () => {
 			});
 			return data;
 		}
-		setCountries(fetchCountries());
+		fetchCountries().then((result) => {
+			console.log(result);
+			setCountries(result);
+		}).catch(err => console.log(err))
 	}, []);
 
 	return (
@@ -173,9 +181,13 @@ const PassengerAccordion = ({ initialValues, index, disabled, countries, addOrUp
 				</AccordionButton>
 			</h2>
 			<AccordionPanel pb={4}>
-				<AddPassenger initialValues={initialValues} addPassenger={addOrUpdatePassengers} countries={[]} />
+				<AddPassenger
+					initialValues={initialValues}
+					addPassenger={addOrUpdatePassengers}
+					countries={countries}
+				/>
 			</AccordionPanel>
 		</AccordionItem>
 	);
 };
-export default Passenger;
+export default withErrorHandler(Passenger);

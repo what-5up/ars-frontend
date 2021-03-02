@@ -289,7 +289,7 @@ class SeatMap extends Component {
 					</VStack>
 					<Divider orientation="vertical" />
 					<VStack w="32%" spacing={8} justify="right">
-						<PassengerFlight />
+						<PassengerFlight {...this.state.flight}/>
 						<Spacer />
 						<Button
 							size="lg"

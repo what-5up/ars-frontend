@@ -1,25 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import {
-	Box,
-	Flex,
-	Button,
-	Text,
-	Input,
-	FormErrorMessage,
-	FormControl,
-	NumberInput,
-	NumberInputField,
-	NumberInputStepper,
-	NumberIncrementStepper,
-	NumberDecrementStepper,
-	HStack,
-	useNumberInput,
-} from '@chakra-ui/react';
+import { Box, Flex, Button, Text, Input, FormErrorMessage, FormControl } from '@chakra-ui/react';
 import Select, { components } from 'react-select';
 import PeopleIcon from '@material-ui/icons/People';
 import RemoveIcon from '@material-ui/icons/Remove';
 import AddIcon from '@material-ui/icons/Add';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
 import Fab from '@material-ui/core/Fab';
 import FlightIcon from '@material-ui/icons/Flight';
@@ -94,9 +78,13 @@ const FindFlights = ({ setFlights, setPassengerCount, setTravellerClass }) => {
 	const [classes, setClasses] = useState([]);
 	const [origins, setOrigins] = useState([]);
 	const [destinations, setDestinations] = useState([{ label: '', customAbbreviation: '' }]);
+
 	useEffect(async () => {
 		let classes = await getTravelerClasses();
-		console.log(classes);
+		if (classes === undefined) {
+			classes = {};
+			classes.data = [];
+		}
 		classes = classes.data.map((item) => {
 			return { label: item.class, value: item.id };
 		});
@@ -105,34 +93,37 @@ const FindFlights = ({ setFlights, setPassengerCount, setTravellerClass }) => {
 
 	useEffect(async () => {
 		let routes = await getRoutes();
+		console.log(routes);
 
 		let tempDestinations = [];
 		let tempOrigins = [];
 
-		routes.data.forEach((item) => {
-			let index = tempOrigins.findIndex((entry) => item.origin_code == entry.value);
-			if (index < 0) {
-				tempOrigins.push({
-					value: item.origin_code,
-					label: item.origin,
-					customAbbreviation: item.origin_region,
-				});
-				tempDestinations.push([]);
-				tempDestinations[tempDestinations.length - 1].push({
-					id: item.id,
-					value: item.destination_code,
-					label: item.destination,
-					customAbbreviation: item.destination_region,
-				});
-			} else {
-				tempDestinations[index].push({
-					id: item.id,
-					value: item.destination_code,
-					label: item.destination,
-					customAbbreviation: item.destination_region,
-				});
-			}
-		});
+		if (routes != undefined && routes.hasOwnProperty('data')) {
+			routes.data.forEach((item) => {
+				let index = tempOrigins.findIndex((entry) => item.origin_code == entry.value);
+				if (index < 0) {
+					tempOrigins.push({
+						value: item.origin_code,
+						label: item.origin,
+						customAbbreviation: item.origin_region,
+					});
+					tempDestinations.push([]);
+					tempDestinations[tempDestinations.length - 1].push({
+						id: item.id,
+						value: item.destination_code,
+						label: item.destination,
+						customAbbreviation: item.destination_region,
+					});
+				} else {
+					tempDestinations[index].push({
+						id: item.id,
+						value: item.destination_code,
+						label: item.destination,
+						customAbbreviation: item.destination_region,
+					});
+				}
+			});
+		}
 
 		setOrigins(tempOrigins);
 		// setDestinations(tempDestinations);
@@ -160,11 +151,11 @@ const FindFlights = ({ setFlights, setPassengerCount, setTravellerClass }) => {
 					.oneOf(classes.map((item) => item.value))
 					.required('Required'),
 				date: Yup.date().min(new Date(), 'Choose a date in the future'),
-				passengers: Yup.number().default(1).min(1, "minimum one required").required('Required'),
+				passengers: Yup.number().default(1).min(1, 'minimum one required').required('Required'),
 			})}
 			onSubmit={async (values) => {
 				setPassengerCount(values.passengers);
-				setTravellerClass(values.travelClass)
+				setTravellerClass(values.travelClass);
 				let flights = await getScheduledFlights(values);
 				console.log(flights);
 				setFlights(flights.data);
