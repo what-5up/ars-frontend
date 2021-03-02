@@ -166,7 +166,7 @@ const UpdateModal = ({
                   <FormControl
                     isInvalid={props.errors.price && props.touched.price}
                   >
-                    <FormLabel>Discount:</FormLabel>
+                    <FormLabel>Price:</FormLabel>
                     <InputGroup>
                       <Input
                         type="number"
