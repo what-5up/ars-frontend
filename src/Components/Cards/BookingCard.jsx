@@ -18,20 +18,43 @@ import {
 	AlertDialogHeader,
 	AlertDialogContent,
 	AlertDialogOverlay,
+	Divider,
 } from '@chakra-ui/react';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import { formatPrice, getDateTime } from '../../utils/helpers';
 import PaymentCard from './PaymentCard';
 import Fab from '@material-ui/core/Fab';
+import airplane from '../../assets/img/airplane.png';
+import MyLocationIcon from '@material-ui/icons/MyLocation';
+import LocationOnIcon from '@material-ui/icons/LocationOn';
 
-
-const BookingCard = ({ id, departure, arrival, origin_code, destination_code, final_amount, state, cancelBooking, addPayment }) => {
+const BookingCard = ({
+	id,
+	departure,
+	arrival,
+	origin_code,
+	destination_code,
+	final_amount,
+	state,
+	cancelBooking,
+	addPayment,
+}) => {
 	departure = getDateTime(departure);
 	arrival = getDateTime(arrival);
 
-  console.log(final_amount);
 	return (
-		<Flex boxShadow="xl" borderRadius="10px" m="10px" mt="5" p="8px" justifyContent="center">
+		<Flex
+			boxShadow="xl"
+			borderRadius="10px"
+			m="10px"
+			mt="5"
+			p="8px"
+			justifyContent="center"
+			style={{
+				boxShadow: '0 1px 3px 0 rgb(60 64 67 / 30%), 0 4px 8px 3px rgb(60 64 67 / 15%)',
+				minWidth: '80%',
+			}}
+		>
 			<Grid h="200px" w="80vw" templateRows="repeat(3, 1fr)" templateColumns="repeat(20, 1fr)" gap={2} mx="auto">
 				<GridItem rowSpan={2} colSpan={4}>
 					<Box pt={4}>
@@ -43,9 +66,25 @@ const BookingCard = ({ id, departure, arrival, origin_code, destination_code, fi
 					</Box>
 				</GridItem>
 				<GridItem rowSpan={2} colSpan={7}>
-					<Box w={{ base: '80%', sm: '60%', md: '50%' }} mb={{ base: 12, md: 0 }}>
-						<Image src={'/images/flight-icon.png'} size="100%" rounded="1rem" alt="flight image" />
-					</Box>
+					<Flex>
+						<Flex alignItems="center" mb={{ base: 12, md: 0 }}>
+							<MyLocationIcon />
+							<Divider width="148px" backgroundColor="black" opacity="1" borderBottomWidth = "2px" borderColor="black"/>
+						</Flex>
+						<Flex
+							justifyContent="center"
+							alignItems="center"
+							w={{ base: '80%', sm: '60%', md: '50%' }}
+							mx="auto"
+							mb={{ base: 12, md: 0 }}
+						>
+							<Image src={airplane} height="70px" mt="3" rounded="1rem" alt="flight image" />
+						</Flex>
+						<Flex alignItems="center" mb={{ base: 12, md: 0 }}>
+							<Divider width="148px" backgroundColor="black" opacity="1" borderBottomWidth = "2px" borderColor="black"/>
+							<LocationOnIcon />
+						</Flex>
+					</Flex>
 				</GridItem>
 				<GridItem rowSpan={2} colSpan={4}>
 					<Box pt={4}>
@@ -68,11 +107,17 @@ const BookingCard = ({ id, departure, arrival, origin_code, destination_code, fi
 						</VStack>
 					</Center>
 				</GridItem>
-				<GridItem rowSpan={1} colSpan={20}>
+				<GridItem rowSpan={1} colSpan={20} mb="4">
 					<Center mt={3}>
 						<HStack spacing={8}>
-							{ state === "booked" && <CancelBooking cancelBooking={() => cancelBooking(id)} />}
-              { state === "booked" && <PaymentCard addPayment = {(transactionKey) => {addPayment(id,transactionKey)}}/>}
+							{state === 'booked' && <CancelBooking cancelBooking={() => cancelBooking(id)} />}
+							{state === 'booked' && (
+								<PaymentCard
+									addPayment={(transactionKey) => {
+										addPayment(id, transactionKey);
+									}}
+								/>
+							)}
 						</HStack>
 					</Center>
 				</GridItem>
