@@ -15,9 +15,6 @@ import {
   Td,
   TableCaption,
   Flex,
-  Radio,
-  RadioGroup,
-  Stack,
   Badge,
 } from "@chakra-ui/react";
 import { ArrowDownIcon, ArrowUpIcon } from "@chakra-ui/icons";
@@ -27,7 +24,6 @@ import { getPastFlightDetails } from "../../api/report-api";
 import { getRoutes } from "../../api/route-api";
 
 const FlightDetailsReport = (props) => {
-  const [fetchedData, setFetchedData] = useState([]);
   const [dataToShow, setDataToShow] = useState([]);
   const [filterValues, setFilterValues] = useState({
     origin: null,
@@ -42,35 +38,37 @@ const FlightDetailsReport = (props) => {
     response = response.data;
     let originSet = new Set();
     let destinationSet = new Set();
-    let data = response.map((row) => {
-      let route = routes.find((r) => r.id === row.route);
-      originSet.add(route.origin_region);
-      destinationSet.add(route.destination_region);
-      return {
-        origin: route.origin_region,
-        destination: route.destination_region,
-        departure: row.departure,
-        delay: row.delayed_departure
-          ? `${
-              (new Date(row.delayed_departure) - new Date(row.departure)) /
-              1000 /
-              60
-            } minutes delayed`
-          : null,
-        passengers: row.passengers,
-      };
-    });
-    data = _.orderBy(data, ["origin", "destination"], ["asc", "asc"]);
-    // filtering data
-    data = filterValues.origin
-      ? data.filter((rw) => rw.origin === filterValues.origin)
-      : data;
-    data = filterValues.destination
-      ? data.filter((rw) => rw.destination === filterValues.destination)
-      : data;
-    setDataToShow(data);
-    setOrigins(originSet);
-    setDests(destinationSet);
+    if (response) {
+      let data = response.map((row) => {
+        let route = routes.find((r) => r.id === row.route);
+        originSet.add(route.origin_region);
+        destinationSet.add(route.destination_region);
+        return {
+          origin: route.origin_region,
+          destination: route.destination_region,
+          departure: row.departure,
+          delay: row.delayed_departure
+            ? `${
+                (new Date(row.delayed_departure) - new Date(row.departure)) /
+                1000 /
+                60
+              } minutes delayed`
+            : null,
+          passengers: row.passengers,
+        };
+      });
+      data = _.orderBy(data, ["origin", "destination"], ["asc", "asc"]);
+      // filtering data
+      data = filterValues.origin
+        ? data.filter((rw) => rw.origin === filterValues.origin)
+        : data;
+      data = filterValues.destination
+        ? data.filter((rw) => rw.destination === filterValues.destination)
+        : data;
+      setDataToShow(data);
+      setOrigins(originSet);
+      setDests(destinationSet);
+    }
   }, [filterValues]);
   const handleFilterChange = (filterChange) => {
     setFilterValues({ ...filterValues, ...filterChange });

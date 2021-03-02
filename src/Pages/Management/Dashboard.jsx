@@ -21,7 +21,7 @@ const Dashboard = () => {
     <Router>
       <div>
         <ManagementHeader />
-		<Buttons/>
+        <Buttons />
         <Content />
         <Footer />
       </div>
@@ -71,41 +71,31 @@ const Content = () => {
   return transitions.map(({ item, props, key }) => (
     <animated.div key={key} style={props}>
       <Flex mt={5} flexDirection="column" minWidth="100vw">
-        <Switch location={item}>
-          <Route path="/BookingsByPassengerTypeReport">
-            <Flex justifyContent="center" minWidth="80%">
+        <Flex justifyContent="center" minWidth="80%">
+          <Switch location={item}>
+            <Route path="/BookingsByPassengerTypeReport">
               <BookingsByPassengerTypeReport />
-            </Flex>
-          </Route>
-          <Route path="/PassengersForDestinationReport">
-            <Flex justifyContent="center" minWidth="80%">
+            </Route>
+            <Route path="/PassengersForDestinationReport">
               <PassengersForDestinationReport />
-            </Flex>
-          </Route>
-          <Route path="/PassengersInFlightReport">
-            <Flex justifyContent="center" minWidth="80%">
+            </Route>
+            <Route path="/PassengersInFlightReport">
               <PassengersInFlightReport />
-            </Flex>
-          </Route>
-          <Route path="/RevenueReport">
-            <Flex justifyContent="center" minWidth="80%">
+            </Route>
+            <Route path="/RevenueReport">
               <RevenueReport />
-            </Flex>
-          </Route>
-          <Route path="/FlightDetailsReport">
-            <Flex justifyContent="center" minWidth="80%">
+            </Route>
+            <Route path="/FlightDetailsReport">
               <FlightDetailsReport />
-            </Flex>
-          </Route>
-          <Route path="/">
-            <BookingsByPassengerTypeReport />
-          </Route>
-        </Switch>
+            </Route>
+            <Route path="/">
+              <BookingsByPassengerTypeReport />
+            </Route>
+          </Switch>
+        </Flex>
       </Flex>
     </animated.div>
   ));
 };
 
 export default Dashboard;
-
-

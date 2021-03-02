@@ -37,7 +37,10 @@ const PassengersInFlightReport = (props) => {
   useEffect(async () => {
     let response = await getPassengersByFlightNo(filterValues.route);
     response = response.data;
-    var data = response.above18.concat(response.below18);
+    var data = [];
+    if (response && response.above18) {
+      data = response.above18.concat(response.below18);
+    }
     var routs = await getRoutes();
     routs = routs.data || [];
     setRoutes(routs);
