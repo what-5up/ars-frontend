@@ -12,10 +12,6 @@ const BOOKING_URL = "bookings";
  */
 export const getUser = (id) => getRequest(`${URL}/${id}`);
 
-//TODO: implement getUsers
-const getUsers = () => {
-    
-}
 /**
  * Add an user to the database
  * 

@@ -1,4 +1,4 @@
-import { React} from "react";
+import { React, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Flex,
@@ -11,12 +11,35 @@ import {
   ReactRouterLink,
 } from "@chakra-ui/react";
 import Media from "react-media";
-import { connect } from "react-redux";
+import { connect, useSelector } from "react-redux";
 import ThemeSelector from "../../Components/ThemeSelector/ThemeSelector";
 import MyProfilePopup from "../../Components/Popups/MyProfilePopup";
+import { getEmployee } from '../../api';
 
 const SRHeader = () => {
   const { colorMode, _ } = useColorMode();
+  const userID = useSelector((state) => state.auth.userID);
+  const [user, setUser] = useState({
+    title: null,
+    firstName : null,
+    lastName: null,
+    desc: null,
+    email: null
+  });
+
+  useEffect(async () => {
+    const result = await getEmployee(userID);
+    if (result.data) {
+      setUser({
+        title: result.data.title_name,
+        firstName: result.data.first_name,
+        lastName: result.data.last_name,
+        desc: result.data.designation,
+        email: result.data.email
+      });
+    }
+  }, [userID]);
+
   return (
     <Flex
       width="full"
@@ -34,7 +57,7 @@ const SRHeader = () => {
           <Stack isInline justifyContent="space-between" mt={4} align="center">
             <Menu direction={"row"} />
             <ThemeSelector />
-            <MyProfilePopup />
+            <MyProfilePopup user={user}/>
           </Stack>
         </Stack>
       </Box>
