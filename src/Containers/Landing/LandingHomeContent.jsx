@@ -16,8 +16,9 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import RegistrationArea from "../../Components/Forms/RegistrationArea";
+import { connect, useSelector } from "react-redux";
 
-export default function LandingHomeContent({
+const LandingHomeContent = ({
   title,
   subtitle1,
   subtitle2,
@@ -25,8 +26,9 @@ export default function LandingHomeContent({
   ctaLink,
   ctaText,
   ...rest
-}) {
+}) => {
   const [imageIndex, setImageIndex] = useState(0);
+  const isAuthenticated = useSelector((state) => state.auth.userAuthenticated);
   React.useEffect(() => {
     const interval = setInterval(() => {
       setImageIndex((imageIndex) => (imageIndex + 1) % images.length);
@@ -89,7 +91,7 @@ export default function LandingHomeContent({
         >
           Terms and conditions apply.
         </Text>
-        <CreateNewAccountButton ctaText={ctaText} />
+        {!isAuthenticated && <CreateNewAccountButton ctaText={ctaText} />}
       </Stack>
       <Box w={{ base: "90%", sm: "70%", md: "65%" }} mb={{ base: 12, md: 0 }}>
         <Image
@@ -123,7 +125,7 @@ LandingHomeContent.defaultProps = {
   subtitle2: [
     "Book your flight instantly with our online system",
     "Book your flight in anytime, anywhere",
-    "Earn upto 50% discounts and more",
+    "Earn upto 20% discounts and more",
     "Reserve a seat of your choosing",
     "Get instant emails on any update of your bookings"
   ],
@@ -173,3 +175,5 @@ const CreateNewAccountButton = ({ ctaText }) => {
     </>
   );
 };
+
+export default connect(null, null)(LandingHomeContent);
