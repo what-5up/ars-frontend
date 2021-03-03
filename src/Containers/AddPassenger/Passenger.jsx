@@ -13,7 +13,7 @@ import {
 	AccordionIcon,
 } from '@chakra-ui/react';
 import AddPassenger from '../../Components/Cards/AddPassenger';
-import { addOrUpdateArray } from '../../utils/helpers';
+import { addOrUpdateArray, removeFromArray } from '../../utils/helpers';
 import { useLocation, useHistory } from 'react-router-dom';
 import PassengerFlight from '../../Components/Cards/PassengerFlight';
 import AddedPassengers from '../../Components/Cards/AddedPassengers';
@@ -41,17 +41,25 @@ const Passenger = () => {
 		history.push('/seatmap', { passengers: passengers, flightID: flight.id, ...locationParams });
 	};
 
-	const addOrUpdatePassengers = (obj, scenario="new") => {
+	const addOrUpdatePassengers = (obj, scenario = 'new') => {
 		let newPassengers = passengers;
 		let index = passengers.findIndex((item) => item.disabled == true);
-		if (index > 0) {
-			if (index == obj.id + 1) {
-				newPassengers = addOrUpdateArray(passengers, { ...passengers[index], disabled: false });
-				setCurrentIndex(index);
-			}
+		if (scenario == 'remove-added') {
+			newPassengers = removeFromArray(newPassengers, obj);
 		} else {
-			setCanContinue(true);
+			if (index > 0) {
+				if (index == obj.id + 1) {
+					if (scenario == 'new') {
+						newPassengers = addOrUpdateArray(passengers, { ...passengers[index], disabled: false });
+						setCurrentIndex(index);
+					}
+				}
+			} else if (scenario == 'new') {
+				setCanContinue(true);
+			}
 		}
+
+		console.log(newPassengers);
 		setPassengers([...addOrUpdateArray(newPassengers, obj)]);
 	};
 
@@ -72,14 +80,13 @@ const Passenger = () => {
 	}, []);
 
 	useEffect(async () => {
-		if(!location.state.isGuest){
+		if (!location.state.isGuest) {
 			let prevPassengers = [];
-		
+
 			prevPassengers = await getAddedPassengers(userID);
 			prevPassengers = prevPassengers.data || [];
 			setAddedPassengers(prevPassengers);
 		}
-		
 	}, []);
 
 	useEffect(async () => {
