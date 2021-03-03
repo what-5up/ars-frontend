@@ -19,6 +19,13 @@ import {
 	AlertDialogContent,
 	AlertDialogOverlay,
 	Divider,
+	Modal,
+	ModalOverlay,
+	ModalContent,
+	ModalHeader,
+	ModalCloseButton,
+	ModalBody,
+	useDisclosure
 } from '@chakra-ui/react';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import { formatPrice, getDateTime } from '../../utils/helpers';
@@ -27,6 +34,9 @@ import Fab from '@material-ui/core/Fab';
 import airplane from '../../assets/img/airplane.png';
 import MyLocationIcon from '@material-ui/icons/MyLocation';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
+import {getBookingByUser} from '../../api/user-api';
+import { useSelector } from 'react-redux';
+import BookingDetails from './BookingDetails';
 
 const BookingCard = ({
 	id,
@@ -39,6 +49,21 @@ const BookingCard = ({
 	cancelBooking,
 	addPayment,
 }) => {
+    let userID = useSelector((state) => state.auth.userID);
+	const [booking, setBooking] = useState({})
+	const getBookingDetails = async () => {
+		let result = await getBookingByUser(userID,id);
+		if(!result.hasOwnProperty('error')){
+
+			result = result.data || []
+			if(result.length > 0){
+				result = {passengers: result, class:result[0].class}
+			}
+			setBooking(result)
+			onOpen();
+		}
+	}
+	const { onOpen, isOpen, onClose } = useDisclosure();
 	departure = getDateTime(departure);
 	arrival = getDateTime(arrival);
 
@@ -51,9 +76,11 @@ const BookingCard = ({
 			p="8px"
 			justifyContent="center"
 			style={{
+				cursor:"pointer",
 				boxShadow: '0 1px 3px 0 rgb(60 64 67 / 30%), 0 4px 8px 3px rgb(60 64 67 / 15%)',
 				minWidth: '80%',
 			}}
+			onClick={getBookingDetails}
 		>
 			<Grid h="200px" w="80vw" templateRows="repeat(3, 1fr)" templateColumns="repeat(20, 1fr)" gap={2} mx="auto">
 				<GridItem rowSpan={2} colSpan={4}>
@@ -69,7 +96,13 @@ const BookingCard = ({
 					<Flex>
 						<Flex alignItems="center" mb={{ base: 12, md: 0 }}>
 							<MyLocationIcon />
-							<Divider width="148px" backgroundColor="black" opacity="1" borderBottomWidth = "2px" borderColor="black"/>
+							<Divider
+								width="148px"
+								backgroundColor="black"
+								opacity="1"
+								borderBottomWidth="2px"
+								borderColor="black"
+							/>
 						</Flex>
 						<Flex
 							justifyContent="center"
@@ -81,7 +114,13 @@ const BookingCard = ({
 							<Image src={airplane} height="70px" mt="3" rounded="1rem" alt="flight image" />
 						</Flex>
 						<Flex alignItems="center" mb={{ base: 12, md: 0 }}>
-							<Divider width="148px" backgroundColor="black" opacity="1" borderBottomWidth = "2px" borderColor="black"/>
+							<Divider
+								width="148px"
+								backgroundColor="black"
+								opacity="1"
+								borderBottomWidth="2px"
+								borderColor="black"
+							/>
 							<LocationOnIcon />
 						</Flex>
 					</Flex>
@@ -122,6 +161,25 @@ const BookingCard = ({
 					</Center>
 				</GridItem>
 			</Grid>
+			<Modal
+				isCentered
+				closeOnOverlayClick={false}
+				isOpen={isOpen}
+				onClose={onClose}
+				size="md"
+				motionPreset="slideInBottom"
+				isCentered
+				closeOnEsc
+			>
+				<ModalOverlay />
+				<ModalContent>
+					<ModalHeader>Passengers</ModalHeader>
+					<ModalCloseButton />
+					<ModalBody>
+						<BookingDetails booking = {booking}/>
+					</ModalBody>
+				</ModalContent>
+			</Modal>
 		</Flex>
 	);
 };
