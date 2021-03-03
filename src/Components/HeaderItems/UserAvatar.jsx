@@ -1,10 +1,10 @@
 import { Wrap, WrapItem, Avatar } from "@chakra-ui/react";
 
-const UserAvatar = ({ imageUrl, onClick, size = "sm" }) => {
+const UserAvatar = ({ name, onClick, size = "sm" }) => {
   return (
     <Wrap>
       <WrapItem>
-        <Avatar size={size} cursor="pointer" src={imageUrl} onClick={onClick} />
+        <Avatar size={size} cursor="pointer" name={name} onClick={onClick} />
       </WrapItem>
     </Wrap>
   );

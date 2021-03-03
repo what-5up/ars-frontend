@@ -1,23 +1,11 @@
-import React from 'react';
-import {
-	Divider,
-	Box,
-	Heading,
-	Text,
-	VStack,
-	Flex,
-	Table,
-	Thead,
-	Tbody,
-	Tr,
-	Th,
-	Td,
-	TableCaption,
-	Tfoot,
-} from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { Divider, Box, Text, Flex, Table, Thead, Tbody, Tr, Th, Td } from '@chakra-ui/react';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
+import '../../styles/AddedPassenger.css';
 
 const AddedPassengers = ({ passengers, id, addPassenger }) => {
+	const [selectedID, setSelectedID] = useState([]);
 	return (
 		<Box
 			p={2}
@@ -34,7 +22,7 @@ const AddedPassengers = ({ passengers, id, addPassenger }) => {
 				minWidth: '80%',
 				height: '300px',
 				justifyContent: 'center',
-				overflow:'auto'
+				overflow: 'auto',
 			}}
 		>
 			<Flex mb={2} mt={3} mx="5">
@@ -56,8 +44,26 @@ const AddedPassengers = ({ passengers, id, addPassenger }) => {
 						{passengers.map((item) => {
 							return (
 								<Tr>
-									<Td cursor="pointer">
-										<AddCircleOutlineIcon onClick= {() => addPassenger({...item,id:id, existing:true, currentID:item.id},'added') }/>
+									<Td
+										cursor="pointer"
+										onClick={(e) => {
+											let type = selectedID.includes(item.id) ? 'remove-added' : 'added';
+
+											if (type == 'remove-added') {
+												setSelectedID((oldArr) => oldArr.filter((entry) => item.id != entry));
+											} else {
+												addPassenger(
+													{ ...item, id: id, existing: true, currentID: item.id },
+													type
+												);
+												setSelectedID((oldArr) => [...oldArr, item.id]);
+											}
+											e.target.closest('tr').classList.toggle('added-passenger');
+
+											console.log(selectedID);
+										}}
+									>
+										{selectedID.includes(item.id) ? <HighlightOffIcon /> : <AddCircleOutlineIcon />}
 									</Td>
 									<Td>{item.first_name}</Td>
 									<Td>{item.last_name}</Td>

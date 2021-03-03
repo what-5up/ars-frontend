@@ -1,4 +1,4 @@
-import { React, useRef } from "react";
+import { React, useRef, useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import {
   Flex,
@@ -31,15 +31,39 @@ import {
 } from "@chakra-ui/react";
 import { HamburgerIcon } from "@chakra-ui/icons";
 import Media from "react-media";
-import { connect, useSelector } from "react-redux";
+import { connect, useSelector, useDispatch } from "react-redux";
 import ThemeSelector from "../../Components/ThemeSelector/ThemeSelector";
 import LoginArea from "../../Components/Forms/LoginArea";
 import RegistrationArea from "../../Components/Forms/RegistrationArea";
 import MyProfilePopup from "../../Components/Popups/MyProfilePopup";
+import { getUser } from "../../api";
+import * as actions from '../../store/actions/index';
 
 const LandingHeader = () => {
   const { colorMode, _ } = useColorMode();
   const isAuthenticated = useSelector((state) => state.auth.userAuthenticated);
+  const userID = useSelector((state) => state.auth.userID);
+  const [user, setUser] = useState({
+    title: null,
+    firstName : null,
+    lastName: null,
+    desc: null,
+    email: null
+  });
+
+  useEffect(async () => {
+    const result = await getUser(userID);
+    if (result.data) {
+      setUser({
+        title: result.data.title_name,
+        firstName: result.data.first_name,
+        lastName: result.data.last_name,
+        desc: result.data.account_type_name,
+        email: result.data.email
+      });
+    }
+  }, [userID]);
+
   return (
     <Flex
       width="full"
@@ -85,7 +109,7 @@ const LandingHeader = () => {
                         isAuthenticated={isAuthenticated}
                       />
                     ) : (
-                      <MyProfilePopup />
+                      <MyProfilePopup user={user}/>
                     )}
                   </Stack>
                 )}
@@ -147,6 +171,12 @@ const MenuItems = (props) => {
   );
 };
 const Menu = ({ direction, isAuthenticated }) => {
+  const dispatch = useDispatch()
+  const onLogout = useCallback(
+    () => dispatch(actions.logout()),
+    [dispatch]
+  )
+
   return (
     <Stack
       direction={direction}
@@ -155,9 +185,10 @@ const Menu = ({ direction, isAuthenticated }) => {
       <MenuItems to="/">Home</MenuItems>
       <MenuItems to="/discover">Discover </MenuItems>
       {isAuthenticated ? (
-        <MenuItems to="/bookings">Bookings </MenuItems>
+      <MenuItems to="/bookings">Bookings </MenuItems>
       ) : null}
       {!isAuthenticated ? <RegisterArea /> : null}
+      {direction === "column" && isAuthenticated && <CustomButton title="Sign Out" onOpen={onLogout}/>}
     </Stack>
   );
 };

@@ -57,11 +57,11 @@ const AddPassenger = ({ initialValues, addPassenger, countries }) => {
 					.oneOf(gender.map((item) => item.value))
 					.required('Required'),
 				country: Yup.string()
-					.oneOf(countries.map((item) => item.value))
+					.oneOf(countries.map((item) => item.value), "Select a country")
 					.required('Required'),
 				birthday: Yup.date().max(new Date(), 'Enter a valid birthday').required('Required'),
 				passport_no: Yup.number().required('Required'),
-				passport_expiry: Yup.date().min(new Date()).required('Required'),
+				passport_expiry: Yup.date().min(new Date(), 'Enter a valid date').required('Required'),
 			})}
 			onSubmit={(values) => {
 				addPassenger(values);

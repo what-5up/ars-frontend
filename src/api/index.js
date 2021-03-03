@@ -6,6 +6,10 @@ export {
 } from './account-types'
 
 export {
+    getEmployee
+} from './employee-api'
+
+export {
     addGuest
 } from './guest-api'
 

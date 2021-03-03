@@ -60,7 +60,7 @@ const GuestUser = ({ routeForward, closeGuest }) => {
 					.oneOf(gender.map((item) => item.value))
 					.required('Required'),
 			})}
-			onSubmit={(values) => onAuth(values, routeForward)}
+			onSubmit={(values) => onAuth(values, (obj) => {routeForward({guest:values,...obj})})}
 		>
 			{(props) => (
 				<Box p={2}>
