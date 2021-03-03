@@ -332,7 +332,7 @@ const FindFlights = ({ setFlights, setPassengerCount, setTravellerClass, setIsSe
 								</Box>
 								<Box flex="2" ml={3} h="100%">
 									<FormControl isInvalid={props.errors.date && props.touched.date}>
-										{/* <Input type="date" h="56px" {...props.getFieldProps('date')} /> */}
+										<Input type="date" h="56px" {...props.getFieldProps('date')} />
 										<FormErrorMessage>{props.errors.date}</FormErrorMessage>
 									</FormControl>
 								</Box>

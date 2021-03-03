@@ -98,17 +98,22 @@ const UpdateModal = ({ values, handleUpdate, forNew }) => {
 								arrivalDate: Yup.string().required('Required'),
 								arrivalTime: Yup.string().required('Required'),
 							}).test('schedule-valid', 'Invalid schedule', function (value) {
-								let arrival = new Date(convertToTimestamp(value.arrivalTime, value.arrivalDate));
-								let departure = new Date(convertToTimestamp(value.departureTime, value.departureDate));
-								if (departure >= arrival) {
-									toast({
-										title: 'Invalid delayed and arrival dates',
-										status: 'error',
-										duration: 9000,
-										isClosable: true,
-									})
-									return this.createError({ message: '${path} nope!', path: 'my.path' });
+								console.log(value);
+								if(value.hasOwnProperty('arrivalTime') && value.hasOwnProperty('arrivalDate') && value.hasOwnProperty('departureDate') && value.hasOwnProperty('departureTime')){
+									console.log("In");
+									let arrival = new Date(convertToTimestamp(value.arrivalTime, value.arrivalDate));
+									let departure = new Date(convertToTimestamp(value.departureTime, value.departureDate));
+									if (departure >= arrival) {
+										toast({
+											title: 'Invalid delayed and arrival dates',
+											status: 'error',
+											duration: 9000,
+											isClosable: true,
+										})
+										return this.createError({ message: '${path} nope!', path: 'my.path' });
+									}
 								}
+							
 								return true;
 							})}
 							onSubmit={async (formValues) => {

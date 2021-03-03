@@ -187,6 +187,7 @@ const AddPassenger = ({ initialValues, addPassenger, countries }) => {
 							<Box flex="5">
 								<FormControl isInvalid={props.errors.passport_expiry && props.touched.passport_expiry}>
 									{/* <DatePicker /> */}
+
 									<Input
 										name="passport_expiry"
 										type="date"

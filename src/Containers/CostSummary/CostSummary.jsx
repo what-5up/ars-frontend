@@ -23,12 +23,12 @@ const Cost = () => {
 		let payload = {
 			scenario: scenario,
 			reservedSeats: reservedSeats,
-			scheduled_flight_id: location.state.flight.id,
-			user_id: userID,
+			scheduled_flight_id: location.state.flight.id
 		};
 		if (transactionKey != null) {
 			payload.transactionKey = transactionKey;
 		}
+		console.log(JSON.stringify(payload));
 		let result = await addBookingByUser(userID, payload);
 		if (!result.hasOwnProperty('error')) {
 			history.push('/');
@@ -63,7 +63,7 @@ const Cost = () => {
 			return { seat_id: passenger.seatID };
 		});
 
-		let result = await getPricing(flight.id, { reserved_seats: reserved_seats, user_id: userID });
+		let result = await getPricing(flight.id, { reserved_seats: reserved_seats });
 		if (!result.hasOwnProperty('error')) {
 			setDiscount(result.data.price_after_discount);
 			setTotalPrice(result.data.total_price);
