@@ -73,6 +73,14 @@ const Passenger = () => {
 				existing: false,
 			});
 			if (i == 0) {
+				if (locationParams.hasOwnProperty('guest')) {	
+					tempArr[0] = {
+						...tempArr[0],
+						...locationParams.guest,
+						first_name: locationParams.guest.firstName,
+						last_name: locationParams.guest.lastName,
+					};
+				}
 				tempArr[0]['disabled'] = false;
 			}
 		}
@@ -86,6 +94,7 @@ const Passenger = () => {
 			prevPassengers = await getAddedPassengers(userID);
 			prevPassengers = prevPassengers.data || [];
 			setAddedPassengers(prevPassengers);
+		} else {
 		}
 	}, []);
 
