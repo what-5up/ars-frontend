@@ -234,8 +234,8 @@ const UpdateModal = ({ values, handleUpdate, forNew }) => {
               }}
               validationSchema={Yup.object({
                 accountType: Yup.string().required("Required"),
-                discount: Yup.number().lessThan(100).required("Required"),
-                bookingsCriteria: Yup.number().required("Required"),
+                discount: Yup.number().min(0).lessThan(100).required("Required"),
+                bookingsCriteria: Yup.number().min(0).required("Required"),
               })}
               onSubmit={(values) => {
                 handleUpdate(values);

@@ -64,7 +64,7 @@ const FlightCard = ({
 						<Flex alignItems="center" mb={{ base: 12, md: 0 }}>
 							<MyLocationIcon />
 							<Divider
-								width="148px"
+								width="100px"
 								backgroundColor="black"
 								opacity="1"
 								borderBottomWidth="2px"

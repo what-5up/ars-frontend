@@ -110,7 +110,7 @@ const UpdateModal = ({
               }}
               validationSchema={Yup.object({
                 travellerClass: Yup.number().required("Required"),
-                price: Yup.number().required("Required"),
+                price: Yup.number().min(0).required("Required"),
               })}
               onSubmit={(newValues) => {
                 if (forNew) {

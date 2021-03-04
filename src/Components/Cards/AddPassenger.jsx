@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Flex, Input, Button, Divider, FormErrorMessage, FormControl, FormLabel, Text } from '@chakra-ui/react';
+import { Box, Flex, Input, Button, Divider, FormErrorMessage, FormControl, FormLabel, Text, InputLeftAddon, InputGroup } from '@chakra-ui/react';
 import Select from 'react-select';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -159,14 +159,21 @@ const AddPassenger = ({ initialValues, addPassenger, countries }) => {
 							</Box>
 							<Box flex="1">
 								<FormControl isInvalid={props.errors.birthday && props.touched.birthday}>
+								<Flex>
+								<InputGroup>
+								<InputLeftAddon children="Birthday" w="30%" />
 									<Input
 										type="date"
 										max={new Date()}
 										placeholder="date"
+										w="70%"
 										value={props.initialValues.date}
 										{...props.getFieldProps('birthday')}
 									/>
+									</InputGroup>
+									</Flex>
 									<FormErrorMessage>{props.errors.birthday}</FormErrorMessage>
+									
 								</FormControl>
 							</Box>
 						</Flex>
@@ -181,19 +188,26 @@ const AddPassenger = ({ initialValues, addPassenger, countries }) => {
 										value={props.initialValues.passport_no}
 										{...props.getFieldProps('passport_no')}
 									/>
+									
 									<FormErrorMessage>{props.errors.passport_no}</FormErrorMessage>
 								</FormControl>
 							</Box>
 							<Box flex="5">
 								<FormControl isInvalid={props.errors.passport_expiry && props.touched.passport_expiry}>
 									{/* <DatePicker /> */}
-
+<Flex>
+<InputGroup>
+								
+								<InputLeftAddon children="Passport Exp" w="30%"/>
 									<Input
 										name="passport_expiry"
 										type="date"
+										w="70%"
 										value={props.initialValues.passport_expiry}
 										{...props.getFieldProps('passport_expiry')}
 									/>
+									</InputGroup>
+									</Flex>
 									<FormErrorMessage>{props.errors.passport_expiry}</FormErrorMessage>
 								</FormControl>
 							</Box>
