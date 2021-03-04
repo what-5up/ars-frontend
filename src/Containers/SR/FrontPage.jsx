@@ -83,7 +83,7 @@ const FrontPage = () => {
                       variant="ghost"
                       onClick={() => goToPricePage(id)}
                     >
-                      {`Flight No ${id}`}
+                      {`Route No ${id}`}
                     </Button>
                   );
                 })}
