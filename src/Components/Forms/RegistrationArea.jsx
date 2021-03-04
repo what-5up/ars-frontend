@@ -91,7 +91,7 @@ const RegistrationForm = ({ onClose }) => {
 							duration: 9000,
 							isClosable: true,
 						});
-						onClose();
+						// onClose();
 					} else {
 						toast({
 							title: 'An error occurred.',
