@@ -1,6 +1,6 @@
 import { React, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Input, Box, Button, Heading, FormControl, FormErrorMessage } from '@chakra-ui/react';
+import { Input, Box, Button, Heading, FormControl, FormErrorMessage, useToast } from '@chakra-ui/react';
 import Select from 'react-select';
 import { ArrowForwardIcon } from '@chakra-ui/icons';
 import Grid from '@material-ui/core/Grid';
@@ -11,13 +11,13 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { gender } from '../../utils/constants';
 
-const RegistrationArea = () => {
+const RegistrationArea = ({ onClose }) => {
 	return (
 		<Box m={8} pb={2}>
 			<Container component="main" maxWidth="md">
 				<div>
 					<RegistrationHeader />
-					<RegistrationForm />
+					<RegistrationForm onClose={onClose} />
 				</div>
 			</Container>
 		</Box>
@@ -46,8 +46,9 @@ RegistrationHeader.defaultProps = {
 	subtitle: 'Join with us to make your dream journey....',
 };
 
-const RegistrationForm = () => {
+const RegistrationForm = ({ onClose }) => {
 	const [titleList, setTitleList] = useState([]);
+	const toast = useToast()
 	useEffect(async () => {
 		let titles = await getTitles();
 		titles = titles.data || [];
@@ -81,7 +82,25 @@ const RegistrationForm = () => {
 					confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match'),
 				})}
 				onSubmit={async (values) => {
-					await addUser(values);
+					var response = await addUser(values);
+					if (response.message === 'User created successfully') {
+						toast({
+							title: 'Account Created.',
+							description: 'Now You Have a Account. Enjoy!',
+							status: 'success',
+							duration: 9000,
+							isClosable: true,
+						});
+						onClose();
+					} else {
+						toast({
+							title: 'An error occurred.',
+							description: response.message,
+							status: 'error',
+							duration: 9000,
+							isClosable: true,
+						});
+					}
 				}}
 			>
 				{(props) => (

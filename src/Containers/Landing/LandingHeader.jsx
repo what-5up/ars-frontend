@@ -266,7 +266,7 @@ const RegisterArea = () => {
         <ModalContent>
           <ModalCloseButton />
           <ModalBody>
-            <RegistrationArea />
+            <RegistrationArea onClose={onClose} />
           </ModalBody>
         </ModalContent>
       </Modal>
