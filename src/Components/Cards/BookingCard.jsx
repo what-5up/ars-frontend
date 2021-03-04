@@ -25,7 +25,7 @@ import {
 	ModalHeader,
 	ModalCloseButton,
 	ModalBody,
-	useDisclosure
+	useDisclosure,
 } from '@chakra-ui/react';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import { formatPrice, getDateTime } from '../../utils/helpers';
@@ -34,7 +34,7 @@ import Fab from '@material-ui/core/Fab';
 import airplane from '../../assets/img/airplane.png';
 import MyLocationIcon from '@material-ui/icons/MyLocation';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
-import {getBookingByUser} from '../../api/user-api';
+import { getBookingByUser } from '../../api/user-api';
 import { useSelector } from 'react-redux';
 import BookingDetails from './BookingDetails';
 
@@ -49,20 +49,26 @@ const BookingCard = ({
 	cancelBooking,
 	addPayment,
 }) => {
-    let userID = useSelector((state) => state.auth.userID);
-	const [booking, setBooking] = useState({})
-	const getBookingDetails = async () => {
-		let result = await getBookingByUser(userID,id);
-		if(!result.hasOwnProperty('error')){
-
-			result = result.data || []
-			if(result.length > 0){
-				result = {passengers: result, class:result[0].class}
+	let userID = useSelector((state) => state.auth.userID);
+	const [booking, setBooking] = useState({});
+	const getBookingDetails = async (e) => {
+		if (!e.target.closest('button')) {
+			console.log('have');
+			let result = await getBookingByUser(userID, id);
+			if (!result.hasOwnProperty('error')) {
+				result = result.data || [];
+				if (result.length > 0) {
+					result = { passengers: result, class: result[0].class };
+				}
+				else{
+					result = {passengers: [], class:"Economy"}
+				}
+				console.log(result);
+				setBooking(result);
+				onOpen();
 			}
-			setBooking(result)
-			onOpen();
 		}
-	}
+	};
 	const { onOpen, isOpen, onClose } = useDisclosure();
 	departure = getDateTime(departure);
 	arrival = getDateTime(arrival);
@@ -76,7 +82,7 @@ const BookingCard = ({
 			p="8px"
 			justifyContent="center"
 			style={{
-				cursor:"pointer",
+				cursor: 'pointer',
 				boxShadow: '0 1px 3px 0 rgb(60 64 67 / 30%), 0 4px 8px 3px rgb(60 64 67 / 15%)',
 				minWidth: '80%',
 			}}
@@ -141,7 +147,7 @@ const BookingCard = ({
 								{state != 'completed' ? 'Not Paid' : 'Paid'}
 							</Badge>
 							<Heading pt={0}>{formatPrice(final_amount)}</Heading>
-							<Text color="gray.500">3 Passengers</Text>
+							{/* <Text color="gray.500">3 Passengers</Text> */}
 							<Text color="gray.500">Economy Class</Text>
 						</VStack>
 					</Center>
@@ -176,7 +182,7 @@ const BookingCard = ({
 					<ModalHeader>Passengers</ModalHeader>
 					<ModalCloseButton />
 					<ModalBody>
-						<BookingDetails booking = {booking}/>
+						<BookingDetails booking={booking} />
 					</ModalBody>
 				</ModalContent>
 			</Modal>
